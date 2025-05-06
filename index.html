@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beta — On-Chain OTC Options</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#EAEAEA] text-[#788585] font-sans">
+
+  <!-- Navbar -->
+  <nav class="mx-auto flex items-center justify-between px-6 py-4 max-w-7xl">
+    <!-- Logo -->
+    <a href="#">
+      <svg viewBox="0 0 24 24" height="80px" width="80px" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="SVGRepo_iconCarrier"> 
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M15 11.5C14.7239 11.5 14.5 11.7239 14.5 12C14.5 12.2761 14.7239 12.5 15 12.5C15.2761 12.5 15.5 12.2761 15.5 12C15.5 11.7239 15.2761 11.5 15 11.5ZM13.5 12C13.5 11.1716 14.1716 10.5 15 10.5C15.8284 10.5 16.5 11.1716 16.5 12C16.5 12.8284 15.8284 13.5 15 13.5C14.1716 13.5 13.5 12.8284 13.5 12Z" 
+          fill="#8FC93A"></path> 
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M9 11.5C8.72386 11.5 8.5 11.7239 8.5 12C8.5 12.2761 8.72386 12.5 9 12.5C9.27614 12.5 9.5 12.2761 9.5 12C9.5 11.7239 9.27614 11.5 9 11.5ZM7.5 12C7.5 11.1716 8.17157 10.5 9 10.5C9.82843 10.5 10.5 11.1716 10.5 12C10.5 12.8284 9.82843 13.5 9 13.5C8.17157 13.5 7.5 12.8284 7.5 12Z" 
+          fill="#8FC93A"></path> 
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4556 5.63613C15.6756 5.82194 16.7004 6.25713 17.4102 7.27534C18.1692 8.36416 18.5 10.0302 18.5 12.4999C18.5 14.6609 17.5191 16.4122 16.2329 17.6151C14.9588 18.8067 13.3419 19.4999 12 19.4999C10.4696 19.4999 8.84831 18.6924 7.62113 17.4471C6.38737 16.195 5.5 14.4492 5.5 12.4999C5.5 10.0302 5.83082 8.36416 6.58982 7.27534C7.2996 6.25714 8.32444 5.82194 9.54444 5.63613C9.70705 4.98353 10.2971 4.5 11 4.5H13C13.7029 4.5 14.2929 4.98353 14.4556 5.63613ZM9.5 6.6571C8.53681 6.83212 7.87319 7.18298 7.41018 7.8472C6.83585 8.6711 6.5 10.0707 6.5 12.4999C6.5 14.1405 7.24899 15.6447 8.33342 16.7452C9.42442 17.8524 10.8031 18.4999 12 18.4999C13.0352 18.4999 14.4182 17.9431 15.5499 16.8848C16.6694 15.8377 17.5 14.339 17.5 12.4999C17.5 10.0707 17.1642 8.6711 16.5898 7.8472C16.1268 7.18298 15.4632 6.83212 14.5 6.6571V8C14.5 8.82843 13.8284 9.5 13 9.5H11C10.1716 9.5 9.5 8.82843 9.5 8V6.6571ZM10.5 6C10.5 5.72386 10.7239 5.5 11 5.5H13C13.2761 5.5 13.5 5.72386 13.5 6V8C13.5 8.27614 13.2761 8.5 13 8.5H11C10.7239 8.5 10.5 8.27614 10.5 8V6Z" 
+          fill="#8FC93A"></path> 
+        </g>
+      </svg>
+    </a>
+
+    <!-- Spacer to push links to the right -->
+    <div class="flex-1"></div>
+
+    <!-- Navigation Links -->
+    <ul class="flex space-x-6 text-gray-700 text-lg hidden md:flex">
+      <li>
+        <a href="#why-us" class="hover:text-[#7FC149] transition">
+          Why Us
+        </a>
+      </li>
+      <li>
+        <a href="#docs" class="hover:text-[#7FC149] transition">
+          Docs
+        </a>
+      </li>
+    </ul>
+
+    <!-- Mobile Menu Button -->
+    <div class="md:hidden">
+      <button class="text-gray-700 hover:text-green-600 focus:outline-none">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section bg-gray-300 -->
+  <section class="w-full flex items-center justify-center pt-12 pb-24 px-6 md:px-[65px]" >
+    <div class="p-10 rounded-2xl shadow-xl w-full min-h-[500px] flex items-center justify-left max-w-7xl"
+     style="background-image: url('./images/bg2.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+      <div class="text-left text-[#8FC93A]">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6">
+          DeFi Options Tailored to You
+        </h1>
+        <p class="text-lg md:text-xl mb-24 text-[#FFFFFF] max-w-4xl ">
+          Create custom option contracts on any crypto or commodity. Set your strike price, choose your expiry or go perpetual. 
+          Trade, hedge, and build powerful DeFi strategies with on-chain derivatives.
+        </p>
+        <button class="bg-[#EAEAEA] text-lg text-[#00292F] px-6 py-2 rounded-2xl mt-4 md:mt-0 hover:text-[#EAEAEA] hover:border-[#8FC93A] hover:bg-[#498292] transition">
+          Learn More
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem & Vision Section -->
+  <section class="w-full bg-cover bg-center bg-no-repeat text-white" style="background-image: url('./images/b5.jpg');">
+    <div class="text-[#eaeaea] mx-auto min-h-[300px] flex flex-col md:flex-row items-start md:items-center justify-between gap-12 p-6 md:px-[65px] md:py-10 max-w-screen-xl">
+      <!-- Title -->
+      <h2 class="text-3xl md:text-5xl font-bold max-w-3xl text-center md:text-left mb-6 md:mb-0">
+        Powering the Next Open Market for Derivatives
+      </h2>
+
+      <!-- Vision Text -->
+      <p class="text-lg md:text-xl max-w-4xl leading-relaxed text-center md:text-left">
+        The future of finance is built on blockchain.  We are developing the next generation of derivatives, which will replace standardized and expensive derivatives with permissionless and efficient smart contracts.  Our mission is to equip organizations with the tools they need to build a more efficient DeFi ecosystem.
+      </p>
+    </div>
+  </section>
+
+  <!-- Use Cases Section -->
+  <section class="w-full py-24 px-[65px]">
+    <div class="max-w-7xl mx-auto text-center">
+
+      <!-- Section Title -->
+      <h2 class="text-3xl md:text-5xl font-bold mb-32 text-[#00292F]">
+        Real Solutions with Smart Derivatives
+      </h2>
+
+      <!-- Cards Container -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+        <!-- Card 1 -->
+        <a href="#" class="group block bg-gray-100 bg-opacity-40 border-2 border-gray-300 rounded-2xl shadow-lg p-8 transition-all duration-300 hover:bg-[#001312] hover:border-[#8FC93A] hover:shadow-2xl">
+          <div class="flex flex-col items-center text-center space-y-4">
+            <svg viewBox="0 0 24 24" height="200px" width="200px" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier"> 
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12.0001 3.5C12.1742 3.5 12.3358 3.59058 12.4266 3.73912L16.6012 10.5646C16.6748 10.6849 16.6942 10.8308 16.6545 10.9661C16.6148 11.1015 16.5197 11.2138 16.3928 11.2754L12.2182 13.2991C12.0804 13.3659 11.9197 13.3659 11.782 13.2991L7.6074 11.2754C7.48045 11.2138 7.38541 11.1015 7.34571 10.9661C7.30602 10.8308 7.32536 10.6849 7.39897 10.5646L11.5735 3.73912C11.6644 3.59058 11.8259 3.5 12.0001 3.5ZM12.0001 4.95828L8.53971 10.616L12.0001 12.2935L15.4605 10.616L12.0001 4.95828Z" 
+                fill="#8FC93A"></path> 
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12.0001 20.0503C11.8321 20.0503 11.6753 19.966 11.5828 19.8257L7.40813 13.5003C7.28391 13.3121 7.30107 13.064 7.45001 12.8946C7.59896 12.7253 7.84283 12.6766 8.04536 12.7758L12.0001 14.7127L15.9547 12.7758C16.1572 12.6766 16.4011 12.7253 16.55 12.8946C16.699 13.064 16.7161 13.3121 16.5919 13.5003L12.4174 19.8257C12.3248 19.9659 12.1681 20.0503 12.0001 20.0503ZM12.0001 18.6426L14.7465 14.4811L12.22 15.7185C12.0812 15.7864 11.9189 15.7864 11.7801 15.7185L9.25356 14.481L12.0001 18.6426Z" 
+                fill="#8FC93A"></path> 
+              </g>
+            </svg>
+            <h3 class="text-xl text-[#00292F] font-semibold group-hover:text-[#8FC93A]">
+              Zero Risk Staking
+            </h3>
+            <p class="text-[#788585] group-hover:text-[#F7F7FF] text-base">
+              Stake with upside, hedge the downside. Protect your yield with options that minimize volatility while your capital keeps working
+            </p>
+          </div>
+        </a>
+
+        <!-- Card 2 -->
+        <a href="#" class="group block bg-gray-100 bg-opacity-40 border-2 border-gray-300 rounded-2xl shadow-lg p-8 transition-all duration-300 hover:bg-[#001312] hover:border-[#8FC93A] hover:shadow-2xl">
+          <div class="flex flex-col items-center text-center space-y-4">
+            <svg viewBox="0 0 24 24" height="200px" width="200px" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier"> 
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16 3.5C15.1716 3.5 14.5 4.17157 14.5 5C14.5 5.65311 14.9174 6.20873 15.5 6.41465V7.5H7C6.17157 7.5 5.5 8.17157 5.5 9V15C5.5 15.8284 6.17157 16.5 7 16.5H8.5V17.5854C7.9174 17.7913 7.5 18.3469 7.5 19C7.5 19.8284 8.17157 20.5 9 20.5C9.82843 20.5 10.5 19.8284 10.5 19C10.5 18.3469 10.0826 17.7913 9.5 17.5854V16.5H17C17.8284 16.5 18.5 15.8284 18.5 15V13.4146C19.0826 13.2087 19.5 12.6531 19.5 12C19.5 11.3469 19.0826 10.7913 18.5 10.5854V9C18.5 8.17157 17.8284 7.5 17 7.5H16.5V6.41465C17.0826 6.20873 17.5 5.65311 17.5 5C17.5 4.17157 16.8284 3.5 16 3.5ZM15.5 5C15.5 4.72386 15.7239 4.5 16 4.5C16.2761 4.5 16.5 4.72386 16.5 5C16.5 5.27614 16.2761 5.5 16 5.5C15.7239 5.5 15.5 5.27614 15.5 5ZM17.5 10.5V9C17.5 8.72386 17.2761 8.5 17 8.5H7C6.72386 8.5 6.5 8.72386 6.5 9V15C6.5 15.2761 6.72386 15.5 7 15.5H17C17.2761 15.5 17.5 15.2761 17.5 15V13.5H14C13.1716 13.5 12.5 12.8284 12.5 12C12.5 11.1716 13.1716 10.5 14 10.5H17.5ZM9 18.5C8.72386 18.5 8.5 18.7239 8.5 19C8.5 19.2761 8.72386 19.5 9 19.5C9.27614 19.5 9.5 19.2761 9.5 19C9.5 18.7239 9.27614 18.5 9 18.5ZM13.5 12C13.5 11.7239 13.7239 11.5 14 11.5H18C18.2761 11.5 18.5 11.7239 18.5 12C18.5 12.2761 18.2761 12.5 18 12.5H14C13.7239 12.5 13.5 12.2761 13.5 12Z" 
+                fill="#8FC93A"></path> 
+              </g>
+            </svg>
+            <h3 class="text-xl text-[#00292F] font-semibold group-hover:text-[#8FC93A]">
+              Cover DeFi Positions
+            </h3>
+            <p class="text-[#788585] group-hover:text-[#F7F7FF] text-base">
+              Reduce overcollateralization. Use options to protect locked value in DeFi protocols and improve capital efficiency
+            </p>
+          </div>
+        </a>
+
+        <!-- Card 3 -->
+        <a href="#" class="group block bg-gray-100 bg-opacity-40 border-2 border-gray-300 rounded-2xl shadow-lg p-8 transition-all duration-300 hover:bg-[#001312] hover:border-[#8FC93A] hover:shadow-2xl">
+          <div class="flex flex-col items-center text-center space-y-4">
+            <svg viewBox="0 0 24 24" height="200px" width="200px" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier"> 
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M11 21.5C11 21.2239 11.2239 21 11.5 21H12.5C12.7762 21 13 21.2239 13 21.5C13 21.7761 12.7762 22 12.5 22H11.5C11.2239 22 11 21.7761 11 21.5Z" 
+                fill="#8FC93A"></path> 
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.6799 2.61589C11.8654 2.46137 12.1347 2.46137 12.3201 2.61589L12.4416 2.71712C14.3795 4.33207 15.5 6.72437 15.5 9.247V13.25L17.3001 14.6C17.426 14.6945 17.5001 14.8427 17.5001 15V20C17.5001 20.2762 17.2762 20.5 17.0001 20.5C16.7239 20.5 16.5001 20.2762 16.5001 20V15.25L15.5 14.5V20C15.5 20.2761 15.2762 20.5 15 20.5H9.00003C8.72389 20.5 8.50003 20.2761 8.50003 20V14.5L7.5 15.25V20C7.5 20.2762 7.27614 20.5 7 20.5C6.72386 20.5 6.5 20.2762 6.5 20V15C6.5 14.8427 6.5741 14.6945 6.7 14.6L8.50003 13.25V9.247C8.50003 6.72437 9.62052 4.33207 11.5585 2.71712L11.6799 2.61589ZM9.50003 19.5H14.5V9.247C14.5 7.10879 13.5877 5.0767 12 3.65682C10.4124 5.0767 9.50003 7.10879 9.50003 9.247V19.5Z" 
+                fill="#8FC93A"></path> 
+              </g>
+            </svg>
+            <h3 class="text-xl text-[#00292F] font-semibold group-hover:text-[#8FC93A]">
+              Call Option ICO
+            </h3>
+            <p class="text-[#788585] group-hover:text-[#F7F7FF] text-base">
+              Fundraise in a way that rewards belief, not speculation. Delay circulation, encourages long-term participation, and keeps your tokenomics clean
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About us -->
+  <section class="w-full pt-12 pb-24 px-6 md:px-[65px] text-[#eaeaea]" 
+    style="background-image: url('./images/bg3.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+
+    <!-- Why Us Section -->
+    <section class="w-full " >
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <!-- Text Column -->
+        <div>
+          <h2 class="text-3xl md:text-5xl font-bold mb-6">
+            Inspired by ISDA Running on Smart Contracts
+          </h2>
+          <p class="text-lg md:text-xl text-[#788585] leading-relaxed">
+            We integrate globally recognized derivatives standards with the efficiency of blockchain technology, bringing the trusted structure of traditional finance into decentralized markets
+          </p>
+        </div>
+
+        <!-- Image Placeholder Column -->
+        <div class="w-full rounded-xl overflow-hidden flex justify-center">
+          <svg viewBox="0 0 24 24" height="350px" width="350px" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier"> 
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M5.50235 7.98295C5.62019 14.017 10.1383 16.8072 12.0376 17.9403C13.1796 17.422 14.7386 16.2719 16.0431 14.5979C17.3876 12.8723 18.4366 10.6225 18.4972 7.98264C17.6467 7.34413 15.4145 6 12 6C8.58496 6 6.35255 7.34457 5.50235 7.98295ZM4.68303 7.35469C5.47366 6.70661 8.00284 5 12 5C15.9972 5 18.5263 6.70661 19.317 7.35469C19.4328 7.44966 19.5 7.59157 19.5 7.74138C19.5 10.7559 18.3216 13.3007 16.8319 15.2125C15.3486 17.1161 13.5301 18.4265 12.1857 18.9642C12.0409 19.0222 11.8773 19.0092 11.7435 18.9292C11.6977 18.9018 11.6494 18.8731 11.5985 18.8428C9.7213 17.7264 4.5 14.6212 4.5 7.74138C4.5 7.59157 4.56717 7.44966 4.68303 7.35469Z" 
+              fill="#F7F7FF"></path> 
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M14.8536 9.14645C15.0488 9.34171 15.0488 9.65829 14.8536 9.85355L11.8536 12.8536C11.6583 13.0488 11.3417 13.0488 11.1464 12.8536L9.64645 11.3536C9.45118 11.1583 9.45118 10.8417 9.64645 10.6464C9.84171 10.4512 10.1583 10.4512 10.3536 10.6464L11.5 11.7929L14.1464 9.14645C14.3417 8.95118 14.6583 8.95118 14.8536 9.14645Z" 
+              fill="#F7F7FF"></path> 
+            </g>
+          </svg>
+        </div>      
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="w-full">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <!-- Image Column -->
+        <div class="w-full rounded-xl overflow-hidden flex justify-center">
+          <svg viewBox="0 0 24 24" height="350px" width="350px" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier"> 
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M9.41848 5.98345C9.01199 6.20074 8.68017 6.5143 8.48392 6.86938C8.29049 7.21934 8.20035 7.67497 8.42255 8.09066C8.64475 8.50636 9.07368 8.68453 9.47213 8.71812C9.87639 8.75219 10.3215 8.6505 10.728 8.43321C11.1345 8.21592 11.4663 7.90235 11.6625 7.54728C11.8559 7.19732 11.9461 6.74169 11.7239 6.32599C11.5017 5.9103 11.0728 5.73213 10.6743 5.69854C10.27 5.66447 9.82498 5.76616 9.41848 5.98345ZM9.30446 7.61925C9.29524 7.602 9.26638 7.52092 9.35913 7.35312C9.44905 7.19043 9.62828 7.0052 9.88989 6.86536C10.1515 6.72552 10.4051 6.6794 10.5903 6.69501C10.7814 6.71111 10.8328 6.78015 10.842 6.79741C10.8512 6.81466 10.8801 6.89574 10.7873 7.06354C10.6974 7.22623 10.5182 7.41146 10.2565 7.5513C9.99494 7.69113 9.74134 7.73726 9.55612 7.72165C9.36507 7.70555 9.31369 7.63651 9.30446 7.61925Z" 
+              fill="#F7F7FF"></path> 
+              <path d="M8 15C8.55228 15 9 14.7761 9 14.5C9 14.2239 8.55228 14 8 14C7.44772 14 7 14.2239 7 14.5C7 14.7761 7.44772 15 8 15Z" 
+              fill="#F7F7FF"></path> 
+              <path d="M14.5 18C14.7761 18 15 17.7761 15 17.5C15 17.2239 14.7761 17 14.5 17C14.2239 17 14 17.2239 14 17.5C14 17.7761 14.2239 18 14.5 18Z" 
+              fill="#F7F7FF"></path> 
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 3.5C7.30558 3.5 3.5 7.30558 3.5 12C3.5 16.6944 7.30558 20.5 12 20.5C16.6944 20.5 20.5 16.6944 20.5 12C20.5 7.30558 16.6944 3.5 12 3.5ZM4.57817 10.9132C5.10468 7.28607 8.22698 4.5 12 4.5C16.1421 4.5 19.5 7.85786 19.5 12C19.5 12.2221 19.4903 12.4419 19.4714 12.6591C18.3979 13.039 16.0397 13.7734 13.0632 13.3946C12.7892 13.3598 12.5389 13.5536 12.5041 13.8275C12.4692 14.1015 12.663 14.3518 12.9369 14.3866C15.7207 14.7408 18.0021 14.1882 19.2884 13.7765C18.4905 17.0612 15.5301 19.5 12 19.5C7.88139 19.5 4.53817 16.1802 4.50032 12.0705C4.81001 12.3123 5.26583 12.5 6.00001 12.5C6.27615 12.5 6.50001 12.2761 6.50001 12C6.50001 11.7238 6.27615 11.5 6.00001 11.5C5.33194 11.5 4.83752 11.1696 4.57817 10.9132Z" 
+              fill="#F7F7FF"></path> 
+            </g>
+          </svg>
+        </div> 
+
+        <!-- Features Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <!-- Feature 1 -->
+          <div>
+            <h3 class="text-xl font-semibold mb-2 ">
+              Zero Slippage
+            </h3>
+            <p class="text-[#788585]">
+              Trade large positions peer-to-peer with no market impact
+            </p>
+          </div>
+          <!-- Feature 2 -->
+          <div>
+            <h3 class="text-xl font-semibold mb-2">
+              No Intermediaries
+            </h3>
+            <p class="text-[#788585]">
+              Interact directly with the protocol and remove third parties
+            </p>
+          </div>
+          <!-- Feature 3 -->
+          <div>
+            <h3 class="text-xl font-semibold mb-2">
+              Permissionless
+            </h3>
+            <p class="text-[#788585]">
+              No gatekeepers, deploy and trade OTC derivatives, while remaining anonymous 
+            </p>
+          </div>
+          <!-- Feature 4 -->
+          <div>
+            <h3 class="text-xl font-semibold mb-2">
+              Automated Risk Management
+            </h3>
+            <p class="text-[#788585]">
+              Collateral management handled by smart contracts with predefined rules
+            </p>
+          </div>
+          <!-- Feature 5 -->
+          <div>
+            <h3 class="text-xl font-semibold mb-2">
+              Customization
+            </h3>
+            <p class="text-[#788585]">
+              Set the parameters as you need to match your strategies
+            </p>
+          </div>
+          <!-- Feature 6 -->
+          <div>
+            <h3 class="text-xl font-semibold mb-2">
+              Physical Settlement Contracts
+            </h3>
+            <p class="text-[#788585]">
+              Design and trade options on tokens that don’t have price oracles
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- DAO Section -->
+  <section class="w-full py-24 px-6 md:px-[65px]">
+    <!-- Section Title -->
+    <h2 class="text-3xl text-[#00292F] md:text-5xl font-bold text-center mb-12">
+      Shape the Future of DeFi
+    </h2>
+
+    <!-- DAO Features Grid -->
+    <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12">
+      <!-- DAO Feature 1 -->
+      <div class="flex flex-col items-center">
+        <svg viewBox="0 0 24 24" height="200px" width="200px" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+          <g id="SVGRepo_iconCarrier"> 
+            <path d="M13.4805 6.8124C12.5144 5.91331 11.4192 5.15053 10.2236 4.55273L9.77637 5.44716C10.8752 5.99657 11.8826 6.69613 12.7729 7.52L4.14645 16.1464C3.95118 16.3417 3.95118 16.6583 4.14645 16.8536C4.34171 17.0488 4.65829 17.0488 4.85355 16.8536L13.48 8.22711C14.3038 9.11734 15.0034 10.1248 15.5528 11.2236L16.4472 10.7763C15.8494 9.58079 15.0867 8.48562 14.1876 7.51951L14.3536 7.35355C14.5488 7.15829 14.5488 6.84171 14.3536 6.64645C14.1583 6.45118 13.8417 6.45118 13.6464 6.64645L13.4805 6.8124Z" 
+            fill="#8FC93A"></path> 
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M16 13.5C14.6193 13.5 13.5 14.6193 13.5 16C13.5 17.3807 14.6193 18.5 16 18.5C17.3807 18.5 18.5 17.3807 18.5 16C18.5 14.6193 17.3807 13.5 16 13.5ZM12.5 16C12.5 14.067 14.067 12.5 16 12.5C17.933 12.5 19.5 14.067 19.5 16C19.5 17.933 17.933 19.5 16 19.5C14.067 19.5 12.5 17.933 12.5 16Z" 
+            fill="#8FC93A"></path> 
+          </g>
+        </svg>
+        <h3 class="text-[#00292F] text-xl font-semibold mb-5">
+          Earn $DAO
+        </h3>
+        <p class="text-[#788585] text-center mb-10">
+          Build and list your contracts to create markets and earn $DAO based on the trading volume in your market
+        </p>
+      </div>
+
+      <!-- DAO Feature 2 -->
+      <div class="flex flex-col items-center">
+        <svg viewBox="0 0 24 24" height="200px" width="200px" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+          <g id="SVGRepo_iconCarrier"> 
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.5 11H4.5C4.22386 11 4 11.2239 4 11.5C4 11.7761 4.22386 12 4.5 12H19.5C19.7761 12 20 11.7761 20 11.5C20 11.2239 19.7761 11 19.5 11H17.5C17.5 7.96243 15.0376 5.5 12 5.5C8.96243 5.5 6.5 7.96243 6.5 11ZM7.5 11C7.5 8.51472 9.51472 6.5 12 6.5C14.4853 6.5 16.5 8.51472 16.5 11H7.5Z" 
+            fill="#8FC93A"></path> 
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M10.437 15C10.215 14.1374 9.43192 13.5 8.5 13.5C7.39543 13.5 6.5 14.3954 6.5 15.5C6.5 16.6046 7.39543 17.5 8.5 17.5C9.43192 17.5 10.215 16.8626 10.437 16H13.563C13.785 16.8626 14.5681 17.5 15.5 17.5C16.6046 17.5 17.5 16.6046 17.5 15.5C17.5 14.3954 16.6046 13.5 15.5 13.5C14.5681 13.5 13.785 14.1374 13.563 15H10.437ZM8.5 14.5C7.94772 14.5 7.5 14.9477 7.5 15.5C7.5 16.0523 7.94772 16.5 8.5 16.5C9.05228 16.5 9.5 16.0523 9.5 15.5C9.5 14.9477 9.05228 14.5 8.5 14.5ZM14.5 15.5C14.5 16.0523 14.9477 16.5 15.5 16.5C16.0523 16.5 16.5 16.0523 16.5 15.5C16.5 14.9477 16.0523 14.5 15.5 14.5C14.9477 14.5 14.5 14.9477 14.5 15.5Z" 
+            fill="#8FC93A"></path> 
+          </g>
+        </svg>
+        <h3 class="text-[#00292F] text-xl font-semibold mb-5">
+          Participate
+        </h3>
+        <p class="text-[#788585] text-center mb-10">
+          Influence key decisions on upgrades, and the future direction of the project
+        </p>
+      </div>
+
+      <!-- DAO Feature 3 -->
+      <div class="flex flex-col items-center">
+        <svg viewBox="0 0 24 24" height="200px" width="200px" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+          <g id="SVGRepo_iconCarrier"> 
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M11.7899 8.5463C11.9232 8.48457 12.0768 8.48457 12.2101 8.5463L17.2101 10.8621C17.3869 10.944 17.5 11.121 17.5 11.3158V17.1053C17.5 17.2837 17.4049 17.4486 17.2505 17.538L12.2505 20.4327C12.0956 20.5224 11.9044 20.5224 11.7495 20.4327L6.74948 17.538C6.59507 17.4486 6.5 17.2837 6.5 17.1053V11.3158C6.5 11.121 6.61312 10.944 6.78987 10.8621L11.7899 8.5463ZM7.5 12.1261L11.5 14.1331V19.1328L7.5 16.817V12.1261ZM12.5 19.1328L16.5 16.817V12.1261L12.5 14.1331V19.1328ZM12 13.2652L15.8492 11.3338L12 9.55103L8.15081 11.3338L12 13.2652Z" 
+            fill="#8FC93A"></path> 
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C12.2761 3 12.5 3.22386 12.5 3.5V6.5C12.5 6.77614 12.2761 7 12 7C11.7239 7 11.5 6.77614 11.5 6.5V3.5C11.5 3.22386 11.7239 3 12 3Z" 
+            fill="#8FC93A"></path> 
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M7.5 5.5C7.77614 5.5 8 5.72386 8 6V9C8 9.27614 7.77614 9.5 7.5 9.5C7.22386 9.5 7 9.27614 7 9V6C7 5.72386 7.22386 5.5 7.5 5.5Z" 
+            fill="#8FC93A"></path> 
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M16.5 6.5C16.7761 6.5 17 6.72386 17 7V8.5C17 8.77614 16.7761 9 16.5 9C16.2239 9 16 8.77614 16 8.5V7C16 6.72386 16.2239 6.5 16.5 6.5Z" 
+            fill="#8FC93A"></path> 
+          </g>
+        </svg> 
+        <h3 class="text-[#00292F] text-xl font-semibold mb-5">
+          Incentives
+        </h3>
+        <p class="text-[#788585] text-center mb-10">
+          The DAO governs the use of treasury funds, including a portion of fees used for $DAO token buybacks
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="w-full text-[#F7F7FF] pb-24 px-6 md:px-[65px]">
+    <div class="mx-auto flex flex-col rounded-2xl bg-[#1F3331] items-start justify-center max-w-7xl bg-opacity-90 p-10 rounded-xl"
+      style="background-image: url('./images/b4.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+      <!-- Title -->
+      <h2 class="text-3xl text-[#7FC149] md:text-5xl font-bold mb-6 text-left">
+        Be an early adopter
+      </h2>
+
+      <!-- Subtitle -->
+      <p class="text-lg md:text-xl mb-8 text-left">
+        Get in-depth information about how Beta is revolutionizing the OTC derivatives market.
+      </p>
+
+      <!-- Email Input and Button -->
+      <div class="flex flex-col md:flex-row items-start gap-4">
+        <input type="email" placeholder="Enter your email" class="px-4 py-2 w-full md:w-80 rounded-md text-[#1F3331]" />
+        <button class="bg-[#00292F] text-lg text-[#eaeaea] px-6 py-2 rounded-2xl mt-4 md:mt-0 hover:bg-[#8fc93a] transition">
+          Connect
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer class="w-full min-h-[150px] bg-[#001312] text-[#F7F7FF] py-6 px-6 md:px-[65px]">
+    <div class="mx-auto flex items-center justify-between max-w-7xl">
+      <!-- Logo on the left -->
+      <div class="text-2xl font-bold">
+        <svg class="w-[80px] h-[80px] fill-[#f7f7ff] hover:fill-[#7FC149] transition-colors duration-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+          <g id="SVGRepo_iconCarrier"> 
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M15 11.5C14.7239 11.5 14.5 11.7239 14.5 12C14.5 12.2761 14.7239 12.5 15 12.5C15.2761 12.5 15.5 12.2761 15.5 12C15.5 11.7239 15.2761 11.5 15 11.5ZM13.5 12C13.5 11.1716 14.1716 10.5 15 10.5C15.8284 10.5 16.5 11.1716 16.5 12C16.5 12.8284 15.8284 13.5 15 13.5C14.1716 13.5 13.5 12.8284 13.5 12Z" 
+            fill="fill-[#f7f7ff]"></path> 
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M9 11.5C8.72386 11.5 8.5 11.7239 8.5 12C8.5 12.2761 8.72386 12.5 9 12.5C9.27614 12.5 9.5 12.2761 9.5 12C9.5 11.7239 9.27614 11.5 9 11.5ZM7.5 12C7.5 11.1716 8.17157 10.5 9 10.5C9.82843 10.5 10.5 11.1716 10.5 12C10.5 12.8284 9.82843 13.5 9 13.5C8.17157 13.5 7.5 12.8284 7.5 12Z" 
+            fill="fill-[#f7f7ff]"></path> 
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4556 5.63613C15.6756 5.82194 16.7004 6.25713 17.4102 7.27534C18.1692 8.36416 18.5 10.0302 18.5 12.4999C18.5 14.6609 17.5191 16.4122 16.2329 17.6151C14.9588 18.8067 13.3419 19.4999 12 19.4999C10.4696 19.4999 8.84831 18.6924 7.62113 17.4471C6.38737 16.195 5.5 14.4492 5.5 12.4999C5.5 10.0302 5.83082 8.36416 6.58982 7.27534C7.2996 6.25714 8.32444 5.82194 9.54444 5.63613C9.70705 4.98353 10.2971 4.5 11 4.5H13C13.7029 4.5 14.2929 4.98353 14.4556 5.63613ZM9.5 6.6571C8.53681 6.83212 7.87319 7.18298 7.41018 7.8472C6.83585 8.6711 6.5 10.0707 6.5 12.4999C6.5 14.1405 7.24899 15.6447 8.33342 16.7452C9.42442 17.8524 10.8031 18.4999 12 18.4999C13.0352 18.4999 14.4182 17.9431 15.5499 16.8848C16.6694 15.8377 17.5 14.339 17.5 12.4999C17.5 10.0707 17.1642 8.6711 16.5898 7.8472C16.1268 7.18298 15.4632 6.83212 14.5 6.6571V8C14.5 8.82843 13.8284 9.5 13 9.5H11C10.1716 9.5 9.5 8.82843 9.5 8V6.6571ZM10.5 6C10.5 5.72386 10.7239 5.5 11 5.5H13C13.2761 5.5 13.5 5.72386 13.5 6V8C13.5 8.27614 13.2761 8.5 13 8.5H11C10.7239 8.5 10.5 8.27614 10.5 8V6Z" 
+            fill="fill-[#f7f7ff]"></path> 
+          </g>
+        </svg>
+      </div>
+
+      <!-- Social Icons on the right -->
+      <div class="flex gap-6">
+        <a href="#">
+          <svg class="w-[30px] h-[30px] fill-[#f7f7ff] hover:fill-[#7FC149] transition-colors duration-300" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <title>
+              Discord
+            </title>
+            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" 
+            fill="fill-[#f7f7ff]"/>
+          </svg>
+        </a>
+        <a href="#">
+          <svg class="w-[30px] h-[30px] fill-[#f7f7ff] hover:fill-[#7FC149] transition-colors duration-300" role="img" height="30px" width="30px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <title>
+              X
+            </title>
+            <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" 
+            fill="fill-[#f7f7ff]"/>
+          </svg>
+        </a>
+        <a href="#">
+          <svg class="w-[30px] h-[30px] fill-[#f7f7ff] hover:fill-[#7FC149] transition-colors duration-300" role="img" height="30px" width="30px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <title>
+              GitHub
+            </title>
+            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" 
+            fill="fill-[#f7f7ff]"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
