@@ -20,22 +20,27 @@
   </style>
 
 </head>
-<body 
-  class="
-    bg-[#EAEAEA] 
-    text-[#788585] 
-    text-[18px]
-    lg:text-[24px]"
-  Style="
-    background-image: url('./images/bg3.jpg');
-    background-size: cover; 
-    background-position: center; 
-    background-repeat: no-repeat;">
+<body class="
+  bg-[#FFFFFF] 
+  text-[#191308] 
+  text-[18px]
+  lg:text-[24px]
+  rounded-b">
 
   <!-- landing  -->
-  <div class=" relative"
-   >
-    <!-- Navbar -->
+  <div class=" 
+    relative 
+    bg-[#7014f2]
+    rounded-b-full">
+
+    <!-- Navbar 
+    No se ve bien en la version movil
+    Siguen faltando los links
+    El menu no se despliega
+
+    // cuando se hace el hoover sobre los links cambiar el fondo a #D8DDEF y letra a #52FFB8
+    // Hacer que el fondo parezca un boton
+    -->
     <nav class=" 
       w-full  
       flex 
@@ -44,7 +49,11 @@
       backdrop-blur-md 
       sticky
       top-0 
-      p-4">
+      p-2
+      sm:px-6
+      md:px-8
+      xl:px-12
+      2xl:px-24 ">
 
       <!-- Logo -->
       <a href="#">
@@ -54,8 +63,7 @@
             h-12
             lg:w-16
             lg:h-16 
-            fill-[#EAEAEA] 
-            hover:fill-[#8FC93A] 
+            fill-[#FFFFFF] 
             transition-colors 
             duration-300" 
           fill="none" 
@@ -64,11 +72,11 @@
           <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
           <g id="SVGRepo_iconCarrier"> 
             <path fill-rule="evenodd" clip-rule="evenodd" d="M15 11.5C14.7239 11.5 14.5 11.7239 14.5 12C14.5 12.2761 14.7239 12.5 15 12.5C15.2761 12.5 15.5 12.2761 15.5 12C15.5 11.7239 15.2761 11.5 15 11.5ZM13.5 12C13.5 11.1716 14.1716 10.5 15 10.5C15.8284 10.5 16.5 11.1716 16.5 12C16.5 12.8284 15.8284 13.5 15 13.5C14.1716 13.5 13.5 12.8284 13.5 12Z" 
-            fill="fill-[#EAEAEA]"></path> 
+            fill="fill-[#FFFFFF]"></path> 
             <path fill-rule="evenodd" clip-rule="evenodd" d="M9 11.5C8.72386 11.5 8.5 11.7239 8.5 12C8.5 12.2761 8.72386 12.5 9 12.5C9.27614 12.5 9.5 12.2761 9.5 12C9.5 11.7239 9.27614 11.5 9 11.5ZM7.5 12C7.5 11.1716 8.17157 10.5 9 10.5C9.82843 10.5 10.5 11.1716 10.5 12C10.5 12.8284 9.82843 13.5 9 13.5C8.17157 13.5 7.5 12.8284 7.5 12Z" 
-            fill="fill-[#EAEAEA]"></path> 
+            fill="fill-[#FFFFFF]"></path> 
             <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4556 5.63613C15.6756 5.82194 16.7004 6.25713 17.4102 7.27534C18.1692 8.36416 18.5 10.0302 18.5 12.4999C18.5 14.6609 17.5191 16.4122 16.2329 17.6151C14.9588 18.8067 13.3419 19.4999 12 19.4999C10.4696 19.4999 8.84831 18.6924 7.62113 17.4471C6.38737 16.195 5.5 14.4492 5.5 12.4999C5.5 10.0302 5.83082 8.36416 6.58982 7.27534C7.2996 6.25714 8.32444 5.82194 9.54444 5.63613C9.70705 4.98353 10.2971 4.5 11 4.5H13C13.7029 4.5 14.2929 4.98353 14.4556 5.63613ZM9.5 6.6571C8.53681 6.83212 7.87319 7.18298 7.41018 7.8472C6.83585 8.6711 6.5 10.0707 6.5 12.4999C6.5 14.1405 7.24899 15.6447 8.33342 16.7452C9.42442 17.8524 10.8031 18.4999 12 18.4999C13.0352 18.4999 14.4182 17.9431 15.5499 16.8848C16.6694 15.8377 17.5 14.339 17.5 12.4999C17.5 10.0707 17.1642 8.6711 16.5898 7.8472C16.1268 7.18298 15.4632 6.83212 14.5 6.6571V8C14.5 8.82843 13.8284 9.5 13 9.5H11C10.1716 9.5 9.5 8.82843 9.5 8V6.6571ZM10.5 6C10.5 5.72386 10.7239 5.5 11 5.5H13C13.2761 5.5 13.5 5.72386 13.5 6V8C13.5 8.27614 13.2761 8.5 13 8.5H11C10.7239 8.5 10.5 8.27614 10.5 8V6Z" 
-            fill="fill-[#EAEAEA]"></path> 
+            fill="fill-[#FFFFFF]"></path> 
           </g>
         </svg>
       </a>
@@ -82,17 +90,18 @@
       <ul class="
         flex 
         space-x-6 
-        text-[#EAEAEA] 
-        text-lg 
+        text-[#FFFFFF] 
+        text-[18px]
+        lg:text-[24px] 
         hidden 
         md:flex">
         <li>
-          <a href="#why-us" class="hover:text-[#8FC93A] transition">
+          <a href="#why-us">
             Why Us
           </a>
         </li>
         <li>
-          <a href="#docs" class="hover:text-[#8FC93A] transition">
+          <a href="#docs"">
             Docs
           </a>
         </li>
@@ -106,21 +115,23 @@
           </svg>
         </button>
       </div>
+
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero Section 
+     
+    -->
     <section class="
-      py-28
       px-4
-      md:pb-16
-      sm:p-6
+      sm:px-6
       md:px-8
       xl:px-12
       2xl:px-24 
       w-full 
+      h-screen
       flex 
       items-center 
-      justify-left
+      justify-center
       " >
       <!-- Content Container -->
       <div class="`
@@ -129,48 +140,54 @@
         grid
         grid-cols-1
         gap-16">
+
         <!-- Title -->
         <h1 class="
           text-[30px]
           lg:text-[64px] 
-          text-left
+          text-center
           font-bold 
           lg:mb-10
-          text-[#8FC93A]">
-          DeFi Options Tailored to You
+          text-[#FFFFFF]">
+          Somos la chimba
         </h1>
+
         <!-- Subtitle -->
         <h2 class="
           text-[18px]
           lg:text-[24px]
-          text-left
+          text-center
           mb-16 
           max-w-3xl ">
-          Institutional grade on-chain derivatives to build investment and hedging strategies
-      </h2>  
+          La mas plena mi ñero, se re sabe, sisas gonorrea, si no las creee, la mala.
+          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.
+        </h2>  
+
         <!-- Call to Action Button -->
         <div class="
           flex 
-          justify-left 
-          sm:justify-start">
+          justify-center">
           <button class="
             text-[16px]
             lg:text-[24px]
             font-bold
-            text-[#FFFFFF] 
-            bg-[#498292]
+            text-[#191308] 
+            bg-[#52FFB8]
             mb-2
             px-6 
             py-2 
             rounded-2xl">
-            Learn More
+            marquelo
           </button>
         </div>
+        
       </div>
-      <div> </div>
+
     </section>
 
-    <!-- Problem & Vision Section -->
+  </div>
+
+  <!-- Problem & Vision Section -->
     <section class="
       w-full 
       text-[#EAEAEA]
@@ -196,7 +213,7 @@
         md:items-center 
         justify-between 
         ">
-        <!-- Title
+        <!-- Title -->
         <h1 class="
           text-[30px]
           lg:text-[64px]  
@@ -206,7 +223,7 @@
           text-center 
           ">
           Powering the Next Open Market for Derivatives
-        </h1> -->
+        </h1> 
         <!-- Text -->
         <p class="
           text-[20px]
@@ -221,19 +238,6 @@
         </p>   
       </div>
     </section>
-
-    <!-- Background GRADIENT -->
-    <div class="absolute 
-      top-[80%] 
-      left-0 
-      right-0 
-      bottom-0 
-      bg-gradient-to-b 
-      from-transparent 
-      to-[#EAEAEA]">
-    </div>
-
-  </div>
 
 
   <!-- Use Cases Section -->
@@ -251,7 +255,7 @@
       mx-auto 
       text-center">
 
-      <!-- Section Title 
+      <!-- Section Title -->
       <h2 class="
         text-3xl 
         md:text-5xl 
@@ -264,7 +268,7 @@
         2xl:mb-24
         text-[#00292F]">
         Real Solutions with Smart Derivatives
-      </h2> -->
+      </h2> 
 
       <!-- Cards Container -->
       <div class="
@@ -461,7 +465,7 @@
         background-position: center; 
         background-repeat: no-repeat;">
 
-        <!-- Background GRADIENT -->
+        <!-- Background GRADIENT 
       <div class="
         absolute 
         top-[80%] 
@@ -481,7 +485,7 @@
         bg-gradient-to-b 
         from-[#EAEAEA] 
         to-transparent">
-      </div>
+      </div>-->
 
       <!-- container  -->
       <div class="
@@ -506,7 +510,7 @@
             text-[#eaeaea]">
             Powering the Next Open Market for Derivatives
           </h1>
-          <!-- <p class="
+          <p class="
             text-lg 
             md:text-xl 
             text-center
@@ -514,7 +518,7 @@
             text-[#EAEAEA] 
             leading-relaxed">
             We integrate globally recognized derivatives standards with the efficiency of blockchain technology, bringing the trusted structure of traditional finance into decentralized markets
-          </p> -->
+          </p> 
         </div>
 
           <!-- Features Grid -->
