@@ -191,9 +191,8 @@
    The idea in this section is call the attention making an introduction to the use cases of the platform
     It wil include a title and a banner with token logos
   -->
-    <section class="
+  <section class="
       w-full 
-      text-[#EAEAEA]
       grid
       grid-cols-1
       gap-6
@@ -205,13 +204,13 @@
       xl:py-12
       2xl:py-24 
       ">
+
+      <!-- Title -->
       <div class="
         flex 
         flex-col 
-        items-start 
-        md:items-center 
+        items-center
         ">
-        <!-- Title -->
         <h1 class="
           text-[30px]
           lg:text-[64px]  
@@ -223,22 +222,136 @@
           Peguelo y rotelo ñero
         </h1> 
       </div>
-      <div class="
-        flex 
-        items-center 
-        justify-center ">
-        <!-- Logos 
+
+      <!-- Logos 
         La idea es que los logos se muevan de izquierda a derecha
         agregar mas logos de cryptomonedas
         cuando se haga el hover sobre los logos, que se queden quietos
         agregar cotizaciones de los tokens! 
-        -->
+      -->
+      <div class="
+        flex 
+        items-center 
+        justify-center ">
         <img src="./images/svgs/bitcoin-svg.svg" alt="Logo 1" class="w-16 h-16 mx-2">
         <img src="./images/svgs/ethereum-svg.svg" alt="Logo 2" class="w-16 h-16 mx-2">
         <img src="./images/svgs/ripple-svg.svg" alt="Logo 3" class="w-16 h-16 mx-2">
         <img src="./images/svgs/tether--svgr.svg" alt="Logo 3" class="w-16 h-16 mx-2">
       </div>
-    </section>
+  </section>
+
+  <section class="
+    w-full 
+    h-screen 
+    p-4 
+    sm:p-8 
+    flex 
+    items-center 
+    justify-center">
+    <div class="
+      relative 
+      w-full 
+      h-[85vh] 
+      overflow-hidden">
+
+      <!-- Carousel container -->
+      <div id="carousel" 
+        class="
+          flex 
+          transition-transform 
+          duration-500 
+          ease-in-out 
+          h-full">
+
+        <!-- Card 1 -->
+        <div class="
+          min-w-full 
+          h-full 
+          flex 
+          flex-col 
+          items-center
+          md:flex-row 
+          bg-[#D8DDEF] 
+          rounded-3xl 
+
+          overflow-hidden">
+          <div class="
+            md:w-1/2 
+            h-[40%] 
+            md:h-[60%]
+            flex
+            justify-center">
+
+            <img src="images/svgs/tether--svgr.svg" 
+              alt="Card 1" 
+              class="
+                w-[full] 
+                h-full 
+                object-cover">
+          </div>
+          <div class="p-6 
+            md:w-1/2 
+            flex 
+            flex-col 
+            justify-center">
+            <h2 class="
+              text-3xl 
+              font-bold 
+              text-[#191308] 
+              mb-2">
+              Card 1 Title
+            </h2>
+            <h3 class="
+              text-xl 
+              text-[#191308] 
+              mb-2">
+              Card 1 Subtitle
+            </h3>
+            <p class="text-gray-500">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="min-w-full h-full flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="md:w-1/2 h-1/2 md:h-full">
+            <img src="https://via.placeholder.com/600x400" alt="Card 2" class="w-full h-full object-cover">
+          </div>
+          <div class="p-6 md:w-1/2 flex flex-col justify-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Card 2 Title</h2>
+            <h3 class="text-xl text-gray-600 mb-2">Card 2 Subtitle</h3>
+            <p class="text-gray-700">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="min-w-full h-full flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="md:w-1/2 h-1/2 md:h-full">
+            <img src="https://via.placeholder.com/600x400" alt="Card 3" class="w-full h-full object-cover">
+          </div>
+          <div class="p-6 md:w-1/2 flex flex-col justify-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Card 3 Title</h2>
+            <h3 class="text-xl text-gray-600 mb-2">Card 3 Subtitle</h3>
+            <p class="text-gray-700">Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation buttons -->
+      <button onclick="prevSlide()" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white p-3 rounded-full shadow hover:bg-gray-200">
+        &#8592;
+      </button>
+      <button onclick="nextSlide()" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white p-3 rounded-full shadow hover:bg-gray-200">
+        &#8594;
+      </button>
+
+    </div>
+  </section>
+  
+
+
+  
 
   <!-- Problem & Vision Section -->
     <section class="
@@ -1021,5 +1134,6 @@
 
   </footer>
 
+  <script src="app.js"></script>
 </body>
 </html>
