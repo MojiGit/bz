@@ -1,24 +1,25 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #f8f9fa;
-    color: #333;
+font-family: 'Roboto', sans-serif;
+}
+
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
   }
-  
-  header {
-    background: #0052cc;
-    color: white;
-    padding: 2rem;
-    text-align: center;
+  100% {
+    transform: translateX(-50%);
   }
-  
-  footer {
-    background: #e1e1e1;
-    text-align: center;
-    padding: 1rem;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-  }
+}
+
+.animate-scroll-left {
+  animation: scroll-left 40s linear infinite;
+}
+
+#scroll-wrapper:hover #scroll-content {
+  animation-play-state: paused;
+}
+
+
+
   

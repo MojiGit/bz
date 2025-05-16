@@ -9,15 +9,11 @@
   <title>Beta — On-Chain OTC Options</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <link rel="stylesheet" type="text/css" href="/styles.css">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-    font-family: 'Roboto', sans-serif;
-    }
-  </style>
 
 </head>
 
@@ -32,12 +28,9 @@
   <div class=" 
     relative 
     bg-[#7014f2]
-    rounded-b-full"
-    style="
-        background-image: url('./images/texture_purple_4.jpg'); 
-        background-size: cover; 
-        background-position: center; 
-        background-repeat: no-repeat;"
+    h-screen
+    rounded-b-full
+    shadow-2xl"
     >
 
     <!-- Navbar -->
@@ -103,7 +96,7 @@
 
       <!-- Mobile Menu Button -->
       <div class="md:hidden">
-        <button id="mobile-menu-button" class="text-[#EAEAEA] hover:text-[#8FC93A] focus:outline-none">
+        <button id="mobile-menu-button" class="text-[#EAEAEA] hover:text-[#52FFB8] focus:outline-none">
           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
@@ -117,7 +110,6 @@
       <ul class="space-y-4 text-[18px]">
         <li><a href="#why-us">Why Us</a></li>
         <li><a href="#docs">Docs</a></li>
-        <li><a href="#contact">Contact</a></li>
       </ul>
     </div>
 
@@ -126,13 +118,12 @@
      The idea is to have a title, a subtitle and a call to action button
     -->
     <section class="
-      px-4
-      sm:px-6
-      md:px-8
-      xl:px-12
-      2xl:px-24 
+      p-4
+      sm:p-6
+      md:p-8
+      xl:p-12
+      2xl:p-24 
       w-full 
-      h-screen
       flex 
       items-center 
       justify-center
@@ -647,6 +638,61 @@
     </div>
 
   </section>
+
+<section class="mt-12 px-4 lg:px-8">
+  <h2 class="text-2xl lg:text-3xl font-bold text-black mb-4">
+    Market Overview
+  </h2>
+
+  <div id="scroll-wrapper" class="
+    overflow-hidden 
+    relative 
+    bg-black/5 
+    backdrop-blur-sm 
+    border border-white/10 
+    rounded-2xl 
+    py-4
+  ">
+    <div id="scroll-content" class="
+      flex 
+      items-center 
+      gap-8 
+      whitespace-nowrap 
+      animate-scroll-left
+      will-change-transform
+    ">
+      <!-- Template duplicated via JS -->
+      <template id="crypto-template">
+        <div class="flex items-center gap-2 text-white text-sm md:text-base">
+          <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC" class="w-6 h-6" />
+          <span>BTC: $<span class="crypto-price" data-symbol="bitcoin">--</span></span>
+        </div>
+        <div class="flex items-center gap-2 text-white text-sm md:text-base">
+          <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH" class="w-6 h-6" />
+          <span>ETH: $<span class="crypto-price" data-symbol="ethereum">--</span></span>
+        </div>
+        <div class="flex items-center gap-2 text-white text-sm md:text-base">
+          <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" alt="MATIC" class="w-6 h-6" />
+          <span>MATIC: $<span class="crypto-price" data-symbol="matic-network">--</span></span>
+        </div>
+        <div class="flex items-center gap-2 text-white text-sm md:text-base">
+          <img src="https://cryptologos.cc/logos/polkadot-new-dot-logo.png" alt="DOT" class="w-6 h-6" />
+          <span>DOT: $<span class="crypto-price" data-symbol="polkadot">--</span></span>
+        </div>
+        <div class="flex items-center gap-2 text-white text-sm md:text-base">
+          <img src="https://cryptologos.cc/logos/solana-sol-logo.png" alt="SOL" class="w-6 h-6" />
+          <span>SOL: $<span class="crypto-price" data-symbol="solana">--</span></span>
+        </div>
+      </template>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
   
   <!-- Use Cases Section 
     Develop the kind of things that can be done with the platform 
