@@ -20,40 +20,35 @@
   </style>
 
 </head>
+
 <body class="
   bg-[#FFFFFF] 
   text-[#191308] 
   text-[18px]
-  lg:text-[24px]
-  rounded-b">
+  lg:text-[24px]"
+  >
 
   <!-- landing  -->
   <div class=" 
     relative 
     bg-[#7014f2]
-    rounded-b-full">
+    rounded-b-full"
+    style="
+        background-image: url('./images/texture_purple_4.jpg'); 
+        background-size: cover; 
+        background-position: center; 
+        background-repeat: no-repeat;"
+    >
 
-    <!-- Navbar 
-    No se ve bien en la version movil
-    Siguen faltando los links
-    El menu no se despliega
-
-    // cuando se hace el hoover sobre los links cambiar el fondo a #D8DDEF y letra a #52FFB8
-    // Hacer que el fondo parezca un boton
-    -->
+    <!-- Navbar -->
     <nav class=" 
-      w-full  
-      flex 
-      items-center 
-      justify-between
-      backdrop-blur-md 
-      sticky
-      top-0 
-      p-2
-      sm:px-6
-      md:px-8
-      xl:px-12
-      2xl:px-24 ">
+      sticky top-5 z-50
+      mx-5
+      p-2 sm:px-6 md:px-8 xl:px-12 2xl:px-24
+      backdrop-blur-md bg-white/10
+      border border-white/20
+      rounded-2xl
+      flex items-center justify-between">
 
       <!-- Logo -->
       <a href="#">
@@ -88,7 +83,6 @@
 
       <!-- Navigation Links -->
       <ul class="
-        flex 
         space-x-6 
         text-[#FFFFFF] 
         text-[18px]
@@ -109,7 +103,7 @@
 
       <!-- Mobile Menu Button -->
       <div class="md:hidden">
-        <button class="text-[#EAEAEA] hover:text-[#8FC93A] focus:outline-none">
+        <button id="mobile-menu-button" class="text-[#EAEAEA] hover:text-[#8FC93A] focus:outline-none">
           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
@@ -117,6 +111,15 @@
       </div>
 
     </nav>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="md:hidden mx-5 mt-2 p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white hidden">
+      <ul class="space-y-4 text-[18px]">
+        <li><a href="#why-us">Why Us</a></li>
+        <li><a href="#docs">Docs</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
 
     <!-- Hero Section 
      Pretty much ok, the most important thing is to have good content
@@ -645,105 +648,16 @@
 
   </section>
   
-  <!-- Problem & Vision Section 
-  Mejorar el texto, la idea es que el texto sea claro y conciso
-  necesito una forma de hacer mejor contraste entre el texto y el fondo 
+  <!-- Use Cases Section 
+    Develop the kind of things that can be done with the platform 
   -->
-    <section class="
-      w-full 
-      text-[#EAEAEA]
-      flex
-      items-center
-      justify-center
-      p-4
-      sm:p-6
-      md:p-8
-      xl:p-12
-      2xl:p-24 
-      ">
-      <div class="
-        min-h-[300px] 
-        w-full
-        flex
-        items-center
-        justify-center
-        ">
-        <!-- Title -->
-        <h1 class="
-          text-[30px]
-          lg:text-[64px]  
-          text-[#7014f2]
-          font-bold 
-          max-w-7xl 
-          text-center 
-          ">
-          Our mission is to equip traders with the tools they need
-        </h1>  
-      </div>
-
-    </section>
-
-  <!-- Problem & Vision Section -->
-    <section class="
-      w-full 
-      text-[#EAEAEA]
-      flex
-      items-center
-      justify-center
-      pt-16
-      pb-32
-      md:pb-64
-      px-4
-      sm:px-6
-      md:px-8
-      xl:px-12
-      2xl:px-24 
-      ">
-      <div class="
-        min-h-[300px] 
-        max-w-[1400px]
-        flex 
-        flex-col 
-        md:flex-row 
-        items-start 
-        md:items-center 
-        justify-between 
-        ">
-        <!-- Title -->
-        <h1 class="
-          text-[30px]
-          lg:text-[64px]  
-          text-[#EAEAEA]
-          font-bold 
-          max-w-3xl 
-          text-center 
-          ">
-          Powering the Next Open Market for Derivatives
-        </h1> 
-        <!-- Text -->
-        <p class="
-          text-[20px]
-          lg:text-[36px]
-          max-w-xl
-          font-bold
-          xl:max-w-7xl 
-          text-center 
-          ">
-          <!-- The future of finance is built on blockchain.  We are developing the next generation of derivatives, which will replace standardized and expensive derivatives with permissionless and efficient smart contracts.   -->
-          Our mission is to equip traders with the tools they need to build a more efficient DeFi ecosystem
-        </p>   
-      </div>
-    </section>
-
-  <!-- Use Cases Section -->
   <section class="
     w-full 
-    px-4
-    sm:px-6
-    md:px-8
-    lg:pb-64
-    xl:px-12
-    2xl:px-24">
+    p-4
+    sm:p-6
+    md:p-8
+    lg:p-12
+    2xl:p-24">
 
     <div class="
       max-w-7xl 
@@ -755,11 +669,10 @@
         text-3xl 
         md:text-5xl 
         font-bold 
-        mb-12
+        mb-6
         sm:mb-8 
         lg:mb-10
         xl:mb-12
-        xl:mt-0
         2xl:mb-24
         text-[#00292F]">
         Real Solutions with Smart Derivatives
@@ -769,7 +682,7 @@
       <div class="
         grid 
         grid-cols-1 
-        lg:grid-cols-3 
+        lg:grid-cols-2 
         gap-8">
 
         <!-- Card 1 -->
@@ -789,7 +702,7 @@
             grid-cols-1 
             gap-4
             place-items-left">
-            <!-- Icon
+            <!-- Icon -->
             <div class="
               flex
               items-center
@@ -811,7 +724,7 @@
                   fill="#8FC93A"></path> 
                 </g>
               </svg>
-            </div> -->
+            </div> 
             <!-- text-->  
             <div >
               <h2 class="
@@ -820,7 +733,7 @@
                 text-left
                 text-[#025f71] 
                 font-semibold">
-                1. Design 
+                Don't Hold, Hedge 
               </h2>
             </div>  
             <div>
@@ -851,7 +764,7 @@
             grid-cols-1 
             gap-4
             place-items-left">
-            <!-- Icon
+            <!-- Icon -->
             <div class="
               flex
               items-center
@@ -873,7 +786,7 @@
                   fill="#8FC93A"></path> 
                 </g>
               </svg>
-            </div> -->
+            </div> 
             <!-- text-->  
             <div >
               <h2 class="
@@ -882,7 +795,7 @@
                 text-left
                 text-[#025f71] 
                 font-semibold">
-                2. Quote 
+                Volatility farming
               </h2>
             </div>  
             <div>
@@ -896,398 +809,92 @@
             </div>
           </div>
         </a>
-        <!-- Card 3 -->
-        <a href="#" 
-          class="
-            group 
-            block 
-            relative  
-            rounded-2xl 
-            xl:p-8"
-            >
 
-          <!-- content -->
-          <div class="
-            relative
-            grid 
-            grid-cols-1 
-            gap-4
-            place-items-left">
-
-            <!-- title-->  
-            <div >
-              <h2 class="
-                text-[36px]
-                lg:text-[64px] 
-                text-left
-                text-[#025f71] 
-                font-semibold">
-                3. Deploy 
-              </h2>
-            </div>
-            <!-- paragraph -->    
-            <div>
-              <p class="
-                text-[18px]
-                lg:text-[24px]
-                text-left
-                text-[#001312]">
-                Stake with upside, hedge the downside. Protect your yield with options that minimize volatility while your capital keeps working
-              </p>
-            </div>
-          </div>
-        </a>
       </div>
+
     </div>
+
   </section>
 
-
-  
-
-  <!-- About us -->
-  <div class="relative"> 
-    <section class="
-      w-full 
-      px-4
-      py-32
-      sm:px-6
-      md:px-8
-      xl:px-12
-      2xl:px-24" 
-      style="
-        background-image: url('./images/bg2.jpg'); 
-        background-size: cover; 
-        background-position: center; 
-        background-repeat: no-repeat;">
-
-        <!-- Background GRADIENT 
-      <div class="
-        absolute 
-        top-[80%] 
-        left-0 
-        right-0 
-        bottom-0 
-        bg-gradient-to-b 
-        from-transparent 
-        to-[#EAEAEA]">
-      </div>
-      <div class="
-        absolute 
-        top-0 
-        left-0 
-        right-0 
-        h-[20%] 
-        bg-gradient-to-b 
-        from-[#EAEAEA] 
-        to-transparent">
-      </div>-->
-
-      <!-- container  -->
-      <div class="
-        max-w-7xl 
-        mx-auto
-        py-12 
-        grid 
-        grid-cols-1 
-        md:grid-cols-2 
-        gap-12 
-        items-center">
-
-        <!-- Text Column -->
-        <div>
-          <h1 class="
-            text-3xl 
-            md:text-5xl 
-            font-bold 
-            mb-6 
-            text-center
-            md:text-left
-            text-[#eaeaea]">
-            Powering the Next Open Market for Derivatives
-          </h1>
-          <p class="
-            text-lg 
-            md:text-xl 
-            text-center
-            md:text-left
-            text-[#EAEAEA] 
-            leading-relaxed">
-            We integrate globally recognized derivatives standards with the efficiency of blockchain technology, bringing the trusted structure of traditional finance into decentralized markets
-          </p> 
-        </div>
-
-          <!-- Features Grid -->
-        <div class="
-          grid 
-          grid-cols-1 
-          sm:grid-cols-2 
-          gap-8">
-          <!-- Feature 1 -->
-          <div>
-            <h3 class="
-              text-xl 
-              font-semibold 
-              mb-2 
-              text-[#498292]">
-              Zero Slippage
-            </h3>
-            <p class="
-              text-[#EAEAEA]">
-              Trade large positions peer-to-peer with no market impact
-            </p>
-          </div>
-          <!-- Feature 2 -->
-          <div>
-            <h3 class="
-              text-xl 
-              font-semibold 
-              mb-2 
-              text-[#498292]">
-              No Intermediaries
-            </h3>
-            <p class="
-              text-[#EAEAEA]">
-              Interact directly with the protocol and remove third parties
-            </p>
-          </div>
-          <!-- Feature 3 -->
-          <div>
-            <h3 class="
-              text-xl 
-              font-semibold 
-              mb-2 
-              text-[#498292]">
-              Permissionless
-            </h3>
-            <p class="
-              text-[#EAEAEA]">
-              No gatekeepers, deploy and trade OTC derivatives, while remaining anonymous 
-            </p>
-          </div>
-          <!-- Feature 4 -->
-          <div>
-            <h3 class="
-              text-xl 
-              font-semibold 
-              mb-2 
-              text-[#498292]">
-              Automated Risk Management
-            </h3>
-            <p class="
-              text-[#EAEAEA]">
-              Collateral management handled by smart contracts with predefined rules
-            </p>
-          </div>
-          <!-- Feature 5 -->
-          <div>
-            <h3 class="
-              text-xl 
-              font-semibold 
-              mb-2 
-              text-[#498292]">
-              Customization
-            </h3>
-            <p class="
-              text-[#eaeaea]">
-              Set the parameters as you need to match your strategies
-            </p>
-          </div>
-          <!-- Feature 6 -->
-          <div>
-            <h3 class="
-              text-xl 
-              font-semibold 
-              mb-2 
-              text-[#498292]">
-              Physical Settlement Contracts
-            </h3>
-            <p class="
-              text-[#EAEAEA]">
-              Design and trade options on tokens that don’t have price oracles
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- DAO Section -->
+    <!-- About us Section 
+  Mejorar el texto, la idea es que el texto sea claro y conciso
+  necesito una forma de hacer mejor contraste entre el texto y el fondo
+   -->
   <section class="
-    w-full 
-    px-4
-    py-12
-    sm:px-6
-    md:px-8
-    xl:px-12
-    2xl:px-24
-    flex
-    flex-col
-    justify-center">
-
-    <!-- Section Title -->
-    <h2 class="
-      text-3xl 
-      text-[#00292F] 
-      md:text-5xl 
-      font-bold 
-      text-center 
-      mb-12">
-      Shape the Future of DeFi
-    </h2>
-
-    <!-- DAO Features Grid -->
-    <div class="
-      mx-auto 
-      max-w-7xl
-      grid 
-      grid-cols-[230px]
-      sm:grid-cols-[180px_180px_180px] 
-      md:grid-cols-[200px_200px_200px]
-      lg:grid-cols-[280px_280px_280px] 
-      place-items-center 
+      w-full 
+      grid
+      grid-cols-1
       gap-10
-      lg:gap-12">
+      items-center
+      justify-center
+      p-4
+      sm:p-6
+      md:p-8
+      xl:p-12
+      2xl:p-24 
+      ">
+      <!-- Title -->
+      <h1 class="
+        text-[30px]
+        lg:text-[64px]  
+        text-[#191308]
+        font-bold 
+        max-w-7xl 
+        text-center
+        ">
+        Our mission is to equip traders with the tools they need
+      </h1>  
+      
+      <!-- Text -->
+      <p class="
+        text-[20px]
+        lg:text-[36px]
+        text-[#191308]
+        max-w-xl
+        font-bold
+        xl:max-w-7xl 
+        text-center 
+        ">
+        Our mission is to equip traders with the tools they need to build a more efficient DeFi ecosystem
+      </p>   
 
-      <!-- DAO Feature 1 -->
       <div class="
-        grid
-        griud-cols-1
-        gap-4
-        place-items-center">
-        <!-- Icon -->
-        <svg viewBox="0 0 24 24" 
-          class="
-            w-32 
-            h-32" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg">
-          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-          <g id="SVGRepo_iconCarrier"> 
-            <path d="M13.4805 6.8124C12.5144 5.91331 11.4192 5.15053 10.2236 4.55273L9.77637 5.44716C10.8752 5.99657 11.8826 6.69613 12.7729 7.52L4.14645 16.1464C3.95118 16.3417 3.95118 16.6583 4.14645 16.8536C4.34171 17.0488 4.65829 17.0488 4.85355 16.8536L13.48 8.22711C14.3038 9.11734 15.0034 10.1248 15.5528 11.2236L16.4472 10.7763C15.8494 9.58079 15.0867 8.48562 14.1876 7.51951L14.3536 7.35355C14.5488 7.15829 14.5488 6.84171 14.3536 6.64645C14.1583 6.45118 13.8417 6.45118 13.6464 6.64645L13.4805 6.8124Z" 
-            fill="#8FC93A"></path> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M16 13.5C14.6193 13.5 13.5 14.6193 13.5 16C13.5 17.3807 14.6193 18.5 16 18.5C17.3807 18.5 18.5 17.3807 18.5 16C18.5 14.6193 17.3807 13.5 16 13.5ZM12.5 16C12.5 14.067 14.067 12.5 16 12.5C17.933 12.5 19.5 14.067 19.5 16C19.5 17.933 17.933 19.5 16 19.5C14.067 19.5 12.5 17.933 12.5 16Z" 
-            fill="#8FC93A"></path> 
-          </g>
-        </svg>
+        max-w-[1400px]
+        flex 
+        flex-col 
+        md:flex-row 
+        items-start 
+        md:items-center 
+        justify-between 
+        ">
+        
         <!-- Title -->
-        <h3 class="
-          text-[#00292F] 
-          text-xl 
-          font-semibold">
-          Earn $BETA
-        </h3>
-        <!-- Divider -->
-        <div class="
-          h-1 
-          w-3/4 
-          bg-[#8FC93A] 
-          rounded-full 
-          mx-auto">
-        </div>
-        <!-- Description -->
+        <h1 class="
+          text-[30px]
+          lg:text-[64px]  
+          text-[#191308]
+          font-bold 
+          max-w-3xl 
+          text-left 
+          ">
+          Volatility farming
+        </h1> 
+        
+        <!-- Text -->
         <p class="
-          text-[#788585] 
-          text-center ">
-          Giving the power to the community. Mint $BETA by creating options and listing them on the platform
-        </p>
+          text-[20px]
+          lg:text-[36px]
+          max-w-xl
+          font-bold
+          xl:max-w-7xl 
+          text-[#191308]
+          text-left 
+          ">
+          Our mission is to equip traders with the tools they need to build a more efficient DeFi ecosystem
+        </p>   
+
       </div>
 
-      <!-- DAO Feature 2 -->
-      <div class="
-        grid
-        griud-cols-1
-        gap-4
-        place-items-center">
-        <!-- Icon -->
-        <svg viewBox="0 0 24 24" 
-          class="
-            w-32 
-            h-32" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg">
-          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-          <g id="SVGRepo_iconCarrier"> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.5 11H4.5C4.22386 11 4 11.2239 4 11.5C4 11.7761 4.22386 12 4.5 12H19.5C19.7761 12 20 11.7761 20 11.5C20 11.2239 19.7761 11 19.5 11H17.5C17.5 7.96243 15.0376 5.5 12 5.5C8.96243 5.5 6.5 7.96243 6.5 11ZM7.5 11C7.5 8.51472 9.51472 6.5 12 6.5C14.4853 6.5 16.5 8.51472 16.5 11H7.5Z" 
-            fill="#8FC93A"></path> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M10.437 15C10.215 14.1374 9.43192 13.5 8.5 13.5C7.39543 13.5 6.5 14.3954 6.5 15.5C6.5 16.6046 7.39543 17.5 8.5 17.5C9.43192 17.5 10.215 16.8626 10.437 16H13.563C13.785 16.8626 14.5681 17.5 15.5 17.5C16.6046 17.5 17.5 16.6046 17.5 15.5C17.5 14.3954 16.6046 13.5 15.5 13.5C14.5681 13.5 13.785 14.1374 13.563 15H10.437ZM8.5 14.5C7.94772 14.5 7.5 14.9477 7.5 15.5C7.5 16.0523 7.94772 16.5 8.5 16.5C9.05228 16.5 9.5 16.0523 9.5 15.5C9.5 14.9477 9.05228 14.5 8.5 14.5ZM14.5 15.5C14.5 16.0523 14.9477 16.5 15.5 16.5C16.0523 16.5 16.5 16.0523 16.5 15.5C16.5 14.9477 16.0523 14.5 15.5 14.5C14.9477 14.5 14.5 14.9477 14.5 15.5Z" 
-            fill="#8FC93A"></path> 
-          </g>
-        </svg>
-        <!-- Title -->
-        <h3 class="
-          text-[#00292F] 
-          text-xl 
-          font-semibold">
-          Participate
-        </h3>
-        <!-- Divider -->
-        <div class="
-          h-1 
-          w-3/4 
-          bg-[#8FC93A] 
-          rounded-full 
-          mx-auto">
-        </div>
-        <!-- Description -->
-        <p class="
-          text-[#788585] 
-          text-center ">
-          Involve yourself in significant choices about the use of treasury funds, upgrades, and the future of the project
-        </p>
-      </div>
-
-      <!-- DAO Feature 3 -->
-      <div class="
-        grid
-        griud-cols-1
-        gap-4
-        place-items-center">
-        <!-- Icon -->
-        <svg viewBox="0 0 24 24" 
-          class="
-            w-32 
-            h-32" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg">
-          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-          <g id="SVGRepo_iconCarrier"> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M11.7899 8.5463C11.9232 8.48457 12.0768 8.48457 12.2101 8.5463L17.2101 10.8621C17.3869 10.944 17.5 11.121 17.5 11.3158V17.1053C17.5 17.2837 17.4049 17.4486 17.2505 17.538L12.2505 20.4327C12.0956 20.5224 11.9044 20.5224 11.7495 20.4327L6.74948 17.538C6.59507 17.4486 6.5 17.2837 6.5 17.1053V11.3158C6.5 11.121 6.61312 10.944 6.78987 10.8621L11.7899 8.5463ZM7.5 12.1261L11.5 14.1331V19.1328L7.5 16.817V12.1261ZM12.5 19.1328L16.5 16.817V12.1261L12.5 14.1331V19.1328ZM12 13.2652L15.8492 11.3338L12 9.55103L8.15081 11.3338L12 13.2652Z" 
-            fill="#8FC93A"></path> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C12.2761 3 12.5 3.22386 12.5 3.5V6.5C12.5 6.77614 12.2761 7 12 7C11.7239 7 11.5 6.77614 11.5 6.5V3.5C11.5 3.22386 11.7239 3 12 3Z" 
-            fill="#8FC93A"></path> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M7.5 5.5C7.77614 5.5 8 5.72386 8 6V9C8 9.27614 7.77614 9.5 7.5 9.5C7.22386 9.5 7 9.27614 7 9V6C7 5.72386 7.22386 5.5 7.5 5.5Z" 
-            fill="#8FC93A"></path> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M16.5 6.5C16.7761 6.5 17 6.72386 17 7V8.5C17 8.77614 16.7761 9 16.5 9C16.2239 9 16 8.77614 16 8.5V7C16 6.72386 16.2239 6.5 16.5 6.5Z" 
-            fill="#8FC93A"></path> 
-          </g>
-        </svg>
-        <!-- Title -->
-        <h3 class="
-          text-[#00292F] 
-          text-xl 
-          font-semibold">
-          Incentives
-        </h3>
-        <!-- Divider -->
-        <div class="
-          h-1 
-          w-3/4 
-          bg-[#8FC93A] 
-          rounded-full 
-          mx-auto">
-        </div>
-        <!-- Description -->
-        <p class="
-          text-[#788585] 
-          text-center ">
-          Hold $BETA and enjoy trading fee discounts based on tier levels, or participate in $BETA buyback program 
-        </p>
-      </div>
-
-    </div>
   </section>
 
   <!-- CTA Section -->
@@ -1314,7 +921,7 @@
       2xl:p-24 
       rounded-xl"
       style="
-        background-image: url('./images/b4.jpg'); 
+        background-image: url('./images/texture_purple_1.jpg'); 
         background-size: cover; 
         background-position: center; 
         background-repeat: no-repeat;">
