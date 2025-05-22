@@ -1,4 +1,4 @@
-const carousel = document.getElementById('carousel');
+/* const carousel = document.getElementById('carousel');
     const totalSlides = carousel.children.length;
     let currentSlide = 0;
 
@@ -15,6 +15,63 @@ const carousel = document.getElementById('carousel');
       currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
       updateCarousel();
     }
+*/
+const track = document.getElementById('carousel-track');
+const slides = track.children;
+const dots = document.querySelectorAll('.dot');
+let current = 0;
+const total = slides.length;
+let timer;
+
+function goTo(index) {
+  current = ((index % total) + total) % total;  // safe modulo
+  track.style.transform = `translateX(-${current * 100}%)`;
+
+  // Update dots
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('bg-gray-800', i === current);
+    dot.classList.toggle('bg-gray-300', i !== current);
+  });
+}
+
+function next() {
+  goTo(current + 1);
+}
+
+function startAutoPlay() {
+  stopAutoPlay();  // clear any previous timer first
+  timer = setInterval(next, 15000);
+}
+
+function stopAutoPlay() {
+  if (timer) clearInterval(timer);
+}
+
+// Click on any slide to go to next
+Array.from(slides).forEach(slide => {
+  slide.addEventListener('click', () => {
+    stopAutoPlay();
+    next();
+    startAutoPlay();
+  });
+});
+
+// Dot navigation
+dots.forEach((dot, index) => {
+  dot.addEventListener('click', () => {
+    stopAutoPlay();
+    goTo(index);
+    startAutoPlay();
+  });
+});
+
+// Optional: pause auto-play on hover
+track.parentElement.addEventListener('mouseenter', stopAutoPlay);
+track.parentElement.addEventListener('mouseleave', startAutoPlay);
+
+// Init
+goTo(0);
+startAutoPlay();
 
 
 const menuButton = document.getElementById('mobile-menu-button');
