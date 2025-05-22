@@ -241,405 +241,9 @@
   The idea is to have a card with an image and a text description
   I am missing the text and the images 
 
-  I don't like the buttons, I would like to have a better design
-  maybe instead of buttons we can add a bar with dots that indicate the current slide
   or a bar at the head with the tiles like - 1. design - 2. quote - 3. deploy, and according with the selected slide, 
   the title is highlighted and the content is shown
-  -->
-  <section class="
-    min-w-full 
-    min-h-screen 
-    p-4 
-    sm:px-16 
-    flex 
-    items-center 
-    justify-center">
-    <div class="
-      relative 
-      w-full 
-      overflow-hidden">
-
-      <!-- Carousel container -->
-      <div id="carousel" 
-        class="
-          flex 
-          transition-transform 
-          duration-500 
-          ease-in-out 
-          h-full">
-
-        <!-- Card 1 -->
-        <div class="
-          min-w-full 
-          h-full 
-          flex 
-          flex-col 
-          items-center
-          md:flex-row 
-          bg-[#eaeaea] 
-          rounded-3xl 
-          p-4
-          overflow-hidden">
-
-          <!-- Image for md+ screens only -->
-          <div class="
-            hidden 
-            md:block 
-            md:w-1/2
-            p-6 
-            h-full">
-            <img src="images/svgs/tether--svgr.svg" 
-              alt="Design" 
-              class="
-              w-full 
-              h-full 
-              object-cover">
-          </div>
-
-          <!-- text -->
-          <div class="
-            py-6 
-            md:w-1/2 
-            flex 
-            flex-col 
-            justify-center">
-
-            <h2 class="
-              text-[36px]
-              lg:text-[64px] 
-              font-bold 
-              text-[#191308] 
-              mb-2">
-              Design
-            </h2>
-
-            <!-- image -->
-            <div class="
-              block 
-              flex
-              items-center
-              justify-center
-              md:hidden m
-              p-4">
-
-              <img src="images/svgs/tether--svgr.svg"  
-                alt="Design"
-                class="
-                  w-1/2 
-                  h-1/2 
-                  rounded-md">
-            </div>
-
-            <h3 class="
-              text-[24px]
-              lg:text-[48px] 
-              text-[#191308] 
-              mb-2">
-              Subtitle 1
-            </h3>
-
-            <p class="
-              text-[#D8DDEF]
-              text-[18px]
-              lg:text-[24px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-            </p>
-
-            <h3 class="
-              text-[24px]
-              lg:text-[48px] 
-              text-[#191308] 
-              mb-2">
-              Subtitle 2
-            </h3>
-
-            <p class="
-              text-gray-500
-              text-[18px]
-              lg:text-[24px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-            </p>
-
-            <h3 class="
-              text-[24px]
-              lg:text-[48px] 
-              text-[#191308] 
-              mb-2">
-              Subtitle 3
-            </h3>
-
-            <p class="
-              text-gray-500
-              text-[18px]
-              lg:text-[24px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-            </p>
-
-          </div>
-
-        </div>
-
-        <!-- Card 2 -->
-        <div class="
-          min-w-full 
-          h-full 
-          flex 
-          flex-col 
-          items-center
-          md:flex-row 
-          bg-[#D8DDEF] 
-          rounded-3xl 
-          p-4
-          overflow-hidden">
-
-          <!-- Image for md+ screens only -->
-          <div class="
-            hidden 
-            md:block 
-            md:w-1/2 
-            p-6
-            h-full">
-            <img src="images/svgs/bitcoin-svg.svg" 
-              alt="Quote" 
-              class="
-              w-full 
-              h-full 
-              object-cover">
-          </div>
-
-          <!-- content -->
-          <div class="
-            py-6 
-            md:w-1/2 
-            flex 
-            flex-col 
-            justify-center">
-
-            <h2 class="
-              text-[36px]
-              lg:text-[64px] 
-              font-bold 
-              text-[#191308] 
-              mb-2">
-              Quote
-            </h2>
-
-            <!-- image -->
-            <div class="
-              block 
-              flex
-              items-center
-              justify-center
-              md:hidden m
-              p-4">
-
-              <img src="images/svgs/bitcoin-svg.svg"  
-                alt="Design"
-                class="
-                  w-1/2 
-                  h-1/2 
-                  rounded-md">
-            </div>
-
-            <h3 class="
-              text-[24px]
-              lg:text-[48px] 
-              text-[#191308] 
-              mb-2">
-              Subtitle 1
-            </h3>
-            
-            <p class="
-              text-gray-500
-              text-[18px]
-              lg:text-[24px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-            </p>
-
-            <h3 class="
-              text-[24px]
-              lg:text-[48px] 
-              text-[#191308] 
-              mb-2">
-              Subtitle 2
-            </h3>
-
-            <p class="
-              text-gray-500
-              text-[18px]
-              lg:text-[24px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-            </p>
-
-            <h3 class="
-              text-[24px]
-              lg:text-[48px] 
-              text-[#191308] 
-              mb-2">
-              Subtitle 3
-            </h3>
-
-            <p class="
-              text-gray-500
-              text-[18px]
-              lg:text-[24px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-            </p>
-
-          </div>
-
-        </div>
-
-        <!-- Card 3 -->
-        <div class="
-          min-w-full 
-          h-full 
-          flex 
-          flex-col 
-          items-center
-          md:flex-row 
-          bg-[#7014f2] 
-          rounded-3xl 
-          p-4
-          overflow-hidden">
-
-          <!-- Image for md+ screens only -->
-          <div class="
-            hidden 
-            md:block 
-            md:w-1/2 
-            p-6
-            h-full">
-            <img src="images/svgs/ripple-svg.svg" 
-              alt="Design" 
-              class="
-              w-full 
-              h-full 
-              object-cover">
-          </div>
-
-          <!-- text -->
-          <div class="
-            py-6 
-            md:w-1/2 
-            flex 
-            flex-col 
-            justify-center">
-
-            <h2 class="
-              text-[36px]
-              lg:text-[64px] 
-              font-bold 
-              text-[#FFFFFF] 
-              mb-2">
-              Trade
-            </h2>
-
-            <!-- image -->
-            <div class="
-              block 
-              flex
-              items-center
-              justify-center
-              md:hidden m
-              p-4">
-
-              <img src="images/svgs/ripple-svg.svg"  
-                alt="Design"
-                class="
-                  w-1/2 
-                  h-1/2 
-                  rounded-md">
-
-            </div>
-
-            <h3 class="
-              text-[24px]
-              lg:text-[48px] 
-              text-[#191308] 
-              mb-2">
-              Subtitle 1
-            </h3>
-
-            <p class="
-              text-[#eaeaea]
-              text-[18px]
-              lg:text-[24px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-            </p>
-
-            <h3 class="
-              text-[24px]
-              lg:text-[48px] 
-              text-[#191308] 
-              mb-2">
-              Subtitle 2
-            </h3>
-
-            <p class="
-              text-gray-500
-              text-[18px]
-              lg:text-[24px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-            </p>
-
-            <h3 class="
-              text-[24px]
-              lg:text-[48px] 
-              text-[#191308] 
-              mb-2">
-              Subtitle 3
-            </h3>
-
-            <p class="
-              text-gray-500
-              text-[18px]
-              lg:text-[24px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-            </p>
-
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Navigation buttons -->
-
-      <button 
-        onclick="prevSlide()" 
-        class="
-          absolute 
-          left-2 
-          top-1/2 
-          transform 
-          -translate-y-1/2 
-          bg-white p-3 
-          rounded-full 
-          shadow 
-          hover:bg-gray-200">
-        &#8592;
-      </button>
-
-      <button 
-        onclick="nextSlide()" 
-        class="
-          absolute 
-          right-2 
-          top-1/2 
-          transform 
-          -translate-y-1/2 
-          bg-white 
-          p-3 
-          rounded-full 
-          shadow 
-          hover:bg-gray-200">
-        &#8594;
-      </button>
-
-    </div>
-
-  </section>
-
+  --> 
   <section class=" 
     w-full 
     min-h-screen 
@@ -791,36 +395,34 @@
             <h2 class="text-2xl font-semibold mb-4">Slide Three</h2>
             <p>This is the third slide.</p>
           </div>
+
         </div>
+
       </div>
 
       <!-- Dots -->
-<div class="flex justify-center space-x-4  p-6 rounded-lg">
-  <span class="dot inline-block w-4 h-4 rounded-full bg-gray-800 cursor-pointer"></span>
-  <span class="dot inline-block w-4 h-4 rounded-full bg-gray-400 cursor-pointer"></span>
-  <span class="dot inline-block w-4 h-4 rounded-full bg-gray-400 cursor-pointer"></span>
-</div>
+      <div class="flex justify-center space-x-4  p-6 rounded-lg">
+        <span class="dot inline-block w-4 h-4 rounded-full bg-gray-800 cursor-pointer"></span>
+        <span class="dot inline-block w-4 h-4 rounded-full bg-gray-400 cursor-pointer"></span>
+        <span class="dot inline-block w-4 h-4 rounded-full bg-gray-400 cursor-pointer"></span>
+      </div>
 
-
-</section>
+  </section>
 
   <!-- Market Overview Section 
     The idea is to have a ticker with the prices of the tokens
     I am not sure if the ticker is the best option, but it is a good start
     I am missing the text and the images 
     make it bigger, the formatting have to change a lot-->
-  <section class="mt-12 px-4 lg:px-8">
-    <h2 class="text-2xl lg:text-3xl font-bold text-black mb-4">
-      Market Overview
-    </h2>
+  <section class="mt-12">
 
     <div id="scroll-wrapper" class="
       overflow-hidden 
       relative 
-      bg-black/5 
+      bg-[#7014f2]
       backdrop-blur-sm 
-      border border-white/10 
-      rounded-2xl 
+      border 
+      border-white/10 
       py-4
     ">
       <div id="scroll-content" class="
@@ -830,27 +432,29 @@
         whitespace-nowrap 
         animate-scroll-left
         will-change-transform
+        font-bold 
+        text-[16px]
       ">
         <!-- Template duplicated via JS -->
         <template id="crypto-template">
-          <div class="flex items-center gap-2 text-white text-sm md:text-base">
-            <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC" class="w-6 h-6" />
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" alt="BTC" class="w-6 h-6" />
             <span>BTC: $<span class="crypto-price" data-symbol="bitcoin">--</span></span>
           </div>
-          <div class="flex items-center gap-2 text-white text-sm md:text-base">
-            <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH" class="w-6 h-6" />
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/279/large/ethereum.png" alt="ETH" class="w-6 h-6" />
             <span>ETH: $<span class="crypto-price" data-symbol="ethereum">--</span></span>
           </div>
-          <div class="flex items-center gap-2 text-white text-sm md:text-base">
-            <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" alt="MATIC" class="w-6 h-6" />
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png" alt="MATIC" class="w-6 h-6" />
             <span>MATIC: $<span class="crypto-price" data-symbol="matic-network">--</span></span>
           </div>
-          <div class="flex items-center gap-2 text-white text-sm md:text-base">
-            <img src="https://cryptologos.cc/logos/polkadot-new-dot-logo.png" alt="DOT" class="w-6 h-6" />
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/12171/large/polkadot.png" alt="DOT" class="w-6 h-6" />
             <span>DOT: $<span class="crypto-price" data-symbol="polkadot">--</span></span>
           </div>
-          <div class="flex items-center gap-2 text-white text-sm md:text-base">
-            <img src="https://cryptologos.cc/logos/solana-sol-logo.png" alt="SOL" class="w-6 h-6" />
+          <div class="flex items-center gap-2 text-white">
+            <img src=" https://assets.coingecko.com/coins/images/4128/large/solana.png" alt="SOL" class="w-6 h-6" />
             <span>SOL: $<span class="crypto-price" data-symbol="solana">--</span></span>
           </div>
         </template>
