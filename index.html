@@ -310,7 +310,7 @@
               font-bold 
               text-[#191308] 
               mb-2">
-              1. Design
+              Design
             </h2>
 
             <!-- image -->
@@ -421,7 +421,7 @@
               font-bold 
               text-[#191308] 
               mb-2">
-              2. Quote
+              Quote
             </h2>
 
             <!-- image -->
@@ -639,54 +639,60 @@
 
   </section>
 
-<section class="mt-12 px-4 lg:px-8">
-  <h2 class="text-2xl lg:text-3xl font-bold text-black mb-4">
-    Market Overview
-  </h2>
 
-  <div id="scroll-wrapper" class="
-    overflow-hidden 
-    relative 
-    bg-black/5 
-    backdrop-blur-sm 
-    border border-white/10 
-    rounded-2xl 
-    py-4
-  ">
-    <div id="scroll-content" class="
-      flex 
-      items-center 
-      gap-8 
-      whitespace-nowrap 
-      animate-scroll-left
-      will-change-transform
+  <!-- Market Overview Section 
+    The idea is to have a ticker with the prices of the tokens
+    I am not sure if the ticker is the best option, but it is a good start
+    I am missing the text and the images 
+    make it bigger, the formatting have to change a lot-->
+  <section class="mt-12 px-4 lg:px-8">
+    <h2 class="text-2xl lg:text-3xl font-bold text-black mb-4">
+      Market Overview
+    </h2>
+
+    <div id="scroll-wrapper" class="
+      overflow-hidden 
+      relative 
+      bg-black/5 
+      backdrop-blur-sm 
+      border border-white/10 
+      rounded-2xl 
+      py-4
     ">
-      <!-- Template duplicated via JS -->
-      <template id="crypto-template">
-        <div class="flex items-center gap-2 text-white text-sm md:text-base">
-          <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC" class="w-6 h-6" />
-          <span>BTC: $<span class="crypto-price" data-symbol="bitcoin">--</span></span>
-        </div>
-        <div class="flex items-center gap-2 text-white text-sm md:text-base">
-          <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH" class="w-6 h-6" />
-          <span>ETH: $<span class="crypto-price" data-symbol="ethereum">--</span></span>
-        </div>
-        <div class="flex items-center gap-2 text-white text-sm md:text-base">
-          <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" alt="MATIC" class="w-6 h-6" />
-          <span>MATIC: $<span class="crypto-price" data-symbol="matic-network">--</span></span>
-        </div>
-        <div class="flex items-center gap-2 text-white text-sm md:text-base">
-          <img src="https://cryptologos.cc/logos/polkadot-new-dot-logo.png" alt="DOT" class="w-6 h-6" />
-          <span>DOT: $<span class="crypto-price" data-symbol="polkadot">--</span></span>
-        </div>
-        <div class="flex items-center gap-2 text-white text-sm md:text-base">
-          <img src="https://cryptologos.cc/logos/solana-sol-logo.png" alt="SOL" class="w-6 h-6" />
-          <span>SOL: $<span class="crypto-price" data-symbol="solana">--</span></span>
-        </div>
-      </template>
+      <div id="scroll-content" class="
+        flex 
+        items-center 
+        gap-8 
+        whitespace-nowrap 
+        animate-scroll-left
+        will-change-transform
+      ">
+        <!-- Template duplicated via JS -->
+        <template id="crypto-template">
+          <div class="flex items-center gap-2 text-white text-sm md:text-base">
+            <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC" class="w-6 h-6" />
+            <span>BTC: $<span class="crypto-price" data-symbol="bitcoin">--</span></span>
+          </div>
+          <div class="flex items-center gap-2 text-white text-sm md:text-base">
+            <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH" class="w-6 h-6" />
+            <span>ETH: $<span class="crypto-price" data-symbol="ethereum">--</span></span>
+          </div>
+          <div class="flex items-center gap-2 text-white text-sm md:text-base">
+            <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" alt="MATIC" class="w-6 h-6" />
+            <span>MATIC: $<span class="crypto-price" data-symbol="matic-network">--</span></span>
+          </div>
+          <div class="flex items-center gap-2 text-white text-sm md:text-base">
+            <img src="https://cryptologos.cc/logos/polkadot-new-dot-logo.png" alt="DOT" class="w-6 h-6" />
+            <span>DOT: $<span class="crypto-price" data-symbol="polkadot">--</span></span>
+          </div>
+          <div class="flex items-center gap-2 text-white text-sm md:text-base">
+            <img src="https://cryptologos.cc/logos/solana-sol-logo.png" alt="SOL" class="w-6 h-6" />
+            <span>SOL: $<span class="crypto-price" data-symbol="solana">--</span></span>
+          </div>
+        </template>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
 
 
