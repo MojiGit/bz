@@ -12,8 +12,8 @@ function goTo(index) {
 
   // Update dots
   dots.forEach((dot, i) => {
-    dot.classList.toggle('bg-gray-800', i === current);
-    dot.classList.toggle('bg-gray-300', i !== current);
+    dot.classList.toggle('bg-[#52FFB8]', i === current);
+    dot.classList.toggle('bg-[#D8DDEF]', i !== current);
   });
 }
 

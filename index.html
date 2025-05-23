@@ -182,11 +182,8 @@
 
   </div>
 
-  <!-- Logo banner
-   The idea in this section is call the attention making an introduction to the use cases of the platform
-    It wil include a title and a banner with token logos
-    would be nice to add some movement and the prices of the tokens
-  -->
+  <!-- Logo banner -->
+   
   <section class="
       w-full 
       grid
@@ -218,17 +215,11 @@
         </h1> 
       </div>
 
-  </section>
-
-    <!-- Market Overview Section 
-
-    make it bigger, the formatting have to change a lot-->
-  <section class="mt-12">
-
-    <div id="scroll-wrapper" class="
+      <!-- Logos -->
+      <div id="scroll-wrapper" class="
       overflow-hidden 
       relative 
-      bg-[#7014f2]
+      bg-[#191308]
       backdrop-blur-sm 
       border 
       border-white/10 
@@ -242,7 +233,7 @@
         animate-scroll-left
         will-change-transform
         font-bold 
-        text-[16px]
+        text-[20px]
       ">
 
         <!-- Crypto Prices -->
@@ -332,6 +323,7 @@
         
       </div>
     </div>
+
   </section>
 
   <!-- Carousel Section 
@@ -344,9 +336,8 @@
   the title is highlighted and the content is shown
   --> 
   <section class=" 
-    w-full 
-    min-h-screen 
     p-4 
+    max-w-7xl
     sm:px-16 
     flex 
     items-center 
@@ -355,17 +346,13 @@
     <div id="carousel" 
       class="
         relative 
-        w-full 
         mx-auto 
-        mt-12 
         select-none">
 
       <!-- Slides Wrapper -->
       <div class="
         overflow-hidden 
-        rounded-2xl 
-        backdrop-blur-md 
-        bg-gray-200 
+        rounded-3xl 
         border 
         border-white/20">
 
@@ -379,13 +366,13 @@
           <!-- Slide 1 -->
           <div class="
               min-w-full 
-              h-full 
               flex 
               flex-col 
               items-center
               md:flex-row 
-              bg-[#D8DDEF] 
+              bg-[#191308] 
               rounded-3xl 
+              shadow-2xl
               p-4
               overflow-hidden">
               <!-- Image for md+ screens only -->
@@ -395,7 +382,7 @@
                 md:w-1/2 
                 p-6
                 h-full">
-                <img src="images/svgs/bitcoin-svg.svg" 
+                <img src="images/texture_black_1.jpg" 
                   alt="Quote" 
                   class="
                   w-full 
@@ -414,7 +401,78 @@
                   text-[36px]
                   lg:text-[64px] 
                   font-bold 
-                  text-[#191308] 
+                  text-[#52FFB8] 
+                  mb-2">
+                  Design
+                </h2>
+
+                <!-- image -->
+                <div class="
+                  block 
+                  flex
+                  items-center
+                  justify-center
+                  md:hidden m
+                  p-4">
+
+                  <img src="images/texture_black_2.jpg"  
+                    alt="Design"
+                    class="
+                      rounded-md">
+
+                </div>
+                
+                <p class="
+                  text-[#D8DDEF] 
+                  text-[18px]
+                  lg:text-[24px]">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
+                </p>
+
+              </div>
+              
+          </div>
+
+          <!-- Slide 2 -->
+          <div class="
+              min-w-full 
+              flex 
+              flex-col 
+              items-center
+              md:flex-row 
+              bg-[#191308] 
+              rounded-3xl 
+              shadow-2xl
+              p-4
+              overflow-hidden">
+              <!-- Image for md+ screens only -->
+              <div class="
+                hidden 
+                md:block 
+                md:w-1/2 
+                p-6
+                h-full">
+                <img src="images/texture_black_1.jpg" 
+                  alt="Quote" 
+                  class="
+                  w-full 
+                  h-full 
+                  object-cover">
+              </div>
+
+              <!-- content -->
+              <div class="
+                py-6 
+                md:w-1/2 
+                flex 
+                flex-col 
+                justify-center">
+
+                <h2 class="
+                  text-[36px]
+                  lg:text-[64px] 
+                  font-bold 
+                  text-[#52FFB8] 
                   mb-2">
                   Quote
                 </h2>
@@ -428,54 +486,15 @@
                   md:hidden m
                   p-4">
 
-                  <img src="images/svgs/bitcoin-svg.svg"  
+                  <img src="images/texture_black_2.jpg"  
                     alt="Design"
                     class="
-                      w-1/2 
-                      h-1/2 
                       rounded-md">
-                </div>
 
-                <h3 class="
-                  text-[24px]
-                  lg:text-[48px] 
-                  text-[#191308] 
-                  mb-2">
-                  Subtitle 1
-                </h3>
+                </div>
                 
                 <p class="
-                  text-gray-500
-                  text-[18px]
-                  lg:text-[24px]">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-                </p>
-
-                <h3 class="
-                  text-[24px]
-                  lg:text-[48px] 
-                  text-[#191308] 
-                  mb-2">
-                  Subtitle 2
-                </h3>
-
-                <p class="
-                  text-gray-500
-                  text-[18px]
-                  lg:text-[24px]">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-                </p>
-
-                <h3 class="
-                  text-[24px]
-                  lg:text-[48px] 
-                  text-[#191308] 
-                  mb-2">
-                  Subtitle 3
-                </h3>
-
-                <p class="
-                  text-gray-500
+                  text-[#D8DDEF] 
                   text-[18px]
                   lg:text-[24px]">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
@@ -484,15 +503,76 @@
               </div>
               
           </div>
-          <!-- Slide 2 -->
-          <div class="w-full flex-shrink-0 p-6 text-white text-center cursor-pointer">
-            <h2 class="text-2xl font-semibold mb-4">Slide Two</h2>
-            <p>This is the second slide.</p>
-          </div>
+
           <!-- Slide 3 -->
-          <div class="w-full flex-shrink-0 p-6 text-white text-center cursor-pointer">
-            <h2 class="text-2xl font-semibold mb-4">Slide Three</h2>
-            <p>This is the third slide.</p>
+          <div class="
+              min-w-full 
+              flex 
+              flex-col 
+              items-center
+              md:flex-row 
+              bg-[#191308] 
+              rounded-3xl 
+              shadow-2xl
+              p-4
+              overflow-hidden">
+              <!-- Image for md+ screens only -->
+              <div class="
+                hidden 
+                md:block 
+                md:w-1/2 
+                p-6
+                h-full">
+                <img src="images/texture_black_1.jpg" 
+                  alt="Quote" 
+                  class="
+                  w-full 
+                  h-full 
+                  object-cover">
+              </div>
+
+              <!-- content -->
+              <div class="
+                py-6 
+                md:w-1/2 
+                flex 
+                flex-col 
+                justify-center">
+
+                <h2 class="
+                  text-[36px]
+                  lg:text-[64px] 
+                  font-bold 
+                  text-[#52FFB8] 
+                  mb-2">
+                  Deploy
+                </h2>
+
+                <!-- image -->
+                <div class="
+                  block 
+                  flex
+                  items-center
+                  justify-center
+                  md:hidden m
+                  p-4">
+
+                  <img src="images/texture_black_2.jpg"  
+                    alt="Design"
+                    class="
+                      rounded-md">
+
+                </div>
+                
+                <p class="
+                  text-[#D8DDEF] 
+                  text-[18px]
+                  lg:text-[24px]">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
+                </p>
+
+              </div>
+              
           </div>
 
         </div>
@@ -501,9 +581,9 @@
 
       <!-- Dots -->
       <div class="flex justify-center space-x-4  p-6 rounded-lg">
-        <span class="dot inline-block w-4 h-4 rounded-full bg-gray-800 cursor-pointer"></span>
-        <span class="dot inline-block w-4 h-4 rounded-full bg-gray-400 cursor-pointer"></span>
-        <span class="dot inline-block w-4 h-4 rounded-full bg-gray-400 cursor-pointer"></span>
+        <span class="dot inline-block w-4 h-4 rounded-full bg-[#D8DDEF] cursor-pointer"></span>
+        <span class="dot inline-block w-4 h-4 rounded-full bg-[#D8DDEF] cursor-pointer"></span>
+        <span class="dot inline-block w-4 h-4 rounded-full bg-[#D8DDEF] cursor-pointer"></span>
       </div>
 
   </section>
