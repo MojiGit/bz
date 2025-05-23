@@ -48,7 +48,7 @@ dots.forEach((dot, index) => {
   });
 });
 
-// Optional: pause auto-play on hover
+//pause auto-play on hover
 track.parentElement.addEventListener('mouseenter', stopAutoPlay);
 track.parentElement.addEventListener('mouseleave', startAutoPlay);
 
