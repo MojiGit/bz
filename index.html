@@ -214,25 +214,124 @@
           max-w-3xl 
           text-center 
           ">
-          Peguelo y rotelo ñero
+          Trade anything, anywhere, anytime
         </h1> 
       </div>
 
-      <!-- Logos 
-        La idea es que los logos se muevan de izquierda a derecha
-        agregar mas logos de cryptomonedas
-        cuando se haga el hover sobre los logos, que se queden quietos
-        agregar cotizaciones de los tokens! 
-      -->
-      <div class="
+  </section>
+
+    <!-- Market Overview Section 
+
+    make it bigger, the formatting have to change a lot-->
+  <section class="mt-12">
+
+    <div id="scroll-wrapper" class="
+      overflow-hidden 
+      relative 
+      bg-[#7014f2]
+      backdrop-blur-sm 
+      border 
+      border-white/10 
+      py-4
+    ">
+      <div id="scroll-content" class="
         flex 
         items-center 
-        justify-center ">
-        <img src="./images/svgs/bitcoin-svg.svg" alt="Logo 1" class="w-16 h-16 mx-2">
-        <img src="./images/svgs/ethereum-svg.svg" alt="Logo 2" class="w-16 h-16 mx-2">
-        <img src="./images/svgs/ripple-svg.svg" alt="Logo 3" class="w-16 h-16 mx-2">
-        <img src="./images/svgs/tether--svgr.svg" alt="Logo 3" class="w-16 h-16 mx-2">
+        gap-8 
+        whitespace-nowrap 
+        animate-scroll-left
+        will-change-transform
+        font-bold 
+        text-[16px]
+      ">
+
+        <!-- Crypto Prices -->
+        <template id="crypto-template">
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" alt="BTC" class="w-6 h-6" />
+            <span>BTC: $<span class="crypto-price" data-symbol="bitcoin">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/279/large/ethereum.png" alt="ETH" class="w-6 h-6" />
+            <span>ETH: $<span class="crypto-price" data-symbol="ethereum">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png" alt="MATIC" class="w-6 h-6" />
+            <span>MATIC: $<span class="crypto-price" data-symbol="matic-network">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/12171/large/polkadot.png" alt="DOT" class="w-6 h-6" />
+            <span>DOT: $<span class="crypto-price" data-symbol="polkadot">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src=" https://assets.coingecko.com/coins/images/4128/large/solana.png" alt="SOL" class="w-6 h-6" />
+            <span>SOL: $<span class="crypto-price" data-symbol="solana">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/975/large/cardano.png" alt="ADA" class="w-6 h-6" />
+            <span>ADA: $<span class="crypto-price" data-symbol="cardano">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/5/large/dogecoin.png" alt="DOGE" class="w-6 h-6" />
+            <span>DOGE: $<span class="crypto-price" data-symbol="dogecoin">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/2/large/litecoin.png" alt="LTC" class="w-6 h-6" />
+            <span>LTC: $<span class="crypto-price" data-symbol="litecoin">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png" alt="XRP" class="w-6 h-6" />
+            <span>XRP: $<span class="crypto-price" data-symbol="ripple">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png" alt="LINK" class="w-6 h-6" />
+            <span>LINK: $<span class="crypto-price" data-symbol="chainlink">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/100/large/Stellar_symbol_black_RGB.png" alt="XLM" class="w-6 h-6" />
+            <span>XLM: $<span class="crypto-price" data-symbol="stellar">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/12504/large/uniswap-uni.png" alt="UNI" class="w-6 h-6" />
+            <span>UNI: $<span class="crypto-price" data-symbol="uniswap">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/69/large/monero_logo.png" alt="XMR" class="w-6 h-6" />
+            <span>XMR: $<span class="crypto-price" data-symbol="monero">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/1094/large/tron-logo.png" alt="TRX" class="w-6 h-6" />
+            <span>TRX: $<span class="crypto-price" data-symbol="tron">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/4380/large/download.png" alt="ALGO" class="w-6 h-6" />
+            <span>ALGO: $<span class="crypto-price" data-symbol="algorand">--</span></span>
+          </div>
+
+          <div class="flex items-center gap-2 text-white">
+            <img src="https://assets.coingecko.com/coins/images/12645/large/AAVE.png" alt="AAVE" class="w-6 h-6" />
+            <span>AAVE: $<span class="crypto-price" data-symbol="aave">--</span></span>
+          </div>
+
+        </template>
+        
       </div>
+    </div>
   </section>
 
   <!-- Carousel Section 
@@ -409,58 +508,7 @@
 
   </section>
 
-  <!-- Market Overview Section 
-    The idea is to have a ticker with the prices of the tokens
-    I am not sure if the ticker is the best option, but it is a good start
-    I am missing the text and the images 
-    make it bigger, the formatting have to change a lot-->
-  <section class="mt-12">
 
-    <div id="scroll-wrapper" class="
-      overflow-hidden 
-      relative 
-      bg-[#7014f2]
-      backdrop-blur-sm 
-      border 
-      border-white/10 
-      py-4
-    ">
-      <div id="scroll-content" class="
-        flex 
-        items-center 
-        gap-8 
-        whitespace-nowrap 
-        animate-scroll-left
-        will-change-transform
-        font-bold 
-        text-[16px]
-      ">
-        <!-- Template duplicated via JS -->
-        <template id="crypto-template">
-          <div class="flex items-center gap-2 text-white">
-            <img src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" alt="BTC" class="w-6 h-6" />
-            <span>BTC: $<span class="crypto-price" data-symbol="bitcoin">--</span></span>
-          </div>
-          <div class="flex items-center gap-2 text-white">
-            <img src="https://assets.coingecko.com/coins/images/279/large/ethereum.png" alt="ETH" class="w-6 h-6" />
-            <span>ETH: $<span class="crypto-price" data-symbol="ethereum">--</span></span>
-          </div>
-          <div class="flex items-center gap-2 text-white">
-            <img src="https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png" alt="MATIC" class="w-6 h-6" />
-            <span>MATIC: $<span class="crypto-price" data-symbol="matic-network">--</span></span>
-          </div>
-          <div class="flex items-center gap-2 text-white">
-            <img src="https://assets.coingecko.com/coins/images/12171/large/polkadot.png" alt="DOT" class="w-6 h-6" />
-            <span>DOT: $<span class="crypto-price" data-symbol="polkadot">--</span></span>
-          </div>
-          <div class="flex items-center gap-2 text-white">
-            <img src=" https://assets.coingecko.com/coins/images/4128/large/solana.png" alt="SOL" class="w-6 h-6" />
-            <span>SOL: $<span class="crypto-price" data-symbol="solana">--</span></span>
-          </div>
-        </template>
-      </div>
-    </div>
-  </section>
 
 
 
