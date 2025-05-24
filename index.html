@@ -8,97 +8,33 @@
   <meta name="author" content="Beta Team">
   <title>Beta — On-Chain OTC Options</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <link rel="stylesheet" type="text/css" href="/styles.css">
-
+  <link rel="stylesheet" href="/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
+<body class="bg-white text-[#191308] text-[18px] lg:text-[24px] font-['Roboto',sans-serif]">
 
-<body class="
-  bg-[#FFFFFF] 
-  text-[#191308] 
-  text-[18px]
-  lg:text-[24px]"
-  >
-
-  <!-- landing  -->
-  <div class=" 
-    relative 
-    h-screen
-    rounded-b-full
-    shadow-2xl"
-     style="
-        background-image: url('./images/texture_purple_3.jpg'); 
-        background-size: cover; 
-        background-position: center; 
-        background-repeat: no-repeat;"
-    >
-
+  <!-- Landing -->
+  <div class="relative h-screen rounded-b-full shadow-2xl"
+    style="background-image: url('./images/texture_purple_3.jpg'); background-size: cover; background-position: center;">
     <!-- Navbar -->
-    <nav class=" 
-      sticky top-5 z-50
-      mx-5
-      p-2 sm:px-6 md:px-8 xl:px-12 2xl:px-24
-      backdrop-blur-md bg-white/10
-      border border-white/20
-      rounded-2xl
-      flex items-center justify-between">
-
+    <nav class="sticky top-5 z-50 mx-5 p-2 sm:px-6 md:px-8 xl:px-12 2xl:px-24 backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl flex items-center justify-between">
       <!-- Logo -->
       <a href="#">
-        <svg viewBox="0 0 24 24" 
-          class="
-            w-12 
-            h-12
-            lg:w-16
-            lg:h-16 
-            fill-[#FFFFFF] 
-            transition-colors 
-            duration-300" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg">
-          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-          <g id="SVGRepo_iconCarrier"> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M15 11.5C14.7239 11.5 14.5 11.7239 14.5 12C14.5 12.2761 14.7239 12.5 15 12.5C15.2761 12.5 15.5 12.2761 15.5 12C15.5 11.7239 15.2761 11.5 15 11.5ZM13.5 12C13.5 11.1716 14.1716 10.5 15 10.5C15.8284 10.5 16.5 11.1716 16.5 12C16.5 12.8284 15.8284 13.5 15 13.5C14.1716 13.5 13.5 12.8284 13.5 12Z" 
-            fill="fill-[#FFFFFF]"></path> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M9 11.5C8.72386 11.5 8.5 11.7239 8.5 12C8.5 12.2761 8.72386 12.5 9 12.5C9.27614 12.5 9.5 12.2761 9.5 12C9.5 11.7239 9.27614 11.5 9 11.5ZM7.5 12C7.5 11.1716 8.17157 10.5 9 10.5C9.82843 10.5 10.5 11.1716 10.5 12C10.5 12.8284 9.82843 13.5 9 13.5C8.17157 13.5 7.5 12.8284 7.5 12Z" 
-            fill="fill-[#FFFFFF]"></path> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4556 5.63613C15.6756 5.82194 16.7004 6.25713 17.4102 7.27534C18.1692 8.36416 18.5 10.0302 18.5 12.4999C18.5 14.6609 17.5191 16.4122 16.2329 17.6151C14.9588 18.8067 13.3419 19.4999 12 19.4999C10.4696 19.4999 8.84831 18.6924 7.62113 17.4471C6.38737 16.195 5.5 14.4492 5.5 12.4999C5.5 10.0302 5.83082 8.36416 6.58982 7.27534C7.2996 6.25714 8.32444 5.82194 9.54444 5.63613C9.70705 4.98353 10.2971 4.5 11 4.5H13C13.7029 4.5 14.2929 4.98353 14.4556 5.63613ZM9.5 6.6571C8.53681 6.83212 7.87319 7.18298 7.41018 7.8472C6.83585 8.6711 6.5 10.0707 6.5 12.4999C6.5 14.1405 7.24899 15.6447 8.33342 16.7452C9.42442 17.8524 10.8031 18.4999 12 18.4999C13.0352 18.4999 14.4182 17.9431 15.5499 16.8848C16.6694 15.8377 17.5 14.339 17.5 12.4999C17.5 10.0707 17.1642 8.6711 16.5898 7.8472C16.1268 7.18298 15.4632 6.83212 14.5 6.6571V8C14.5 8.82843 13.8284 9.5 13 9.5H11C10.1716 9.5 9.5 8.82843 9.5 8V6.6571ZM10.5 6C10.5 5.72386 10.7239 5.5 11 5.5H13C13.2761 5.5 13.5 5.72386 13.5 6V8C13.5 8.27614 13.2761 8.5 13 8.5H11C10.7239 8.5 10.5 8.27614 10.5 8V6Z" 
-            fill="fill-[#FFFFFF]"></path> 
+        <svg viewBox="0 0 24 24" class="w-12 h-12 lg:w-16 lg:h-16 fill-[#FFFFFF] transition-colors duration-300" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M15 11.5C14.7239 11.5 14.5 11.7239 14.5 12C14.5 12.2761 14.7239 12.5 15 12.5C15.2761 12.5 15.5 12.2761 15.5 12C15.5 11.7239 15.2761 11.5 15 11.5ZM13.5 12C13.5 11.1716 14.1716 10.5 15 10.5C15.8284 10.5 16.5 11.1716 16.5 12C16.5 12.8284 15.8284 13.5 15 13.5C14.1716 13.5 13.5 12.8284 13.5 12Z" fill="#FFFFFF"></path>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M9 11.5C8.72386 11.5 8.5 11.7239 8.5 12C8.5 12.2761 8.72386 12.5 9 12.5C9.27614 12.5 9.5 12.2761 9.5 12C9.5 11.7239 9.27614 11.5 9 11.5ZM7.5 12C7.5 11.1716 8.17157 10.5 9 10.5C9.82843 10.5 10.5 11.1716 10.5 12C10.5 12.8284 9.82843 13.5 9 13.5C8.17157 13.5 7.5 12.8284 7.5 12Z" fill="#FFFFFF"></path>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4556 5.63613C15.6756 5.82194 16.7004 6.25713 17.4102 7.27534C18.1692 8.36416 18.5 10.0302 18.5 12.4999C18.5 14.6609 17.5191 16.4122 16.2329 17.6151C14.9588 18.8067 13.3419 19.4999 12 19.4999C10.4696 19.4999 8.84831 18.6924 7.62113 17.4471C6.38737 16.195 5.5 14.4492 5.5 12.4999C5.5 10.0302 5.83082 8.36416 6.58982 7.27534C7.2996 6.25714 8.32444 5.82194 9.54444 5.63613C9.70705 4.98353 10.2971 4.5 11 4.5H13C13.7029 4.5 14.2929 4.98353 14.4556 5.63613ZM9.5 6.6571C8.53681 6.83212 7.87319 7.18298 7.41018 7.8472C6.83585 8.6711 6.5 10.0707 6.5 12.4999C6.5 14.1405 7.24899 15.6447 8.33342 16.7452C9.42442 17.8524 10.8031 18.4999 12 18.4999C13.0352 18.4999 14.4182 17.9431 15.5499 16.8848C16.6694 15.8377 17.5 14.339 17.5 12.4999C17.5 10.0707 17.1642 8.6711 16.5898 7.8472C16.1268 7.18298 15.4632 6.83212 14.5 6.6571V8C14.5 8.82843 13.8284 9.5 13 9.5H11C10.1716 9.5 9.5 8.82843 9.5 8V6.6571ZM10.5 6C10.5 5.72386 10.7239 5.5 11 5.5H13C13.2761 5.5 13.5 5.72386 13.5 6V8C13.5 8.27614 13.2761 8.5 13 8.5H11C10.7239 8.5 10.5 8.27614 10.5 8V6Z" fill="#FFFFFF"></path>
           </g>
         </svg>
       </a>
-
-      <!-- Spacer to push links to the right -->
-      <div class="
-        flex-1">
-      </div>
-
-      <!-- Navigation Links -->
-      <ul class="
-        space-x-6 
-        text-[#FFFFFF] 
-        text-[18px]
-        lg:text-[24px] 
-        hidden 
-        md:flex">
-        <li>
-          <a href="#why-us">
-            Why Us
-          </a>
-        </li>
-        <li>
-          <a href="#docs"">
-            Docs
-          </a>
-        </li>
+      <div class="flex-1"></div>
+      <ul class="space-x-6 text-[#FFFFFF] text-[18px] lg:text-[24px] hidden md:flex">
+        <li><a href="#why-us" class="hover:text-[#52FFB8] transition">Why Us</a></li>
+        <li><a href="#docs" class="hover:text-[#52FFB8] transition">Docs</a></li>
       </ul>
-
-      <!-- Mobile Menu Button -->
       <div class="md:hidden">
         <button id="mobile-menu-button" class="text-[#D8DDEF] hover:text-[#52FFB8] focus:outline-none">
           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,156 +42,38 @@
           </svg>
         </button>
       </div>
-
     </nav>
-
     <!-- Mobile Dropdown Menu -->
-    <div id="mobile-menu" 
-      class="
-        md:hidden 
-        mx-5 
-        mt-2 
-        p-4 
-        bg-white/10 
-        backdrop-blur-md 
-        border 
-        border-white/20 
-        rounded-2xl 
-        text-white 
-        hidden">
-      <ul class="
-        space-y-4 
-        text-[18px]">
+    <div id="mobile-menu" class="md:hidden mx-5 mt-2 p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white hidden">
+      <ul class="space-y-4 text-[18px]">
         <li><a href="#why-us">Why Us</a></li>
         <li><a href="#docs">Docs</a></li>
       </ul>
     </div>
-
-    <!-- Hero Section 
-     Pretty much ok, the most important thing is to have good content
-     The idea is to have a title, a subtitle and a call to action button
-    -->
-    <section class="
-      pt-16
-      px-4
-      sm:p-6
-      md:p-8
-      xl:p-12
-      2xl:p-24 
-      w-full 
-      flex 
-      items-center 
-      justify-center
-      " >
-      <!-- Content Container -->
-      <div class="`
-        text-[#D8DDEF] 
-        max-w-4xl
-        grid
-        grid-cols-1
-        gap-16">
-
-        <!-- Title -->
-        <h1 class="
-          text-[30px]
-          lg:text-[64px] 
-          text-center
-          font-bold 
-          lg:mb-10
-          text-[#FFFFFF]">
-          Somos la chimba
-        </h1>
-
-        <!-- Subtitle -->
-        <h2 class="
-          text-[18px]
-          lg:text-[24px]
-          text-center
-          mb-16 
-          max-w-3xl ">
+    <!-- Hero Section -->
+    <section class="pt-16 px-4 sm:p-6 md:p-8 xl:p-12 2xl:p-24 w-full flex items-center justify-center">
+      <div class="text-[#D8DDEF] max-w-4xl grid grid-cols-1 gap-16">
+        <h1 class="text-[30px] lg:text-[64px] text-center font-bold lg:mb-10 text-[#FFFFFF]">Somos la chimba</h1>
+        <h2 class="text-[18px] lg:text-[24px] text-center mb-16 max-w-3xl">
           La mas plena mi ñero, se re sabe, sisas gonorrea, si no las creee, la mala.
           Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.
-        </h2>  
-
-        <!-- Call to Action Button -->
-        <div class="
-          flex 
-          justify-center">
-          <button class="
-            text-[16px]
-            lg:text-[24px]
-            font-bold
-            text-[#191308] 
-            bg-[#52FFB8]
-            mb-2
-            px-6 
-            py-2 
-            rounded-2xl">
-            marquelo
-          </button>
+        </h2>
+        <div class="flex justify-center">
+          <button class="text-[16px] lg:text-[24px] font-bold text-[#191308] bg-[#52FFB8] mb-2 px-6 py-2 rounded-2xl">marquelo</button>
         </div>
-        
       </div>
-
     </section>
-
   </div>
 
   <!-- Logo banner -->
-   
-  <section class="
-      w-full 
-      grid
-      grid-cols-1
-      gap-6
-      items-center
-      justify-center
-      py-14
-      sm:py-20
-      md:py-24
-      xl:py-32 
-      ">
-
-      <!-- Title -->
-      <div class="
-        flex 
-        flex-col 
-        items-center
-        ">
-        <h1 class="
-          text-[30px]
-          lg:text-[64px]  
-          text-[#191308]
-          font-bold 
-          text-center 
-          ">
-          Trade anything, anywhere, anytime
-        </h1> 
-      </div>
-
-      <!-- Logos -->
-      <div id="scroll-wrapper" class="
-        overflow-hidden 
-        relative 
-        backdrop-blur-sm 
-        border-2
-        border-[#D8DDEF]
-        py-6
-        shadow-xl">
-
-        <div id="scroll-content" class="
-          flex 
-          items-center 
-          gap-20 
-          whitespace-nowrap 
-          animate-scroll-left
-          will-change-transform
-          font-bold 
-          text-[20px]
-          ">
-
-          <!-- Crypto Prices -->
-          <template id="crypto-template">
+  <section class="w-full grid grid-cols-1 gap-6 items-center justify-center py-14 sm:py-20 md:py-24 xl:py-32">
+    <div class="flex flex-col items-center">
+      <h1 class="text-[30px] lg:text-[64px] text-[#191308] font-bold text-center">Trade anything, anywhere, anytime</h1>
+    </div>
+    <div id="scroll-wrapper" class="overflow-hidden relative backdrop-blur-sm border-2 border-[#D8DDEF] py-6 shadow-xl">
+      <div id="scroll-content" class="flex items-center gap-20 whitespace-nowrap animate-scroll-left will-change-transform font-bold text-[20px]">
+        <!-- Crypto Prices -->
+        <template id="crypto-template">
 
             <div class="flex items-center gap-2 text-[#52FFB8]">
               <img src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" alt="BTC" class="w-10 h-10" />
@@ -338,646 +156,144 @@
             </div>
 
           </template>
-          
-        </div>
       </div>
-
+    </div>
   </section>
 
-  <!-- Carousel Section 
-  The idea is to have a card with an image and a text description
-  I am missing the text and the images 
-
-  or a bar at the head with the tiles like - 1. design - 2. quote - 3. deploy, and according with the selected slide, 
-  the title is highlighted and the content is shown
-  --> 
-  <section class=" 
-    p-4 
-    w-full
-    sm:px-16 
-    flex 
-    justify-center
-    grid
-    grid-cols-1">
-
-    <!-- Section Title -->
-    <h2 class="
-      text-[18px] lg:text-[24px]
-      font-bold 
-      mb-4 lg:mb-8
-      text-[#D8DDEF]">
-      How it Works
-    </h2>
-
-    <div id="carousel" 
-      class="
-        relative 
-        w-full
-        max-w-7xl
-        mx-auto 
-        select-none">
-
-      <!-- Slides Wrapper -->
-      <div class="
-        overflow-hidden 
-        rounded-3xl 
-        border 
-        border-white/20">
-
-        <div id="carousel-track" 
-          class="
-            flex 
-            transition-transform 
-            duration-700 
-            ease-in-out">
-            
+  <!-- Carousel Section -->
+  <section class="p-4 w-full sm:px-16 flex justify-center grid grid-cols-1">
+    <h2 class="text-[18px] lg:text-[24px] font-bold mb-4 lg:mb-8 text-[#D8DDEF]">How it Works</h2>
+    <div id="carousel" class="relative w-full max-w-7xl mx-auto select-none">
+      <div class="overflow-hidden rounded-3xl border border-white/20">
+        <div id="carousel-track" class="flex transition-transform duration-700 ease-in-out">
           <!-- Slide 1 -->
-          <div class="
-              min-w-full 
-              flex 
-              flex-col 
-              items-center
-              md:flex-row 
-              bg-[#191308] 
-              rounded-3xl 
-              shadow-2xl
-              p-4
-              overflow-hidden"
-              style="
-              background-image: url('./images/texture_black_1.jpg'); 
-              background-size: cover; 
-              background-position: center; 
-              background-repeat: no-repeat;">
-
-              <div class="
-                py-6 
-                md:w-1/2 
-                flex 
-                flex-col 
-                justify-center">
-
-                <h2 class="
-                  text-[36px]
-                  lg:text-[64px] 
-                  font-bold 
-                  text-[#52FFB8] 
-                  mb-2">
-                  Design
-                </h2>
-                
-                <p class="
-                  text-[#D8DDEF] 
-                  text-[18px]
-                  lg:text-[24px]">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-                </p>
-
-              </div>
-              
+          <div class="min-w-full flex flex-col items-center md:flex-row bg-[#191308] rounded-3xl shadow-2xl p-4 overflow-hidden" style="background-image: url('./images/texture_black_1.jpg'); background-size: cover; background-position: center;">
+            <div class="py-6 md:w-1/2 flex flex-col justify-center">
+              <h2 class="text-[36px] lg:text-[64px] font-bold text-[#52FFB8] mb-2">Design</h2>
+              <p class="text-[#D8DDEF] text-[18px] lg:text-[24px]">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.</p>
+            </div>
           </div>
-
           <!-- Slide 2 -->
-          <div class="
-              min-w-full 
-              flex 
-              flex-col 
-              items-center
-              md:flex-row 
-              bg-[#191308] 
-              rounded-3xl 
-              shadow-2xl
-              p-4
-              overflow-hidden"
-              style="
-              background-image: url('./images/texture_black_1.jpg'); 
-              background-size: cover; 
-              background-position: center; 
-              background-repeat: no-repeat;">
-
-
-              <!-- content -->
-              <div class="
-                py-6 
-                md:w-1/2 
-                flex 
-                flex-col 
-                justify-center">
-
-                <h2 class="
-                  text-[36px]
-                  lg:text-[64px] 
-                  font-bold 
-                  text-[#52FFB8] 
-                  mb-2">
-                  Quote
-                </h2>
-                
-                <p class="
-                  text-[#D8DDEF] 
-                  text-[18px]
-                  lg:text-[24px]">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-                </p>
-
-              </div>
-              
+          <div class="min-w-full flex flex-col items-center md:flex-row bg-[#191308] rounded-3xl shadow-2xl p-4 overflow-hidden" style="background-image: url('./images/texture_black_1.jpg'); background-size: cover; background-position: center;">
+            <div class="py-6 md:w-1/2 flex flex-col justify-center">
+              <h2 class="text-[36px] lg:text-[64px] font-bold text-[#52FFB8] mb-2">Quote</h2>
+              <p class="text-[#D8DDEF] text-[18px] lg:text-[24px]">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.</p>
+            </div>
           </div>
-
           <!-- Slide 3 -->
-          <div class="
-              min-w-full 
-              flex 
-              flex-col 
-              items-center
-              md:flex-row 
-              bg-[#191308] 
-              rounded-3xl 
-              shadow-2xl
-              p-4
-              overflow-hidden"
-              style="
-              background-image: url('./images/texture_black_1.jpg'); 
-              background-size: cover; 
-              background-position: center; 
-              background-repeat: no-repeat;">
-
-              <!-- Image for md+ screens only 
-              <div class="
-                hidden 
-                md:block 
-                md:w-1/2 
-                p-6
-                h-full">
-                <img src="images/texture_black_1.jpg" 
-                  alt="Quote" 
-                  class="
-                  w-full 
-                  h-full 
-                  object-cover">
-              </div>-->
-
-              <!-- content -->
-              <div class="
-                py-6 
-                md:w-1/2 
-                flex 
-                flex-col 
-                justify-center">
-
-                <h2 class="
-                  text-[36px]
-                  lg:text-[64px] 
-                  font-bold 
-                  text-[#52FFB8] 
-                  mb-2">
-                  Deploy
-                </h2>
-
-                <!-- image 
-                <div class="
-                  block 
-                  flex
-                  items-center
-                  justify-center
-                  md:hidden m
-                  p-4">
-
-                  <img src="images/texture_black_2.jpg"  
-                    alt="Design"
-                    class="
-                      rounded-md">
-
-                </div>-->
-                
-                <p class="
-                  text-[#D8DDEF] 
-                  text-[18px]
-                  lg:text-[24px]">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.
-                </p>
-
-              </div>
-              
+          <div class="min-w-full flex flex-col items-center md:flex-row bg-[#191308] rounded-3xl shadow-2xl p-4 overflow-hidden" style="background-image: url('./images/texture_black_1.jpg'); background-size: cover; background-position: center;">
+            <div class="py-6 md:w-1/2 flex flex-col justify-center">
+              <h2 class="text-[36px] lg:text-[64px] font-bold text-[#52FFB8] mb-2">Deploy</h2>
+              <p class="text-[#D8DDEF] text-[18px] lg:text-[24px]">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.</p>
+            </div>
           </div>
-
         </div>
-
       </div>
-
-      <!-- Dots -->
-      <div class="flex justify-center space-x-4  p-6 rounded-lg">
+      <div class="flex justify-center space-x-4 p-6 rounded-lg">
         <span class="dot inline-block w-4 h-4 rounded-full bg-[#D8DDEF] cursor-pointer"></span>
         <span class="dot inline-block w-4 h-4 rounded-full bg-[#D8DDEF] cursor-pointer"></span>
         <span class="dot inline-block w-4 h-4 rounded-full bg-[#D8DDEF] cursor-pointer"></span>
       </div>
-
-  </section>
-
-  <!-- Use Cases Section 
-    Develop the kind of things that can be done with the platform   -->
-  <section class="
-    w-full 
-    p-4
-    sm:p-6
-    md:p-8
-    lg:p-16
-    2xl:p-24">
-
-    <div class="
-      mx-auto 
-      text-left
-      ">
-
-      <!-- Section Title -->
-      <h2 class="
-        text-[18px] lg:text-[24px]
-        font-bold 
-        mb-4 lg:mb-8
-        text-[#D8DDEF]">
-        Use Cases
-      </h2> 
-
-      <!-- Cards Container -->
-      <div class="
-        grid grid-cols-1
-        divide-y-2 divide-[#D8DDEF]   
-        gap-8">
-
-        <!-- Card 1 -->
-        <a href="#" 
-          class="
-            group 
-            block 
-            relative  
-            p-4"
-            >
-
-          <!-- content -->
-          <div class="
-            relative
-            grid 
-            grid-cols-1
-            lg:grid-cols-2 
-            gap-4
-            place-items-left">
-
-            <!-- text-->  
-            <div >
-              <h2 class="
-                text-[36px]
-                lg:text-[64px] 
-                text-left
-                text-[#191308] 
-                font-semibold">
-                Don't Hold, Hedge 
-              </h2>
-            </div> 
-
-            <div>
-              <p class="
-                text-[18px]
-                lg:text-[24px]
-                text-left
-                text-[#D8DDEF]">
-                Stake with upside, hedge the downside. Protect your yield with options that minimize volatility while your capital keeps working
-              </p>
-            </div>
-          </div>
-
-        </a>
-
-        <!-- Card 1 -->
-        <a href="#" 
-          class="
-            group 
-            block 
-            relative  
-            p-4"
-            >
-
-          <!-- content -->
-          <div class="
-            relative
-            grid 
-            grid-cols-1
-            lg:grid-cols-2 
-            gap-4
-            place-items-left">
-
-            <!-- text-->  
-            <div >
-              <h2 class="
-                text-[36px]
-                lg:text-[64px] 
-                text-left
-                text-[#191308] 
-                font-semibold">
-                Volatility Farming 
-              </h2>
-            </div> 
-
-            <div>
-              <p class="
-                text-[18px]
-                lg:text-[24px]
-                text-left
-                text-[#D8DDEF]">
-                Stake with upside, hedge the downside. Protect your yield with options that minimize volatility while your capital keeps working
-              </p>
-            </div>
-          </div>
-
-        </a>
-
-        <!-- Card 1 -->
-        <a href="#" 
-          class="
-            group 
-            block 
-            relative  
-            p-4"
-            >
-
-          <!-- content -->
-          <div class="
-            relative
-            grid 
-            grid-cols-1
-            lg:grid-cols-2 
-            gap-4
-            place-items-left">
-
-            <!-- text-->  
-            <div >
-              <h2 class="
-                text-[36px]
-                lg:text-[64px] 
-                text-left
-                text-[#191308] 
-                font-semibold">
-                Upfront Yield
-              </h2>
-            </div> 
-
-            <div>
-              <p class="
-                text-[18px]
-                lg:text-[24px]
-                text-left
-                text-[#D8DDEF]">
-                Stake with upside, hedge the downside. Protect your yield with options that minimize volatility while your capital keeps working
-              </p>
-            </div>
-          </div>
-
-        </a>
-
-      </div>
-
     </div>
-
   </section>
 
-  <!-- About us Section 
-  Mejorar el texto, la idea es que el texto sea claro y conciso  -->
-  <section class="
-    w-full 
-    p-4
-    sm:px-16">
-
-    <!-- Section Title -->
-    <h2 class="
-      text-[18px] lg:text-[24px]
-      font-bold 
-      mb-4 lg:mb-8
-      text-[#D8DDEF]">
-      About Us
-    </h2>
-
-    <div class="
-      grid
-      grid-cols-1 lg:grid-cols-2
-      gap-10
-      items-center
-      justify-center">
-      
-      <!-- image  -->
-      <div class="
-        p-6
-        h-full">
-
-        <img src="images/texture_black_1.jpg" 
-          alt="Quote" 
-          class="
-          w-full 
-          h-full 
-          object-cover
-          rounded-3xl">
-
+  <!-- Use Cases Section -->
+  <section class="w-full p-4 sm:p-6 md:p-8 lg:p-16">
+    <h2 class="text-[18px] lg:text-[24px] font-bold mb-4 lg:mb-8 text-[#D8DDEF]">Use Cases</h2>
+    <div class="mx-auto text-left max-w-7xl">
+      <div class="grid grid-cols-1 divide-y-2 divide-[#D8DDEF] gap-8">
+        <!-- Card 1 -->
+        <a href="#" class="group block relative p-4">
+          <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <h2 class="text-[36px] lg:text-[64px] text-left text-[#191308] font-semibold">Don't Hold, Hedge</h2>
+            </div>
+            <div>
+              <p class="text-[18px] lg:text-[24px] text-left text-[#D8DDEF]">Stake with upside, hedge the downside. Protect your yield with options that minimize volatility while your capital keeps working</p>
+            </div>
+          </div>
+        </a>
+        <!-- Card 2 -->
+        <a href="#" class="group block relative p-4">
+          <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <h2 class="text-[36px] lg:text-[64px] text-left text-[#191308] font-semibold">Volatility Farming</h2>
+            </div>
+            <div>
+              <p class="text-[18px] lg:text-[24px] text-left text-[#D8DDEF]">Stake with upside, hedge the downside. Protect your yield with options that minimize volatility while your capital keeps working</p>
+            </div>
+          </div>
+        </a>
+        <!-- Card 3 -->
+        <a href="#" class="group block relative p-4">
+          <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <h2 class="text-[36px] lg:text-[64px] text-left text-[#191308] font-semibold">Upfront Yield</h2>
+            </div>
+            <div>
+              <p class="text-[18px] lg:text-[24px] text-left text-[#D8DDEF]">Stake with upside, hedge the downside. Protect your yield with options that minimize volatility while your capital keeps working</p>
+            </div>
+          </div>
+        </a>
       </div>
+    </div>
+  </section>
 
-      <!-- Title -->
-      <h1 class="
-        text-[30px]
-        lg:text-[64px]  
-        text-[#191308]
-        font-bold 
-        max-w-7xl 
-        text-left
-        p-6">
+  <!-- About Us Section -->
+  <section class="w-full p-4 sm:p-6 md:p-8 lg:p-16 flex flex-col items-center">
+    <h2 class="text-[18px] lg:text-[24px] font-bold mb-4 lg:mb-8 text-[#D8DDEF]">About Us</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 flex flex-col justify-center items-center max-w-7xl">
+      <div class="h-full">
+        <img src="images/texture_black_1.jpg" alt="Quote" class="w-full h-full object-cover rounded-3xl">
+      </div>
+      <h1 class="text-[30px] lg:text-[64px] text-[#191308] font-bold max-w-7xl text-left p-6">
         Our mission is to build a more efficient DeFi ecosystem
-      </h1>  
-
+      </h1>
     </div>
-
-      <!-- Text -->
-    <p class="
-      text-[20px]
-      lg:text-[36px]
-      text-[#191308]
-      max-w-xl
-      font-bold
-      p-6
-      xl:max-w-7xl 
-      text-left
-      ">
+    <p class="text-[20px] lg:text-[36px] text-[#191308] max-w-xl font-bold py-6 xl:max-w-7xl text-left">
       We equip traders with the tools they need to develop their strategies
-    </p>   
-
+    </p>
   </section>
 
   <!-- CTA Section -->
-  <section class="
-    w-full 
-    p-4
-    sm:p-6
-    md:p-8
-    lg:p-16
-    2xl:p-24">
-    <div class="
-      mx-auto 
-      grid 
-      grid-cols-1 
-      md:grid-cols-2 
-      gap-10 
-      rounded-2xl 
-      max-w-7xl 
-      p-4
-      sm:p-6
-      md:p-8
-      xl:p-12
-      2xl:p-24 
-      rounded-xl"
-      style="
-        background-image: url('./images/texture_purple_2.jpg'); 
-        background-size: cover; 
-        background-position: center; 
-        background-repeat: no-repeat;">
-      
-      <!-- Text content -->
+  <section class="w-full p-4 sm:p-6 md:p-8 lg:p-16 flex justify-center">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 rounded-2xl p-4 sm:p-6 md:p-8 max-w-7xl" style="background-image: url('./images/texture_purple_2.jpg'); background-size: cover; background-position: center;">
       <div>
-        <!-- Title -->
-        <h2 class="
-          text-3xl 
-          text-[#D8DDEF] 
-          md:text-5xl 
-          font-bold 
-          mb-6 
-          text-left">
-          Join our Community
-        </h2>
-
-        <!-- Subtitle -->
-        <p class="
-          text-lg
-          text-[#D8DDEF]
-          md:text-xl 
-          text-left">
+        <h2 class="text-3xl text-[#D8DDEF] md:text-5xl font-bold mb-6 text-left">Join our Community</h2>
+        <p class="text-lg text-[#D8DDEF] md:text-xl text-left">
           Whether you are a developer, a DeFi enthusiast, or simply passionate about building better financial solutions, our Discord is the place to connect and contribute
         </p>
       </div>
-
-      <!-- Discord link-->
-      <div class="
-        flex 
-        md:flex-row 
-        items-center 
-        justify-center">
-        <!-- Icon -->
+      <div class="flex md:flex-row items-center justify-center">
         <a href="#">
-          <svg viewBox="0 0 24 24" 
-            class="
-              w-16 
-              h-16
-              sm:w-32
-              sm:h-32 
-              fill-[#D8DDEF] 
-              hover:fill-[#52FFB8] 
-              transition-colors 
-              duration-300" 
-            role="img" 
-            xmlns="http://www.w3.org/2000/svg">
-            <title>
-              Discord
-            </title>
-            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" 
-            fill="fill-[#D8DDEF]"/>
+          <svg viewBox="0 0 24 24" class="w-16 h-16 sm:w-32 sm:h-32 fill-[#D8DDEF] hover:fill-[#52FFB8] transition-colors duration-300" role="img" xmlns="http://www.w3.org/2000/svg">
+            <title>Discord</title>
+            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>
           </svg>
         </a>
-      </div> 
+      </div>
     </div>
   </section>
 
   <!-- Footer Section -->
-  <footer class="
-    w-full 
-    min-h-[150px] 
-    bg-[#191308] 
-    text-[#D8DDEF] 
-    p-4
-    sm:p-6
-    md:p-8
-    xl:px-12
-    2xl:px-24">
-
-    <div class="
-      mx-auto 
-      flex 
-      items-center 
-      justify-between 
-      max-w-7xl">
+  <footer class="w-full min-h-[150px] bg-[#191308] text-[#D8DDEF] p-4 sm:p-6 md:p-8 xl:px-12">
+    <div class="flex items-center justify-between max-w-7xl mx-auto">
       <!-- Logo -->
       <div>
-        <svg viewBox="0 0 24 24" 
-          class="
-            w-12 
-            h-12
-            lg:w-16
-            lg:h-16 
-            fill-[#D8DDEF] 
-            hover:fill-[#52FFB8] 
-            transition-colors 
-            duration-300" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg">
-          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-          <g id="SVGRepo_iconCarrier"> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M15 11.5C14.7239 11.5 14.5 11.7239 14.5 12C14.5 12.2761 14.7239 12.5 15 12.5C15.2761 12.5 15.5 12.2761 15.5 12C15.5 11.7239 15.2761 11.5 15 11.5ZM13.5 12C13.5 11.1716 14.1716 10.5 15 10.5C15.8284 10.5 16.5 11.1716 16.5 12C16.5 12.8284 15.8284 13.5 15 13.5C14.1716 13.5 13.5 12.8284 13.5 12Z" 
-            fill="fill-[#D8DDEF]"></path> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M9 11.5C8.72386 11.5 8.5 11.7239 8.5 12C8.5 12.2761 8.72386 12.5 9 12.5C9.27614 12.5 9.5 12.2761 9.5 12C9.5 11.7239 9.27614 11.5 9 11.5ZM7.5 12C7.5 11.1716 8.17157 10.5 9 10.5C9.82843 10.5 10.5 11.1716 10.5 12C10.5 12.8284 9.82843 13.5 9 13.5C8.17157 13.5 7.5 12.8284 7.5 12Z" 
-            fill="fill-[#D8DDEF]"></path> 
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4556 5.63613C15.6756 5.82194 16.7004 6.25713 17.4102 7.27534C18.1692 8.36416 18.5 10.0302 18.5 12.4999C18.5 14.6609 17.5191 16.4122 16.2329 17.6151C14.9588 18.8067 13.3419 19.4999 12 19.4999C10.4696 19.4999 8.84831 18.6924 7.62113 17.4471C6.38737 16.195 5.5 14.4492 5.5 12.4999C5.5 10.0302 5.83082 8.36416 6.58982 7.27534C7.2996 6.25714 8.32444 5.82194 9.54444 5.63613C9.70705 4.98353 10.2971 4.5 11 4.5H13C13.7029 4.5 14.2929 4.98353 14.4556 5.63613ZM9.5 6.6571C8.53681 6.83212 7.87319 7.18298 7.41018 7.8472C6.83585 8.6711 6.5 10.0707 6.5 12.4999C6.5 14.1405 7.24899 15.6447 8.33342 16.7452C9.42442 17.8524 10.8031 18.4999 12 18.4999C13.0352 18.4999 14.4182 17.9431 15.5499 16.8848C16.6694 15.8377 17.5 14.339 17.5 12.4999C17.5 10.0707 17.1642 8.6711 16.5898 7.8472C16.1268 7.18298 15.4632 6.83212 14.5 6.6571V8C14.5 8.82843 13.8284 9.5 13 9.5H11C10.1716 9.5 9.5 8.82843 9.5 8V6.6571ZM10.5 6C10.5 5.72386 10.7239 5.5 11 5.5H13C13.2761 5.5 13.5 5.72386 13.5 6V8C13.5 8.27614 13.2761 8.5 13 8.5H11C10.7239 8.5 10.5 8.27614 10.5 8V6Z" 
-            fill="fill-[#D8DDEF]"></path> 
+        <svg viewBox="0 0 24 24" class="w-12 h-12 lg:w-16 lg:h-16 fill-[#D8DDEF] hover:fill-[#52FFB8] transition-colors duration-300" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M15 11.5C14.7239 11.5 14.5 11.7239 14.5 12C14.5 12.2761 14.7239 12.5 15 12.5C15.2761 12.5 15.5 12.2761 15.5 12C15.5 11.7239 15.2761 11.5 15 11.5ZM13.5 12C13.5 11.1716 14.1716 10.5 15 10.5C15.8284 10.5 16.5 11.1716 16.5 12C16.5 12.8284 15.8284 13.5 15 13.5C14.1716 13.5 13.5 12.8284 13.5 12Z" fill="#D8DDEF"></path>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M9 11.5C8.72386 11.5 8.5 11.7239 8.5 12C8.5 12.2761 8.72386 12.5 9 12.5C9.27614 12.5 9.5 12.2761 9.5 12C9.5 11.7239 9.27614 11.5 9 11.5ZM7.5 12C7.5 11.1716 8.17157 10.5 9 10.5C9.82843 10.5 10.5 11.1716 10.5 12C10.5 12.8284 9.82843 13.5 9 13.5C8.17157 13.5 7.5 12.8284 7.5 12Z" fill="#D8DDEF"></path>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4556 5.63613C15.6756 5.82194 16.7004 6.25713 17.4102 7.27534C18.1692 8.36416 18.5 10.0302 18.5 12.4999C18.5 14.6609 17.5191 16.4122 16.2329 17.6151C14.9588 18.8067 13.3419 19.4999 12 19.4999C10.4696 19.4999 8.84831 18.6924 7.62113 17.4471C6.38737 16.195 5.5 14.4492 5.5 12.4999C5.5 10.0302 5.83082 8.36416 6.58982 7.27534C7.2996 6.25714 8.32444 5.82194 9.54444 5.63613C9.70705 4.98353 10.2971 4.5 11 4.5H13C13.7029 4.5 14.2929 4.98353 14.4556 5.63613ZM9.5 6.6571C8.53681 6.83212 7.87319 7.18298 7.41018 7.8472C6.83585 8.6711 6.5 10.0707 6.5 12.4999C6.5 14.1405 7.24899 15.6447 8.33342 16.7452C9.42442 17.8524 10.8031 18.4999 12 18.4999C13.0352 18.4999 14.4182 17.9431 15.5499 16.8848C16.6694 15.8377 17.5 14.339 17.5 12.4999C17.5 10.0707 17.1642 8.6711 16.5898 7.8472C16.1268 7.18298 15.4632 6.83212 14.5 6.6571V8C14.5 8.82843 13.8284 9.5 13 9.5H11C10.1716 9.5 9.5 8.82843 9.5 8V6.6571ZM10.5 6C10.5 5.72386 10.7239 5.5 11 5.5H13C13.2761 5.5 13.5 5.72386 13.5 6V8C13.5 8.27614 13.2761 8.5 13 8.5H11C10.7239 8.5 10.5 8.27614 10.5 8V6Z" fill="#D8DDEF"></path>
           </g>
         </svg>
       </div>
-
-      <!-- Social Icons on the right -->
       <div class="flex gap-6">
-        <!-- X -->
-        <a href="#">
-          <svg viewBox="0 0 24 24"
-            class="
-              w-6
-              h-6 
-              fill-[#D8DDEF] 
-              hover:fill-[#52FFB8] 
-              transition-colors 
-              duration-300" 
-            role="img"  
-            xmlns="http://www.w3.org/2000/svg">
-            <title>
-              X
-            </title>
-            <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" 
-            fill="fill-[#D8DDEF]"/>
-          </svg>
-        </a>
-        <!-- Github  -->
-        <a href="#">
-          <svg viewBox="0 0 24 24"
-            class="
-              w-6 
-              h-6 
-              fill-[#D8DDEF] 
-              hover:fill-[#52FFB8] 
-              transition-colors 
-              duration-300" 
-            role="img" 
-            xmlns="http://www.w3.org/2000/svg">
-            <title>
-              GitHub
-            </title>
-            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" 
-            fill="fill-[#D8DDEF]"/>
-          </svg>
-        </a>
+        <a href="#"><svg viewBox="0 0 24 24" class="w-6 h-6 fill-[#D8DDEF] hover:fill-[#52FFB8] transition-colors duration-300" role="img" xmlns="http://www.w3.org/2000/svg"><title>X</title><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="#"><svg viewBox="0 0 24 24" class="w-6 h-6 fill-[#D8DDEF] hover:fill-[#52FFB8] transition-colors duration-300" role="img" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
       </div>
     </div>
-
   </footer>
-
   <script src="app.js"></script>
 </body>
 </html>
