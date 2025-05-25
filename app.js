@@ -96,4 +96,24 @@ fetchPrices();
 setInterval(fetchPrices, 10000); // update every 10 seconds
 
 
+  let lastScrollY = window.scrollY;
+  const navbar = document.getElementById('main-navbar');
+
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      // Scroll down: hide
+      navbar.classList.remove('opacity-100');
+      navbar.classList.add('opacity-0', 'pointer-events-none');
+    } else {
+      // Scroll up: show
+      navbar.classList.remove('opacity-0', 'pointer-events-none');
+      navbar.classList.add('opacity-100');
+    }
+
+    lastScrollY = currentScrollY;
+  });
+
+
 
