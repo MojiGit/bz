@@ -60,7 +60,7 @@ const scrollContent = document.getElementById('scroll-content');
 const template = document.getElementById('crypto-template');
 
 // Duplicate content twice for smooth scroll
-for (let i = 0; i < 2; i++) {
+for (let i = 0; i < 4; i++) {
   const clone = template.content.cloneNode(true);
   scrollContent.appendChild(clone);
 }
@@ -83,7 +83,7 @@ async function fetchPrices() {
 }
 
 fetchPrices();
-setInterval(fetchPrices, 10000); // update every 10 seconds
+setInterval(fetchPrices, 500000); // update every 10 seconds
 
 
 let lastScrollTop = 0;
