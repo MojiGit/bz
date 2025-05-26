@@ -56,16 +56,6 @@ track.parentElement.addEventListener('mouseleave', startAutoPlay);
 goTo(0);
 startAutoPlay();
 
-
-const menuButton = document.getElementById('mobile-menu-button');
-const menu = document.getElementById('mobile-menu');
-
-  menuButton.addEventListener('click', () => {
-    menu.classList.toggle('hidden');
-  });
-
-
-
 const scrollContent = document.getElementById('scroll-content');
 const template = document.getElementById('crypto-template');
 
@@ -96,24 +86,44 @@ fetchPrices();
 setInterval(fetchPrices, 10000); // update every 10 seconds
 
 
-  let lastScrollY = window.scrollY;
-  const navbar = document.getElementById('main-navbar');
+let lastScrollTop = 0;
+const navbar = document.querySelector('nav');
+const mobileMenu = document.getElementById('mobile-menu');
 
-  window.addEventListener('scroll', () => {
-    const currentScrollY = window.scrollY;
+window.addEventListener('scroll', () => {
+  const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
-    if (currentScrollY > lastScrollY && currentScrollY > 100) {
-      // Scroll down: hide
-      navbar.classList.remove('opacity-100');
-      navbar.classList.add('opacity-0', 'pointer-events-none');
-    } else {
-      // Scroll up: show
-      navbar.classList.remove('opacity-0', 'pointer-events-none');
-      navbar.classList.add('opacity-100');
+  if (currentScroll > lastScrollTop) {
+    // Scroll Down — hide navbar and dropdown (if open)
+    navbar.classList.add('opacity-0', 'pointer-events-none');
+    navbar.classList.remove('opacity-100');
+
+    if (!mobileMenu.classList.contains('hidden')) {
+      mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+      mobileMenu.classList.remove('opacity-100');
     }
+  } else {
+    // Scroll Up — show navbar ONLY
+    navbar.classList.remove('opacity-0', 'pointer-events-none');
+    navbar.classList.add('opacity-100');
 
-    lastScrollY = currentScrollY;
+    // Do NOT show the dropdown here — leave it hidden unless manually triggered
+  }
+
+  lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+});
+
+
+  const menu = document.getElementById('mobile-menu');
+  const button = document.getElementById('mobile-menu-button');
+
+  let menuOpen = false;
+
+  button.addEventListener('click', () => {
+    menuOpen = !menuOpen;
+    menu.classList.toggle('opacity-0', !menuOpen);
+    menu.classList.toggle('pointer-events-none', !menuOpen);
+    menu.classList.toggle('opacity-100', menuOpen);
   });
-
 
 
