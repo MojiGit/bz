@@ -16,7 +16,7 @@
 <body class="bg-white text-[#191308] text-[18px] lg:text-[24px] font-['Roboto',sans-serif]">
 
   <!-- Landing -->
-  <div class="relative rounded-b-full shadow-2xl"
+  <div class="relative rounded-b-2xl shadow-2xl"
     style="background-image: url('./images/texture_blue_4.jpg'); background-size: cover; background-position: center;">
     <!-- Navbar -->
     <div class="relative z-50 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
@@ -64,18 +64,18 @@
 
     <!-- Hero Section -->
     <section class="p-4 sm:p-6 md:p-8 xl:p-12 2xl:p-24 w-full flex flex-col items-center justify-left">
-      <div class="text-[#D8DDEF] grid grid-cols-2 gap-16 p-12">
-          <h1 class="text-[30px] lg:text-[64px] text-left font-bold text-[#FFFFFF]">Simplify DeFi and Master Your Strategy</h1>
-          <h2 class="text-[18px] lg:text-[24px] text-left">
-            all-in-one interface to build, analyze, and execute DeFi investment strategies. 
-            Visualize the compound PNL of multi-asset portfolios, 
-            run simulations to test your hypotheses, 
-            and fine-tune hedges before committing capital. 
-            We bring advanced investment infrastructure to Web3—without the complexity.
-          </h2>
-      </div>
-      <div class="flex justify-left">
-          <a href="https://m-mojica-mateuss-organization.gitbook.io/betazero-1/" target="_blank" rel="noopener noreferrer">
+      <div class="text-[#D8DDEF] grid grid-cols-1 md:grid-cols-2 gap-8 md_gap-16 pb-12 items-center justify-center max-w-7xl">
+        <h1 class="text-[30px] lg:text-[64px] text-left font-bold text-[#FFFFFF]">
+          Simplify DeFi and Master Your Strategy
+        </h1>  
+        <h2 class="text-[18px] lg:text-[24px] text-left">
+          all-in-one interface to build, analyze, and execute DeFi investment strategies. 
+          Visualize the compound PNL of multi-asset portfolios, 
+          run simulations to test your hypotheses, 
+          and fine-tune hedges before committing capital. 
+          We bring advanced investment infrastructure to Web3—without the complexity.
+        </h2>
+        <a href="https://m-mojica-mateuss-organization.gitbook.io/betazero-1/" target="_blank" rel="noopener noreferrer">
             <button class="text-[16px] lg:text-[24px] font-bold text-[#191308] bg-[#52FFB8] px-6 py-2 rounded-2xl">Start Building</button>          
           </a>
       </div>
@@ -86,7 +86,7 @@
   <section class="w-full grid grid-cols-1 gap-6 items-center justify-center py-14 sm:py-20 md:py-24 xl:py-32">
     <div class="flex flex-col items-center">
       <h1 class="text-[30px] lg:text-[64px] text-[#191308] font-bold text-center">
-        Trade anything, anywhere, anytime</h1>
+        Real-Time Quotes Across Multiple DEXs</h1>
     </div>
     <div id="scroll-wrapper" class="overflow-hidden relative backdrop-blur-sm border-2 border-[#D8DDEF] py-6 shadow-xl">
       <div id="scroll-content" class="flex items-center gap-20 whitespace-nowrap animate-scroll-left will-change-transform font-bold text-[20px]">
@@ -188,24 +188,45 @@
       <div class="overflow-hidden rounded-3xl border border-white/20">
         <div id="carousel-track" class="flex transition-transform duration-700 ease-in-out">
           <!-- Slide 1 -->
-          <div class="min-w-full flex flex-col items-center md:flex-row bg-[#191308] rounded-3xl shadow-2xl p-4 overflow-hidden" style="background-image: url('./images/texture_black_1.jpg'); background-size: cover; background-position: center;">
-            <div class="py-6 md:w-1/2 flex flex-col justify-center">
-              <h2 class="text-[36px] lg:text-[64px] font-bold text-[#52FFB8] mb-2">Design</h2>
-              <p class="text-[#D8DDEF] text-[18px] lg:text-[24px]">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.</p>
+          <div class="min-w-full flex flex-col items-center md:flex-row bg-[#191308] rounded-3xl shadow-2xl p-4 md:p-8 overflow-hidden" style="background-image: url('./images/texture_black_1.jpg'); background-size: cover; background-position: center;">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center justify-center">
+              <h2 class="text-[36px] lg:text-[64px] font-bold text-[#52FFB8] mb-2">
+                Design Your Strategy
+              </h2>
+              <p class="text-[#D8DDEF] text-[18px] lg:text-[24px]">
+                Use our intuitive visual interface to build and simulate investment strategies. 
+                Whether you're combining spot assets, perpetuals, or options, 
+                the platform models your compound PNL in real time. 
+                Understand break-even points,
+                and size your contracts with precision—before you risk a single token.
+              </p>
             </div>
           </div>
           <!-- Slide 2 -->
-          <div class="min-w-full flex flex-col items-center md:flex-row bg-[#191308] rounded-3xl shadow-2xl p-4 overflow-hidden" style="background-image: url('./images/texture_black_1.jpg'); background-size: cover; background-position: center;">
-            <div class="py-6 md:w-1/2 flex flex-col justify-center">
-              <h2 class="text-[36px] lg:text-[64px] font-bold text-[#52FFB8] mb-2">Quote</h2>
-              <p class="text-[#D8DDEF] text-[18px] lg:text-[24px]">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.</p>
+          <div class="min-w-full flex flex-col items-center md:flex-row bg-[#191308] rounded-3xl shadow-2xl p-4 md:p-8 overflow-hidden" style="background-image: url('./images/texture_black_1.jpg'); background-size: cover; background-position: center;">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center justify-center">
+              <h2 class="text-[36px] lg:text-[64px] font-bold text-[#52FFB8] mb-2"> 
+                Quote in Real Time
+              </h2>
+              <p class="text-[#D8DDEF] text-[18px] lg:text-[24px]">
+                Request live quotes from integrated DEXs, and protocols across the ecosystem. 
+                Our engine aggregates prices for each leg of your strategy, ensuring you get accurate, market-aligned execution data. 
+                Say goodbye to hunting across protocols
+              </p>
             </div>
           </div>
           <!-- Slide 3 -->
-          <div class="min-w-full flex flex-col items-center md:flex-row bg-[#191308] rounded-3xl shadow-2xl p-4 overflow-hidden" style="background-image: url('./images/texture_black_1.jpg'); background-size: cover; background-position: center;">
-            <div class="py-6 md:w-1/2 flex flex-col justify-center">
-              <h2 class="text-[36px] lg:text-[64px] font-bold text-[#52FFB8] mb-2">Deploy</h2>
-              <p class="text-[#D8DDEF] text-[18px] lg:text-[24px]">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum.</p>
+          <div class="min-w-full flex flex-col items-center md:flex-row bg-[#191308] rounded-3xl shadow-2xl p-4 md:p-8 overflow-hidden" style="background-image: url('./images/texture_black_1.jpg'); background-size: cover; background-position: center;">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center justify-center">
+              <h2 class="text-[36px] lg:text-[64px] font-bold text-[#52FFB8] mb-2">
+                Trade Directly, Securely
+              </h2>
+              <p class="text-[#D8DDEF] text-[18px] lg:text-[24px]">
+                Execute your full strategy directly. Non-custodially, securely, 
+                and without jumping between wallets or protocols. 
+                Every trade is routed through trusted DEXs, and your assets never leave your control. 
+                It’s fast, seamless execution for serious DeFi investors looking to move with precision and confidence.
+              </p>
             </div>
           </div>
         </div>
@@ -225,34 +246,67 @@
       <div class="grid grid-cols-1 divide-y-2 divide-[#D8DDEF] gap-8">
         <!-- Card 1 -->
         <a href="#" class="group block relative p-4">
-          <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
-              <h2 class="text-[36px] lg:text-[64px] text-left text-[#191308] font-semibold">Don't Hold, Hedge</h2>
+              <h2 class="text-[36px] lg:text-[64px] text-left text-[#191308] font-semibold">
+                Dynamic Hedging
+              </h2>
+              <h3 class="text-[24px] lg:text-[36px] text-left text-[#52FFB8] font-semibold mb-2">
+                Hodling is not a strategy
+              </h3>
             </div>
             <div>
-              <p class="text-[18px] lg:text-[24px] text-left text-[#D8DDEF]">Stake with upside, hedge the downside. Protect your yield with options that minimize volatility while your capital keeps working</p>
+              <p class="text-[18px] lg:text-[24px] text-left text-[#D8DDEF]">
+                True risk management means planning for downside. 
+                By combining spot positions with options or perpetuals, 
+                investors can protect their portfolios from volatility without fully exiting the market. 
+                The challenge? Designing, visualizing, 
+                and executing multi-leg hedging strategies is time-consuming and error-prone across fragmented protocols. 
+              </p>
             </div>
           </div>
         </a>
         <!-- Card 2 -->
         <a href="#" class="group block relative p-4">
-          <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
-              <h2 class="text-[36px] lg:text-[64px] text-left text-[#191308] font-semibold">Volatility Farming</h2>
+              <h2 class="text-[36px] lg:text-[64px] text-left text-[#191308] font-semibold">
+                Farming
+              </h2>
+              <h3 class="text-[24px] lg:text-[36px] text-left text-[#52FFB8] font-semibold mb-2">
+                Volatility is an Asset
+              </h3>
             </div>
             <div>
-              <p class="text-[18px] lg:text-[24px] text-left text-[#D8DDEF]">Stake with upside, hedge the downside. Protect your yield with options that minimize volatility while your capital keeps working</p>
+              <p class="text-[18px] lg:text-[24px] text-left text-[#D8DDEF]">
+                Strategies like straddles, strangles, 
+                and other advanced option combinations can turn turbulence into profit—but modeling these setups is complex, 
+                and execution across multiple DEXs is a mess. 
+                With our visual PNL tools and real-time multi-DEX quoting, you can build, test, 
+                and execute volatility-driven strategies with clarity.
+              </p>
             </div>
           </div>
         </a>
         <!-- Card 3 -->
         <a href="#" class="group block relative p-4">
-          <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
-              <h2 class="text-[36px] lg:text-[64px] text-left text-[#191308] font-semibold">Upfront Yield</h2>
+              <h2 class="text-[36px] lg:text-[64px] text-left text-[#191308] font-semibold">
+                Upfront Yield
+              </h2>
+              <h3 class="text-[24px] lg:text-[36px] text-left text-[#52FFB8] font-semibold mb-2">
+                Why wait for gains? 
+              </h3>
             </div>
             <div>
-              <p class="text-[18px] lg:text-[24px] text-left text-[#D8DDEF]">Stake with upside, hedge the downside. Protect your yield with options that minimize volatility while your capital keeps working</p>
+              <p class="text-[18px] lg:text-[24px] text-left text-[#D8DDEF]">
+                Selling options allows investors you to collect premiums up front, 
+                generating instant yield—if you can properly evaluate the risk. 
+                Our platform helps you visualize the full risk/reward profile before you write a contract, 
+                so you can optimize returns while protecting your downside.
+                We make premium farming smarter, faster, and far more accessible.
+              </p>
             </div>
           </div>
         </a>
