@@ -25,7 +25,7 @@
     Derivatives, 
     OTC">
   <meta name="author" content="Beta Web3 Finance Team">
-  <title>Beta | Web3 Options Trading Platform for Custom DeFi Strategies</title>
+  <title>Beta | web3 Options Strategy buildier </title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,7 +36,7 @@
 <body class="bg-white text-[#191308] text-[18px] lg:text-[24px]">
 
   <!-- Landing -->
-  <div class="relative rounded-b-2xl shadow-2xl"
+  <section class="relative rounded-b-2xl shadow-2xl"
     style="background-image: url('./images/texture_purple_3.jpg'); background-size: cover; background-position: center;">
     <!-- Navbar -->
     <div class="relative z-50 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
@@ -80,38 +80,48 @@
     </div>
 
     <!-- space to avoid navbar overlap with hero section -->
-    <div class="h-[100px]"></div>
+    <div class="h-[70px]"></div>
 
     <!-- Hero Section -->
-    <section class="p-4 sm:p-6 md:p-8 xl:p-12 2xl:p-24 w-full flex flex-col items-center justify-left">
-      <div class="text-[#D8DDEF] grid grid-cols-1 md:grid-cols-2 gap-8 md_gap-16 pb-12 items-center justify-center max-w-7xl">
-        <h1 class="text-[30px] lg:text-[64px] text-left font-bold text-[#FFFFFF]">
-          Simplify DeFi and Master Your Strategy
-        </h1>  
-        <h2 class="text-[18px] lg:text-[24px] text-left text-white/80 font-semibold">
-          All-in-one interface to build, analyze, and execute DeFi investment strategies. 
-          Visualize the compound PNL of your portfolio, 
-          run simulations to test your hypotheses, 
-          and trade across several protocols.
-          <br><br> 
-          We bring advanced investment infrastructure to Web3 without the complexity.
-        </h2>
+    <div class="px-4 py-6 sm:p-6 md:p-8 xl:p-12 2xl:p-24 w-full lg:h-[650px] flex items-center justify-center">
+      <div class="text-[#D8DDEF] grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-14 items-center justify-center max-w-7xl">
         <div>
-          <a href="https://m-mojica-mateuss-organization.gitbook.io/betazero-1/" target="_blank" rel="noopener noreferrer">
-            <button class="text-[16px] lg:text-[24px] font-bold text-[#191308] bg-[#00E083] px-6 py-2 rounded-2xl hover:bg-[#52FFB8]">
-              Get Started
-            </button>          
-          </a>
+          <h1 class="text-[30px] lg:text-[64px] text-left font-bold text-[#FFFFFF]">
+            DeFi Options Strategy Builder 
+          </h1->  
+          <div class="hidden md:inline-block">
+            <a href="https://m-mojica-mateuss-organization.gitbook.io/betazero-1/" target="_blank" rel="noopener noreferrer">
+              <button class="text-[16px] lg:text-[24px] font-bold text-[#191308] bg-[#00E083] px-6 py-2 rounded-2xl hover:bg-[#52FFB8]">
+                Get Started
+              </button>          
+            </a>
+          </div>
+        </div>
+        <div>
+          <h2 class="text-[18px] lg:text-[24px] text-left text-white/80 font-semibold mb-8">
+            Visualize risk profiles, pick up a strategy and customize its parameters according to your market outlook
+            <br></br>
+            Tailor your strategy, choose the correct expiration, adjust strikes, position size, and get a quote from the market 
+          </h2>
+          <div class="md:hidden">
+            <a href="https://m-mojica-mateuss-organization.gitbook.io/betazero-1/" target="_blank" rel="noopener noreferrer">
+              <button class="text-[16px] lg:text-[24px] font-bold text-[#191308] bg-[#00E083] px-6 py-2 rounded-2xl hover:bg-[#52FFB8]">
+                Get Started
+              </button>          
+            </a>
+          </div>
         </div>
       </div>
-    </section>
-  </div>
+    </div>
+
+  </section>
 
   <!-- Banner -->
   <section class="w-full grid grid-cols-1 gap-6 items-center justify-center py-14 sm:py-20 md:py-24 xl:py-32">
     <div class="flex flex-col items-center">
       <h1 class="text-[30px] lg:text-[64px] text-[#191308] font-bold text-center">
-        Real-Time Quotes Across Multiple DEXs</h1>
+        Simplify DeFi,
+        Trade Smarter</h1>
     </div>
     <div id="scroll-wrapper" class="overflow-hidden relative py-6 ">
       <div id="scroll-content" class="flex items-center gap-14 whitespace-nowrap animate-scroll-left will-change-transform ">
@@ -249,10 +259,10 @@
           <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center p-4">
             <div>
               <h2 class="text-[36px] lg:text-[64px] text-left text-[#191308] font-semibold">
-                Trade
+                Execute
               </h2>
               <h3 class="text-[24px] lg:text-[36px] text-left text-[#52FFB8] font-semibold mb-2">
-                Execute your full strategy directly
+                Trade your full strategy directly
               </h3>
             </div>
             <div>
@@ -393,37 +403,35 @@
     </div>
   </section>
 
-
-
 <!-- About Us Section -->
-<section id="about-us" class="w-full p-4 sm:p-6 md:p-8 lg:p-16">
-  <h2 class="text-[18px] lg:text-[24px] font-bold mb-4 lg:mb-8 text-[#D8DDEF] text-left ">About Us</h2>
-  <div class="flex flex-col items-center justify-center max-w-7xl mx-auto">
-    <h1 class="text-[30px] lg:text-[64px] text-[#191308] font-bold text-center mb-4 md:mb-10">
-      Empowering Smarter Investing
-    </h1>
-    <div class="w-full flex flex-col xl:flex-row items-center justify-center gap-8 md:gap-10">
-      <div class="w-full xl:w-1/2 flex justify-center items-center">
-        <img src="images/last_dinner.jpeg" alt="Quote" class="w-full h-full max-h-[500px] max-w-[650px] object-cover rounded-3xl shadow-2xl">
-      </div>
-      <div class="w-full xl:w-1/2 flex flex-col items-center justify-center">
-        <p class="text-[18px] lg:text-[24px] text-gray-400 px-4 text-left xl:max-w-7xl">
-          We built this platform because we saw a gap: 
-          sophisticated strategies like hedging, volatility plays, 
-          and premium farming were technically possible, but practically inaccessible. 
-          Navigating between protocols, calculating PNLs manually, 
-          and lacking execution clarity made even experienced investors hesitate. 
-          <br></br>
-          Our mission is to change that—to bring professional-grade tools to DeFi investors, 
-          and make complex strategies as intuitive as clicking a button.
-          <br></br>
-          We’re not just building a platform; we’re creating a community of informed, empowered investors. 
-          Join us as we redefine what’s possible in DeFi, and make sophisticated investing accessible to everyone.
-        </p>
+  <section id="about-us" class="w-full p-4 sm:p-6 md:p-8 lg:p-16">
+    <h2 class="text-[18px] lg:text-[24px] font-bold mb-4 lg:mb-8 text-[#D8DDEF] text-left ">About Us</h2>
+    <div class="flex flex-col items-center justify-center max-w-7xl mx-auto">
+      <h1 class="text-[30px] lg:text-[64px] text-[#191308] font-bold text-center mb-4 md:mb-10">
+        Empowering Smarter Investing
+      </h1>
+      <div class="w-full flex flex-col xl:flex-row items-center justify-center gap-8 md:gap-10">
+        <div class="w-full xl:w-1/2 flex justify-center items-center">
+          <img src="images/last_dinner.jpeg" alt="Quote" class="w-full h-full max-h-[500px] max-w-[650px] object-cover rounded-3xl shadow-2xl">
+        </div>
+        <div class="w-full xl:w-1/2 flex flex-col items-center justify-center">
+          <p class="text-[18px] lg:text-[24px] text-gray-400 px-4 text-left xl:max-w-7xl">
+            We built this platform because we saw a gap: 
+            sophisticated strategies like hedging, volatility plays, 
+            and premium farming were technically possible, but practically inaccessible. 
+            Navigating between protocols, calculating PNLs manually, 
+            and lacking execution clarity made even experienced investors hesitate. 
+            <br></br>
+            Our mission is to change that—to bring professional-grade tools to DeFi investors, 
+            and make complex strategies as intuitive as clicking a button.
+            <br></br>
+            We’re not just building a platform; we’re creating a community of informed, empowered investors. 
+            Join us as we redefine what’s possible in DeFi, and make sophisticated investing accessible to everyone.
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
   <!-- CTA Section -->
   <section class="w-full p-4 sm:p-6 md:p-8 lg:p-16 flex justify-center mb-10">
