@@ -59,8 +59,8 @@ startAutoPlay();
 const scrollContent = document.getElementById('scroll-content');
 const template = document.getElementById('crypto-template');
 
-// Duplicate content twice for smooth scroll
-for (let i = 0; i < 4; i++) {
+// Duplicate content for smooth scroll
+for (let i = 0; i < 10; i++) {
   const clone = template.content.cloneNode(true);
   scrollContent.appendChild(clone);
 }
@@ -75,7 +75,7 @@ async function fetchPrices() {
     document.querySelectorAll('.crypto-price').forEach(el => {
       const id = el.dataset.symbol;
       const price = data[id]?.usd;
-      if (price) el.textContent = price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (price) el.textContent = price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     });
   } catch (err) {
     console.error('Error fetching prices:', err);
@@ -83,7 +83,6 @@ async function fetchPrices() {
 }
 
 fetchPrices();
-setInterval(fetchPrices, 500000); // update every 10 seconds
 
 
 let lastScrollTop = 0;

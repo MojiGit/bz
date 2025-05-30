@@ -8,12 +8,12 @@ font-family: 'Roboto', sans-serif;
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-100%);
   }
 }
 
 .animate-scroll-left {
-  animation: scroll-left 10s linear infinite;
+  animation: scroll-left 60s linear infinite;
 }
 
 #scroll-wrapper:hover #scroll-content {
