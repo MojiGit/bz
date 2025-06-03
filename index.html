@@ -36,12 +36,12 @@
 <body class="bg-white text-[#191308] text-[18px] lg:text-[24px]">
 
   <!-- Landing -->
-  <section class="relative rounded-b-2xl shadow-2xl"
+  <section class="relative rounded-b-2xl shadow-2xl h-screen"
     style="background-image: url('./images/test_5.jpg'); background-size: cover; background-position: center;">
     <!-- Navbar -->
     <div class="relative z-50 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
       
-      <nav id="main-navbar" class="fixed top-4 left-4 right-4 z-50 p-4 sm:px-6 md:px-8 xl:px-12 2xl:px-24 backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl flex items-center justify-between transition-opacity duration-500 ease-in-out opacity-100">
+      <nav id="main-navbar" class="fixed top-4 left-2 right-2 z-50 p-4 sm:px-6 md:px-8 xl:px-12 2xl:px-24 backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl flex items-center justify-between transition-opacity duration-500 ease-in-out opacity-100">
         <!-- Logo -->
         <a href="#">
           <img src="images/svgs/logo_green.svg" alt="Beta" class="w-12 h-6 lg:w-24 lg:h-16">
@@ -282,8 +282,8 @@
 
   <!-- Features -->
   <section id="features" 
-    class="w-full p-4 sm:px-6 md:px-8 lg:px-16 rounded-2xl bg-black"
-    style="background-image: url('./images/test_6.jpg'); background-size: cover; background-position: center;" >
+    class="w-full py-12 px-4 sm:px-6 md:px-8 lg:px-16 rounded-2xl bg-[#191308]">
+    <!-- style="background-image: url('./images/test_6.jpg'); background-size: cover; background-position: center;" -->
     <h2 class="text-[18px] lg:text-[24px] font-bold mb-4 lg:mb-8 text-[#D8DDEF]">Features</h2>
     <div class="grid grid-cols-1 divide-y-2 divide-[#FFFFFF] gap-8 mx-auto text-left max-w-7xl">
       <div>
@@ -294,7 +294,7 @@
           Forget about navigating between protocols and calculating PNLs manually
         </p>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 pt-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pt-8">
         <div>
           <h1 class="text-[24px] lg:text-[36px] text-left text-[#52FFB8] font-semibold mb-2">
             Non-Custodian
@@ -344,6 +344,10 @@
   <!-- use cases Section -->
   <section id="use-cases" class="p-4 w-full sm:px-16 flex | grid grid-cols-1">
     <h2 class="text-[18px] lg:text-[24px] font-bold mb-4 lg:mb-8 text-[#D8DDEF]">Use cases</h2>
+    <div class="flex flex-col items-center mb-8">
+      <h1 class="text-[30px] lg:text-[64px] text-[#191308] font-bold text-center">
+        Optimize Your Next Move</h1>
+    </div>
     <div id="carousel" class="relative w-full max-w-7xl mx-auto select-none">
       <div class="overflow-hidden rounded-3xl border border-white/20 shadow-2xl">
         <div id="carousel-track" class="flex transition-transform duration-700 ease-in-out">
@@ -352,7 +356,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center justify-center">
               <div>
                 <h2 class="text-[36px] lg:text-[64px] font-bold text-[#00E083] mb-2">
-                  Hedging 
+                  Hedge 
                 </h2>
                 <h3 class="text-[24px] lg:text-[36px] text-[#D8DDEF]"> 
                   Stay invested, stay protected
@@ -410,7 +414,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center justify-center">
               <div>
                 <h2 class="text-[36px] lg:text-[64px] font-bold text-[#00E083] mb-2"> 
-                  Upfront Yield  
+                  Yield  
                 </h2>
                 <h3 class="text-[24px] lg:text-[36px] text-[#D8DDEF]">
                   Why wait for gains? 
@@ -435,30 +439,9 @@
             </div>
           </div>
 
-          <!--Slide 4-->
-          <div class="min-w-full flex flex-col items-center md:flex-row bg-[#191308] rounded-3xl px-4 py-6 md:p-8 overflow-hidden">
-            <div class="grid grid-cols-1 items-center justify-center ">
-              <div>
-                <h3 class="text-[24px] lg:text-[36px] text-[#D8DDEF]">
-                  Optimize Your Next Move
-                </h3>
-              </div>  
-              <div>
-                <div class="flex">
-                  <a href="https://m-mojica-mateuss-organization.gitbook.io/betazero-1/" target="_blank" rel="noopener noreferrer" class="text-[36px] lg:text-[64px] font-bold text-[#00E083] mb-2 hover:text-[#52FFB8]">
-                    <p>
-                    Unlock Advanced Strategies
-                    </p>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
       <div class="flex justify-center space-x-4 p-6 rounded-lg">
-        <span class="dot inline-block w-4 h-4 rounded-full bg-[#D8DDEF] cursor-pointer"></span>
         <span class="dot inline-block w-4 h-4 rounded-full bg-[#D8DDEF] cursor-pointer"></span>
         <span class="dot inline-block w-4 h-4 rounded-full bg-[#D8DDEF] cursor-pointer"></span>
         <span class="dot inline-block w-4 h-4 rounded-full bg-[#D8DDEF] cursor-pointer"></span>
@@ -498,8 +481,8 @@
 
   <!-- CTA Section -->
   <section class="w-full p-4 sm:p-6 md:p-8 lg:p-16 flex justify-center mb-10">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 rounded-2xl p-4 sm:p-6 md:p-8 max-w-7xl shadow-2xl" 
-      style="background-image: url('./images/test_9.jpg'); background-size: cover; background-position: center;">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 rounded-2xl p-4 sm:p-6 md:p-8 max-w-7xl shadow-2xl bg-[#191308]">
+      <!-- style="background-image: url('./images/test_9.jpg'); background-size: cover; background-position: center;"-->
       <div>
         <h2 class="text-3xl text-[#D8DDEF] md:text-5xl font-bold mb-6 text-left">Join our Community</h2>
         <p class="text-lg text-[#D8DDEF] md:text-xl text-left">
