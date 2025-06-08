@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" 
+    content="
+    Beta is a Web3 investing platform for on-chain OTC options. 
+    Design, simulate, and execute custom DeFi option strategies 
+    with real-time pricing and non-custodial trading.">
+  <meta name="keywords" content="
+    Web3 investing, 
+    DeFi options, 
+    OTC derivatives, 
+    on-chain options, 
+    smart contracts, 
+    crypto hedging, 
+    decentralized finance, 
+    options trading, 
+    blockchain trading, 
+    DeFi tools
+    DeFi, 
+    Options, 
+    Blockchain, 
+    Derivatives, 
+    OTC">
+  <meta name="author" content="Beta Web3 Finance Team">
+  <title>Beta | DeFi Options Strategy buildier </title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/mvp/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+
+</head>
+<body class="bg-black text-[#D8DDEF] text-[18px] md:text-[24px]">
+
+
+    <div class="max-w-md mx-auto mt-10 p-4 bg-white shadow-lg rounded-2xl">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">
+            Select Base Asset
+        </h2>
+        
+        <label for="assetSelector" class="block text-sm font-medium text-gray-700 mb-1">
+            Choose Asset:
+        </label>
+        <select id="assetSelector" class="w-full p-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="ETH">ETH (Ethereum)</option>
+            <option value="WBTC">WBTC (Wrapped Bitcoin)</option>
+        </select>
+
+        <!-- This is a placeholder for showing selected asset (can be removed later) -->
+        <div id="selectedAsset" class="mt-4 text-sm text-gray-600">
+            Selected Asset: ETH
+        </div>
+    </div>
+
+
+
+<script src="/mvp/app.js"></script>
+</body>
+</html>
