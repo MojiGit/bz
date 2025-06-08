@@ -33,6 +33,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
 
 </head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <body class="bg-black text-[#D8DDEF] text-[18px] md:text-[24px]">
 
 
@@ -53,6 +54,42 @@
         <div id="selectedAsset" class="mt-4 text-sm text-gray-600">
             Selected Asset: ETH
         </div>
+    </div>
+    <!-- Strategy Selection Section -->
+    <div class="max-w-md mx-auto mt-8 p-4 bg-white shadow-md rounded-2xl">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Strategy Setup</h2>
+
+        <!-- Strategy Type -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Choose Strategy Type:</label>
+            <div class="flex items-center gap-4">
+            <label class="flex items-center">
+                <input type="radio" name="strategyType" value="standard" checked class="mr-1"> Standard
+            </label>
+            <label class="flex items-center">
+                <input type="radio" name="strategyType" value="custom" class="mr-1"> Custom
+            </label>
+            </div>
+        </div>
+
+        <!-- Standard Strategy Dropdown -->
+        <div id="standardStrategySection" class="mb-4">
+            <label for="standardStrategy" class="block text-sm font-medium text-gray-700 mb-1">Select Standard Strategy:</label>
+            <select id="standardStrategy" class="w-full p-2 border border-gray-300 rounded-md">
+            <option value="strangle">Strangle (Neutral)</option>
+            <option value="shortCondor">Short Condor</option>
+            </select>
+        </div>
+
+        <!-- Custom Strategy Builder -->
+        <div id="customStrategySection" class="hidden">
+            <div id="customAssetsContainer"></div>
+            <button id="addAssetBtn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">+ Add Asset</button>
+        </div>
+    </div>
+
+    <div class="w-full max-w-4xl mx-auto mt-10">
+        <canvas id="pnlChart" class="w-full h-96"></canvas>
     </div>
 
 
