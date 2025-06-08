@@ -219,3 +219,10 @@ function renderPNLChart(pnlData) {
   });
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  const priceRange = generatePriceRange(1000, 3000, 100); // Replace with your helper function
+  const pnlData = createStrangle(1800, 2200, 50, 50, 1, priceRange); // Replace with your actual strategy logic
+  renderPNLChart(pnlData);
+});
+
+
