@@ -1,6 +1,6 @@
 
 const track = document.getElementById('carousel-track');
-const slides = track.children;
+const slides = Array.from(track.children).filter(child => child.classList.contains('slide'));
 const dots = document.querySelectorAll('.dot');
 let current = 0;
 const total = slides.length;
@@ -124,5 +124,4 @@ window.addEventListener('scroll', () => {
     menu.classList.toggle('pointer-events-none', !menuOpen);
     menu.classList.toggle('opacity-100', menuOpen);
   });
-
 

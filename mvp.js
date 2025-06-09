@@ -1,4 +1,26 @@
 
+// JavaScript logic to handle token selection 
+
+const buttons = document.querySelectorAll('.token-btn');
+const tokenoutput = document.getElementById('token-output');
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      // Remove active state from all buttons
+      buttons.forEach(b => b.classList.remove('bg-[#00E083]', 'text-[#191308]'));
+
+      // Add active state to clicked button
+      btn.classList.add('bg-[#00E083]', 'text-[#191308]');
+
+      // Update page content or state
+      const token = btn.getAttribute('data-token');
+      tokenoutput.textContent = `Selected token: ${token}`;
+    });
+  });
+
+
+
+
 // JavaScript logic to reflect selection
 
   const selector = document.getElementById('assetSelector');
@@ -224,5 +246,3 @@ document.addEventListener('DOMContentLoaded', () => {
   const pnlData = createStrangle(1800, 2200, 50, 50, 1, priceRange); // Replace with your actual strategy logic
   renderPNLChart(pnlData);
 });
-
-

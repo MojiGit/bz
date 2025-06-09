@@ -34,66 +34,116 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="bg-black text-[#D8DDEF] text-[18px] md:text-[24px]">
+<body class="bg-white text-[#D8DDEF] text-[18px] md:text-[24px]">
 
 
-    <div class="max-w-md mx-auto mt-10 p-4 bg-white shadow-lg rounded-2xl">
-        <h2 class="text-xl font-bold mb-4 text-gray-800">
-            Select Base Asset
-        </h2>
-        
-        <label for="assetSelector" class="block text-sm font-medium text-gray-700 mb-1">
-            Choose Asset:
-        </label>
-        <select id="assetSelector" class="w-full p-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="ETH">ETH (Ethereum)</option>
-            <option value="WBTC">WBTC (Wrapped Bitcoin)</option>
-        </select>
+    <!-- Navbar -->
+    <div class="relative z-50">        
+        <nav id="main-navbar"
+            class="fixed top-4 left-2 right-2 z-50 px-4 backdrop-blur-md bg-white/10 border border-[#D8DDEF] rounded-full flex items-center justify-between transition-opacity duration-500 ease-in-out opacity-100">
+            <!-- Logo -->
+            <a href="#">
+            <img src="/images/svgs/logo_green.svg" alt="Beta" class="w-16 h-12 lg:w-24 lg:h-16">
+            </a>
 
-        <!-- This is a placeholder for showing selected asset (can be removed later) -->
-        <div id="selectedAsset" class="mt-4 text-sm text-gray-600">
-            Selected Asset: ETH
-        </div>
+            <div class="flex-1"></div>
+
+            <!-- Desktop Links -->
+            <ul class="space-x-6 text-[#00E083] text-[18px] hidden md:flex items-center">
+                <li><a href="#" class="hover:text-[#52FFB8] transition font-bold">Whitepaper</a></li>
+                <li><a target="_blank" rel="noopener noreferrer" href="https://m-mojica-mateuss-organization.gitbook.io/betazero-1/" class="hover:text-[#52FFB8] transition font-bold">Docs</a></li>
+            </ul>
+        </nav>
+            <!-- space to avoid navbar overlap with hero section -->
+        <div class="h-[50px] md:h-[70px]"></div>
+
     </div>
-    <!-- Strategy Selection Section -->
-    <div class="max-w-md mx-auto mt-8 p-4 bg-white shadow-md rounded-2xl">
-        <h2 class="text-xl font-bold mb-4 text-gray-800">Strategy Setup</h2>
 
-        <!-- Strategy Type -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Choose Strategy Type:</label>
-            <div class="flex items-center gap-4">
-            <label class="flex items-center">
-                <input type="radio" name="strategyType" value="standard" checked class="mr-1"> Standard
-            </label>
-            <label class="flex items-center">
-                <input type="radio" name="strategyType" value="custom" class="mr-1"> Custom
-            </label>
+    <section id="dashboard" class="flex flex-row max-h-screen p-4">
+
+        <div id="menu" class="max-w-xl"> 
+            <div class="flex flex-row ">
+                <h1 class="text-[24px] font-bold text-[#191308] my-6">
+                Option Strategy Builder
+                </h1>
+            </div>
+
+
+            <div id="token-buttons" class="flex gap-2">
+                <button
+                    data-token="WBTC"
+                    class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300 hover:bg-[#D8DDEF] hover:text-[#191308] text-[#D8DDEF]"
+                >
+                    WBTC
+                </button>
+                <label for="">|</label>
+                <button
+                    data-token="ETH"
+                    class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300 hover:bg-[#D8DDEF] hover:text-[#191308] text-[#D8DDEF]"
+                >
+                    ETH
+                </button>
+            </div>
+            
+
+            
+            <div class="max-w-md mx-auto mt-10 p-4 backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 text-[#FFFFFF]">
+                    Select Base Asset
+                </h2>
+                
+                <label for="assetSelector" class="block text-sm font-medium text-[#FFFFFF] mb-1">
+                    Choose Asset:
+                </label>
+                <select id="assetSelector" class="w-full p-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="ETH">ETH (Ethereum)</option>
+                    <option value="WBTC">WBTC (Wrapped Bitcoin)</option>
+                </select>
+
+                <!-- This is a placeholder for showing selected asset (can be removed later) -->
+                <div id="selectedAsset" class="mt-4 text-sm text-[#FFFFFF]">
+                    Selected Asset: ETH
+                </div>
+            </div>
+
+            <!-- Strategy Selection Section -->
+            <div class="max-w-md mx-auto mt-8 p-4 bg-white shadow-md rounded-2xl">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Strategy Setup</h2>
+
+                <!-- Strategy Type -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Choose Strategy Type:</label>
+                    <div class="flex items-center gap-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="strategyType" value="standard" checked class="mr-1"> Standard
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="strategyType" value="custom" class="mr-1"> Custom
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Standard Strategy Dropdown -->
+                <div id="standardStrategySection" class="mb-4">
+                    <label for="standardStrategy" class="block text-sm font-medium text-gray-700 mb-1">Select Standard Strategy:</label>
+                    <select id="standardStrategy" class="w-full p-2 border border-gray-300 rounded-md">
+                    <option value="strangle">Strangle (Neutral)</option>
+                    <option value="shortCondor">Short Condor</option>
+                    </select>
+                </div>
+
+                <!-- Custom Strategy Builder -->
+                <div id="customStrategySection" class="hidden">
+                    <div id="customAssetsContainer"></div>
+                    <button id="addAssetBtn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">+ Add Asset</button>
+                </div>
             </div>
         </div>
 
-        <!-- Standard Strategy Dropdown -->
-        <div id="standardStrategySection" class="mb-4">
-            <label for="standardStrategy" class="block text-sm font-medium text-gray-700 mb-1">Select Standard Strategy:</label>
-            <select id="standardStrategy" class="w-full p-2 border border-gray-300 rounded-md">
-            <option value="strangle">Strangle (Neutral)</option>
-            <option value="shortCondor">Short Condor</option>
-            </select>
+        <div class="w-full max-w-4xl mx-auto mt-10">
+            <canvas id="pnlChart" class="w-full h-96"></canvas>
         </div>
-
-        <!-- Custom Strategy Builder -->
-        <div id="customStrategySection" class="hidden">
-            <div id="customAssetsContainer"></div>
-            <button id="addAssetBtn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">+ Add Asset</button>
-        </div>
-    </div>
-
-    <div class="w-full max-w-4xl mx-auto mt-10">
-        <canvas id="pnlChart" class="w-full h-96"></canvas>
-    </div>
-
-
-
-<script src="/mvp_app.js"></script>
+    </section>
+<script src="/mvp.js"></script>
 </body>
 </html>
