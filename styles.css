@@ -10,18 +10,25 @@ body {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-100%);
+    transform: translateX(-50%);
   }
 }
 
 .animate-scroll-left {
-  animation: scroll-left 60s linear infinite;
+  animation: scroll-left 15s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+@media (max-width: 640px) {
+  .animate-scroll-left {
+    animation-duration: 10s; /* Faster on small screens */
+  }
 }
 
 #scroll-wrapper:hover #scroll-content {
   animation-play-state: paused;
 }
-
 
 
   

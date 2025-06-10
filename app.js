@@ -72,10 +72,8 @@ const scrollContent = document.getElementById('scroll-content');
 const template = document.getElementById('crypto-template');
 
 // Duplicate content for smooth scroll
-for (let i = 0; i < 10; i++) {
-  const clone = template.content.cloneNode(true);
-  scrollContent.appendChild(clone);
-}
+const clone = template.content.cloneNode(true);
+scrollContent.appendChild(clone);
 
 async function fetchPrices() {
   try {

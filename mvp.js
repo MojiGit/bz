@@ -7,10 +7,10 @@ const tokenoutput = document.getElementById('token-output');
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       // Remove active state from all buttons
-      buttons.forEach(b => b.classList.remove('bg-[#00E083]', 'text-[#191308]'));
+      buttons.forEach(b => b.classList.remove('bg-[#00E083]', 'border-[#00E083]' , 'text-[#191308]', 'hover:bg-[#00E083]', 'hover:text-[#191308]'));
 
       // Add active state to clicked button
-      btn.classList.add('bg-[#00E083]', 'text-[#191308]');
+      btn.classList.add('bg-[#00E083]', 'text-[#191308]', 'border-[#00E083]' ,'hover:bg-[#00E083]', 'hover:text-[#191308]');
 
       // Update page content or state
       const token = btn.getAttribute('data-token');

@@ -122,94 +122,66 @@
         Simplify DeFi,
         Trade Smarter</h1>
     </div>
-    <!-- Prices -->
+    <!-- Banner -->
     <div id="scroll-wrapper" class="overflow-hidden relative py-6 ">
+      <!--  Prices -->
       <div id="scroll-content" class="flex items-center gap-8 font-semibold md:text-[36px] whitespace-nowrap animate-scroll-left will-change-transform ">
-        <!-- Crypto Prices -->
-        <template id="crypto-template">
+        
+        <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
+          <img src=" https://assets.coingecko.com/coins/images/4128/large/solana.png" alt="SOL" class="w-12 h-12" />
+          <span>$<span class="crypto-price" data-symbol="solana">--</span></span>
+        </div>
 
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/12645/large/AAVE.png" alt="AAVE" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="aave">--</span></span>
-            </div>
+        <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
+          <img src="https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png" alt="LINK" class="w-12 h-12" />
+          <span>$<span class="crypto-price" data-symbol="chainlink">--</span></span>
+        </div>
 
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border-2 border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/2/large/litecoin.png" alt="LTC" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="litecoin">--</span></span>
-            </div>
+        <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
+          <img src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" alt="BTC" class="w-12 h-12" />
+          <span>$<span class="crypto-price" data-symbol="bitcoin">--</span></span>
+        </div>
 
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" alt="BTC" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="bitcoin">--</span></span>
-            </div>
+        <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
+          <img src="https://assets.coingecko.com/coins/images/279/large/ethereum.png" alt="ETH" class="w-12 h-12 block" />
+          <span>$<span class="crypto-price" data-symbol="ethereum">--</span></span>
+        </div>
 
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/279/large/ethereum.png" alt="ETH" class="w-12 h-12 block" />
-              <span>$<span class="crypto-price" data-symbol="ethereum">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png" alt="MATIC" class="w-12 h-12" />
-              <span>$<span class="crypto-price " data-symbol="matic-network">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/12171/large/polkadot.png" alt="DOT" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="polkadot">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src=" https://assets.coingecko.com/coins/images/4128/large/solana.png" alt="SOL" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="solana">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/975/large/cardano.png" alt="ADA" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="cardano">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/5/large/dogecoin.png" alt="DOGE" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="dogecoin">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png" alt="XRP" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="ripple">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png" alt="LINK" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="chainlink">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/100/large/Stellar_symbol_black_RGB.png" alt="XLM" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="stellar">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/12504/large/uniswap-uni.png" alt="UNI" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="uniswap">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/69/large/monero_logo.png" alt="XMR" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="monero">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/1094/large/tron-logo.png" alt="TRX" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="tron">--</span></span>
-            </div>
-
-            <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
-              <img src="https://assets.coingecko.com/coins/images/4380/large/download.png" alt="ALGO" class="w-12 h-12" />
-              <span>$<span class="crypto-price" data-symbol="algorand">--</span></span>
-            </div>
-
-          </template>
+        <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
+          <img src="https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png" alt="MATIC" class="w-12 h-12" />
+          <span>$<span class="crypto-price " data-symbol="matic-network">--</span></span>
+        </div>
+        
       </div>
+      <!-- Duplicated -->
+      <template id="crypto-template">
+
+        <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
+          <img src=" https://assets.coingecko.com/coins/images/4128/large/solana.png" alt="SOL" class="w-12 h-12" />
+          <span>$<span class="crypto-price" data-symbol="solana">--</span></span>
+        </div>
+
+        <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
+          <img src="https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png" alt="LINK" class="w-12 h-12" />
+          <span>$<span class="crypto-price" data-symbol="chainlink">--</span></span>
+        </div>
+
+        <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
+          <img src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" alt="BTC" class="w-12 h-12" />
+          <span>$<span class="crypto-price" data-symbol="bitcoin">--</span></span>
+        </div>
+
+        <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
+          <img src="https://assets.coingecko.com/coins/images/279/large/ethereum.png" alt="ETH" class="w-12 h-12 block" />
+          <span>$<span class="crypto-price" data-symbol="ethereum">--</span></span>
+        </div>
+
+        <div class="flex items-center justify-center gap-2 text-[#00E083] bg-white border border-white/20 rounded-3xl py-2 shadow-md min-w-[150px] md:min-w-[300px]">
+          <img src="https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png" alt="MATIC" class="w-12 h-12" />
+          <span>$<span class="crypto-price " data-symbol="matic-network">--</span></span>
+        </div>
+
+      </template>
     </div>
 
   </section>
