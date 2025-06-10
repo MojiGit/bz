@@ -90,14 +90,36 @@
             <!-- Strategy Selection Section -->
             <div class="w-full grid grid-cols-1 gap-4">
                 <!--  Strategy empty  -->
-                <div class="flex flex-col p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
+                <div class="grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
                     <h1 class="text-[18px] font-bold text-[#191308] mb-2">
                         Empty Strategy
                     </h1>
-                    <p class="text-[18px] text-[#D8DDEF] mb-2">
-                        Design your strategy from scratch by adding assets and defining their parameters.
-                    </p>
-                    <div>
+                    <div class="p-2">
+                        <p class="text-[18px] text-[#D8DDEF] mb-2">
+                            Design your strategy from scratch by adding assets and defining their parameters.
+                        </p>
+                        <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
+                            Build
+                        </button>
+                    </div>
+                </div>
+
+                <!--  Neutral Strategy  -->
+                <div class="grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
+                    
+                    <div class="flex flex-row items-center gap-2">
+                        <h1 class="text-[18px] font-bold text-[#191308] mb-2">
+                        Strangle
+                        </h1>
+                        <label class="text-[#D8DDEF]">|</label>
+                        <span class="text-[18px] text-[#D8DDEF] ml-2">Neutral</span>
+                    </div>
+                    <div class="p-2">
+                        <p class="text-[18px] text-[#D8DDEF] mb-2">
+                            We simply buy lower strike puts
+                            nd higher strike calls with the same expiration date so that we can profit from the
+                            stock soaring up or plummeting down.
+                        </p>
                         <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
                             Build
                         </button>
@@ -105,7 +127,7 @@
                 </div>
 
                 <!--  Bullish Strategy  -->
-                <div class="flex flex-col p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
+                <div class="grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
                     <div class="flex flex-row items-center gap-2">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">
                             Bull Put Spread
@@ -113,18 +135,38 @@
                         <label class="text-[#D8DDEF]">|</label>
                         <span class="text-[18px] text-[#00E083] ml-2">Bullish</span>
                     </div>
-                    <p class="text-[18px] text-[#D8DDEF] mb-2">
-                        Protect the downside of a Naked Put by buying a lower strike
-                        put to insure the one you sold. Both put strikes should be lower than the current
-                        market price so as to ensure a profit even if the stock doesn’t move at all. 
-                    </p>
                     <div>
+                        <p class="text-[18px] text-[#D8DDEF] mb-2">
+                            Protect the downside of a Naked Put by buying a lower strike
+                            put to insure the one you sold. Both put strikes should be lower than the current
+                            market price so as to ensure a profit even if the stock doesn’t move at all. 
+                        </p>
                         <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
                             Build
                         </button>
                     </div>
                 </div>
 
+                <!--  Beaarish Strategy  -->
+                <div class="grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
+                    <div class="flex flex-row items-center gap-2">
+                        <h1 class="text-[18px] font-bold text-[#191308] mb-2">
+                            Bear Call Spread
+                        </h1>
+                        <label class="text-[#D8DDEF]">|</label>
+                        <span class="text-[18px] text-[#C70039] ml-2">Bearish</span>
+                    </div>
+                    <div>
+                        <p class="text-[18px] text-[#D8DDEF] mb-2">
+                            The concept is to protect the downside of a Naked Call by buying a higher strike
+                            call to insure the one you sold. Both call strikes should be higher than the current
+                            stock price so as to ensure a profit even if the stock doesn’t move at all. 
+                        </p>
+                        <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
+                            Build
+                        </button>
+                    </div>
+                </div>
 
             </div>
             
@@ -175,7 +217,7 @@
 
                 <div class="flex flex-col items-center justify-center">
                     <h2 class="font-bold">Max Profit</h2>
-                    <p>Capped</p>
+                    <p>Uncapped</p>
                 </div>
 
                 <div class="flex flex-col items-center justify-center">
@@ -190,7 +232,7 @@
 
                 <div class="flex flex-col items-center justify-center">
                     <h2 class="font-bold">Strategy Type</h2>
-                    <p>Income</p>
+                    <p>Capital Gain</p>
                 </div>
 
             </div>

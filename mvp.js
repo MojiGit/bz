@@ -1,3 +1,31 @@
+/* 
+
+Hide navbar on scroll down, show on scroll up
+
+*/
+let lastScrollTop = 0;
+const navbar = document.querySelector('nav');
+
+
+window.addEventListener('scroll', () => {
+  const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+  if (currentScroll > lastScrollTop) {
+    // Scroll Down — hide navbar and dropdown (if open)
+    navbar.classList.add('opacity-0', 'pointer-events-none');
+    navbar.classList.remove('opacity-100');
+
+  } else {
+    // Scroll Up — show navbar ONLY
+    navbar.classList.remove('opacity-0', 'pointer-events-none');
+    navbar.classList.add('opacity-100');
+
+    // Do NOT show the dropdown here — leave it hidden unless manually triggered
+  }
+
+  lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+});
+
 
 // JavaScript logic to handle token selection 
 
