@@ -1,4 +1,10 @@
 
+/* 
+
+Carouserl use cases
+
+*/
+
 const track = document.getElementById('carousel-track');
 const slides = Array.from(track.children).filter(child => child.classList.contains('slide'));
 const dots = document.querySelectorAll('.dot');
@@ -52,6 +58,12 @@ dots.forEach((dot, index) => {
 track.parentElement.addEventListener('mouseenter', stopAutoPlay);
 track.parentElement.addEventListener('mouseleave', startAutoPlay);
 
+/* 
+
+Prices banner
+
+*/
+
 // Init
 goTo(0);
 startAutoPlay();
@@ -85,6 +97,12 @@ async function fetchPrices() {
 fetchPrices();
 
 
+
+/* 
+
+Hide navbar on scroll down, show on scroll up
+
+*/
 let lastScrollTop = 0;
 const navbar = document.querySelector('nav');
 const mobileMenu = document.getElementById('mobile-menu');
