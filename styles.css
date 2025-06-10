@@ -20,7 +20,7 @@ body {
   width: max-content;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1020px) {
   .animate-scroll-left {
     animation-duration: 10s; /* Faster on small screens */
   }

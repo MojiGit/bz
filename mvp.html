@@ -34,7 +34,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="bg-white text-[#D8DDEF] text-[18px] md:text-[24px]">
+<body class="bg-white text-[#191308] text-[18px]">
 
 
     <!-- Navbar -->
@@ -69,42 +69,65 @@
             </div>
 
 
-            <div id="token-buttons" class="flex gap-2">
+            <div id="token-buttons" class="flex gap-2 mb-4">
                 <button
+                    id="tokenSelector"
                     data-token="WBTC"
-                    class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300 hover:bg-[#D8DDEF] hover:text-[#191308] text-[#D8DDEF]"
+                    class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300 text-[#D8DDEF]"
                 >
                     WBTC
                 </button>
-                <label for="">|</label>
+                <label class="text-[#D8DDEF]">|</label>
                 <button
                     data-token="ETH"
-                    class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300 hover:bg-[#D8DDEF] hover:text-[#191308] text-[#D8DDEF]"
+                    id="tokenSelector"
+                    class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300 text-[#D8DDEF]"
                 >
                     ETH
                 </button>
             </div>
-            
 
-            
-            <div class="max-w-md mx-auto mt-10 p-4 backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl">
-                <h2 class="text-xl font-bold mb-4 text-[#FFFFFF]">
-                    Select Base Asset
-                </h2>
-                
-                <label for="assetSelector" class="block text-sm font-medium text-[#FFFFFF] mb-1">
-                    Choose Asset:
-                </label>
-                <select id="assetSelector" class="w-full p-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="ETH">ETH (Ethereum)</option>
-                    <option value="WBTC">WBTC (Wrapped Bitcoin)</option>
-                </select>
-
-                <!-- This is a placeholder for showing selected asset (can be removed later) -->
-                <div id="selectedAsset" class="mt-4 text-sm text-[#FFFFFF]">
-                    Selected Asset: ETH
+            <!-- Strategy Selection Section -->
+            <div class="w-full grid grid-cols-1 gap-4">
+                <!--  Strategy empty  -->
+                <div class="flex flex-col p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
+                    <h1 class="text-[18px] font-bold text-[#191308] mb-2">
+                        Empty Strategy
+                    </h1>
+                    <p class="text-[18px] text-[#D8DDEF] mb-2">
+                        Design your strategy from scratch by adding assets and defining their parameters.
+                    </p>
+                    <div>
+                        <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
+                            Build
+                        </button>
+                    </div>
                 </div>
+
+                <!--  Bullish Strategy  -->
+                <div class="flex flex-col p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
+                    <div class="flex flex-row items-center gap-2">
+                        <h1 class="text-[18px] font-bold text-[#191308] mb-2">
+                            Bull Put Spread
+                        </h1>
+                        <label class="text-[#D8DDEF]">|</label>
+                        <span class="text-[18px] text-[#00E083] ml-2">Bullish</span>
+                    </div>
+                    <p class="text-[18px] text-[#D8DDEF] mb-2">
+                        Protect the downside of a Naked Put by buying a lower strike
+                        put to insure the one you sold. Both put strikes should be lower than the current
+                        market price so as to ensure a profit even if the stock doesn’t move at all. 
+                    </p>
+                    <div>
+                        <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
+                            Build
+                        </button>
+                    </div>
+                </div>
+
+
             </div>
+            
 
             <!-- Strategy Selection Section -->
             <div class="max-w-md mx-auto mt-8 p-4 bg-white shadow-md rounded-2xl">
@@ -140,11 +163,59 @@
             </div>
         </div>
 
-        <div class="w-full max-w-4xl mx-auto mt-10">
-            <canvas id="pnlChart" class="w-full h-96"></canvas>
+        <div class="w-full max-w-4xl mx-auto my-10">
+            <canvas id="pnlChart" class="w-full"></canvas>
+            <div class="flex flex-row border border-2 border-[#D8DDEF] shadow-md rounded-2xl p-4 m-4 justify-between">   
+                
+                <div>
+                    <h2>
+                        Underlying Price
+                    </h2>
+                    <p>
+                        5000#
+                    </p>
+                </div>
+
+                <div>
+                    <h2>
+                        Max Profit
+                    </h2>
+                    <p>
+                        Capped
+                    </p>
+                </div>
+
+                <div>
+                    <h2>
+                        Max Loss
+                    </h2>
+                    <p>
+                        Capped
+                    </p>
+                </div>
+
+                <div>
+                    <h2>
+                        Breakeven
+                    </h2>
+                    <p>
+                        2222#
+                    </p>
+                </div>
+
+                <div>
+                    <h2>
+                        Strategy Type
+                    </h2>
+                    <p>
+                        Income
+                    </p>
+                </div>
+
+            </div>
         </div>
     </section>
-    
+
 <script src="./mvp.js"></script>
 </body>
 </html>
