@@ -11,26 +11,23 @@ window.addEventListener('scroll', () => {
   const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
   if (currentScroll > lastScrollTop) {
-    // Scroll Down — hide navbar and dropdown (if open)
+    // Scroll Down — hide navbar 
     navbar.classList.add('opacity-0', 'pointer-events-none');
     navbar.classList.remove('opacity-100');
-
   } else {
     // Scroll Up — show navbar ONLY
     navbar.classList.remove('opacity-0', 'pointer-events-none');
     navbar.classList.add('opacity-100');
-
-    // Do NOT show the dropdown here — leave it hidden unless manually triggered
   }
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
 
-// JavaScript logic to handle token selection 
+
+// JavaScript button for token selection 
 
 const buttons = document.querySelectorAll('.token-btn');
-const tokenoutput = document.getElementById('token-output');
 
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -42,21 +39,10 @@ const tokenoutput = document.getElementById('token-output');
 
       // Update page content or state
       const token = btn.getAttribute('data-token');
-      tokenoutput.textContent = `Selected token: ${token}`;
     });
   });
 
 
-
-
-// JavaScript logic to reflect selection
-
-  const selector = document.getElementById('tokenSelector');
-  const output = document.getElementById('selectedToken');
-
-  selector.addEventListener('change', () => {
-    output.textContent = `Selected Asset: ${selector.value}`;
-  });
 
 // Handle Strategy Type Toggle
   const strategyTypeInputs = document.querySelectorAll('input[name="strategyType"]');
