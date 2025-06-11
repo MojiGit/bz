@@ -29,99 +29,72 @@ window.addEventListener('scroll', () => {
 
 const buttons = document.querySelectorAll('.token-btn');
 
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      // Remove active state from all buttons
-      buttons.forEach(b => b.classList.remove('bg-[#00E083]', 'border-[#00E083]' , 'text-[#191308]'));
 
-      // Add active state to clicked button
-      btn.classList.add('bg-[#00E083]', 'text-[#191308]', 'border-[#00E083]');
-
-      // Update page content or state
-      const token = btn.getAttribute('data-token');
-    });
-  });
-
-
-
-// Handle Strategy Type Toggle
-  const strategyTypeInputs = document.querySelectorAll('input[name="strategyType"]');
-  const standardSection = document.getElementById('standardStrategySection');
-  const customSection = document.getElementById('customStrategySection');
-
-  strategyTypeInputs.forEach(input => {
-    input.addEventListener('change', () => {
-      if (input.value === 'standard' && input.checked) {
-        standardSection.classList.remove('hidden');
-        customSection.classList.add('hidden');
-      } else if (input.value === 'custom' && input.checked) {
-        standardSection.classList.add('hidden');
-        customSection.classList.remove('hidden');
-      }
-    });
-  });
-
-// Add Asset Row Logic
-  const customAssetsContainer = document.getElementById('customAssetsContainer');
-  const addAssetBtn = document.getElementById('addAssetBtn');
-
-  addAssetBtn.addEventListener('click', () => {
-    const assetRow = document.createElement('div');
-    assetRow.className = "border border-gray-300 p-3 rounded mb-4 bg-gray-50";
-
-    assetRow.innerHTML = `
-      <div class="mb-2">
-        <label class="block text-sm font-medium text-gray-700">Asset Type:</label>
-        <select class="assetType w-full p-2 border rounded">
-          <option value="spot">Spot</option>
-          <option value="perp">Perpetual</option>
-          <option value="option">Option</option>
-        </select>
-      </div>
-      <div class="mb-2">
-        <label class="block text-sm font-medium text-gray-700">Entry Price:</label>
-        <input type="number" class="entryPrice w-full p-2 border rounded" placeholder="e.g. 2000">
-      </div>
-      <div class="mb-2">
-        <label class="block text-sm font-medium text-gray-700">Quantity:</label>
-        <input type="number" class="quantity w-full p-2 border rounded" placeholder="e.g. 1">
-      </div>
-      <div class="mb-2 leverageSection hidden">
-        <label class="block text-sm font-medium text-gray-700">Leverage (Only for Perp):</label>
-        <input type="number" class="leverage w-full p-2 border rounded" placeholder="e.g. 2">
-      </div>
-    `;
-
-    const assetTypeSelect = assetRow.querySelector('.assetType');
-    const leverageSection = assetRow.querySelector('.leverageSection');
-
-    assetTypeSelect.addEventListener('change', () => {
-      if (assetTypeSelect.value === 'perp') {
-        leverageSection.classList.remove('hidden');
-      } else {
-        leverageSection.classList.add('hidden');
-      }
-    });
-
-    customAssetsContainer.appendChild(assetRow);
-  });
-
-  // Constants
-const generatePriceRange = (min, max, step) => {
-  const prices = [];
-  for (let price = min; price <= max; price += step) {
-    prices.push(price);
-  }
-  return prices;
+// 1. Mapping from button symbol to CoinGecko ID
+const tokenIdMap = {
+  WBTC: 'wrapped-bitcoin',
+  ETH: 'ethereum',
+  // Add more tokens as needed
 };
 
-// Spot PNL
-function calculateSpotPNL(entryPrice, quantity, priceRange) {
-  return priceRange.map(currentPrice => {
-    const pnl = (currentPrice - entryPrice) * quantity;
-    return { price: currentPrice, pnl };
-  });
+// 2. Fetch current price from CoinGecko
+async function fetchCurrentPrice(tokenId) {
+  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`;
+  const res = await fetch(url);
+  const data = await res.json();
+  return data[tokenId]?.usd || null;
 }
+
+// 3. Generate price range based on current price
+function generateDynamicPriceRange(currentPrice) {
+  const min = currentPrice * 0.7;
+  const max = currentPrice * 1.3;
+  const step = currentPrice * 0.03;
+  const prices = [];
+  for (let price = min; price <= max; price += step) {
+    prices.push(Math.round(price));
+  }
+  return prices;
+}
+
+// 4. Update chart for selected token
+async function updateChartForToken(tokenSymbol) {
+  const tokenId = tokenIdMap[tokenSymbol];
+  if (!tokenId) return;
+  const currentPrice = await fetchCurrentPrice(tokenId);
+  if (!currentPrice) return;
+  const priceRange = generateDynamicPriceRange(currentPrice);
+  // Example: using strangle strategy, adjust as needed
+  const pnlData = createStrangle(
+    currentPrice * 0.9, // put strike
+    currentPrice * 1.1, // call strike
+    50, // premiumPut
+    50, // premiumCall
+    1,  // quantity
+    priceRange
+  );
+  renderPNLChart(pnlData);
+}
+
+// 5. token buttons
+buttons.forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    buttons.forEach(b => b.classList.remove('bg-[#00E083]', 'border-[#00E083]', 'text-[#191308]'));
+    btn.classList.add('bg-[#00E083]', 'text-[#191308]', 'border-[#00E083]');
+    const token = btn.getAttribute('data-token');
+    await updateChartForToken(token);
+  });
+});
+
+// Select WBTC by default on page load
+document.addEventListener('DOMContentLoaded', async () => {
+  const defaultBtn = document.querySelector('.token-btn[data-token="WBTC"]');
+  if (defaultBtn) {
+    defaultBtn.classList.add('bg-[#00E083]', 'text-[#191308]', 'border-[#00E083]');
+  }
+  await updateChartForToken('WBTC');
+});
+
 
 // Perpetual PNL
 function calculatePerpPNL(entryPrice, quantity, leverage, priceRange) {
