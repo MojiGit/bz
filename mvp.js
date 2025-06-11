@@ -1,5 +1,5 @@
-/* 
 
+/* 
 Hide navbar on scroll down, show on scroll up
 
 */
@@ -72,7 +72,9 @@ async function updateChartForToken(tokenSymbol) {
     1, 
     priceRange);
   
-  renderPNLChart(pnlData);
+  renderPNLChart([
+    { label: `${tokenSymbol} Long Call`, data: pnlData, color: '#00E083', bgColor: 'rgba(0, 224, 131, 0.1)' },
+  ], Math.round(currentPrice));
 }
 
 // 5. token buttons
@@ -170,13 +172,46 @@ function createShortCondor(
 
 let chartInstance = null;
 
-function renderPNLChart(pnlData) {
+function renderPNLChart(datasets, strikePrice = null) {
   const ctx = document.getElementById('pnlChart').getContext('2d');
+  const labels = datasets[0].data.map(point => point.price);
 
-  const labels = pnlData.map(point => point.price);
-  const data = pnlData.map(point => point.pnl);
+  // Find min/max Y for the vertical line
+  let allPNL = datasets.flatMap(ds => ds.data.map(point => point.pnl));
+  let minY = Math.min(...allPNL);
+  let maxY = Math.max(...allPNL);
 
-  // Destroy existing chart if already rendered
+  // Add vertical line dataset if strikePrice is provided
+  let allDatasets = datasets.map(ds => ({
+    label: ds.label,
+    data: ds.data.map(point => ({ x: point.price, y: point.pnl })),
+    borderColor: ds.color,
+    backgroundColor: ds.bgColor,
+    borderWidth: 2,
+    pointRadius: 0,
+    fill: true,
+    tension: 0.3,
+  }));
+
+  if (strikePrice !== null) {
+    allDatasets.push({
+      label: 'Strike',
+      data: [
+        { x: strikePrice, y: minY },
+        { x: strikePrice, y: maxY }
+      ],
+      borderColor: 'gray',
+      borderWidth: 2,
+      pointRadius: 0,
+      fill: false,
+      tension: 0,
+      showLine: true,
+      order: 0, // Draw behind other lines
+      type: 'line',
+      stepped: false,
+    });
+  }
+
   if (chartInstance !== null) {
     chartInstance.destroy();
   }
@@ -184,21 +219,13 @@ function renderPNLChart(pnlData) {
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: labels,
-      datasets: [{
-        label: 'PNL Curve',
-        data: data,
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-        borderWidth: 2,
-        pointRadius: 0,
-        fill: true,
-        tension: 0.3,
-      }]
+      datasets: allDatasets
     },
     options: {
+      parsing: false, // Needed for custom {x, y} points
       scales: {
         x: {
+          type: 'linear',
           title: {
             display: true,
             text: 'Price',
@@ -218,7 +245,7 @@ function renderPNLChart(pnlData) {
           intersect: false,
         },
         legend: {
-          display: false,
+          display: true,
         }
       },
       responsive: true,
@@ -226,4 +253,3 @@ function renderPNLChart(pnlData) {
     }
   });
 }
-
