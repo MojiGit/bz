@@ -47,8 +47,8 @@ async function fetchCurrentPrice(tokenId) {
 
 // 3. Generate price range based on current price
 function generateDynamicPriceRange(currentPrice) {
-  const min = currentPrice * 0.7;
-  const max = currentPrice * 1.3;
+  const min = currentPrice * 0.8;
+  const max = currentPrice * 1.4;
   const step = currentPrice * 0.03;
   const prices = [];
   for (let price = min; price <= max; price += step) {
@@ -65,14 +65,13 @@ async function updateChartForToken(tokenSymbol) {
   if (!currentPrice) return;
   const priceRange = generateDynamicPriceRange(currentPrice);
   // Example: using strangle strategy, adjust as needed
-  const pnlData = createStrangle(
-    currentPrice * 0.9, // put strike
-    currentPrice * 1.1, // call strike
-    50, // premiumPut
-    50, // premiumCall
-    1,  // quantity
-    priceRange
-  );
+  const pnlData = calculateOptionPNL(
+    'call', 
+    currentPrice, 
+    currentPrice * 0.09, // Example premium
+    1, 
+    priceRange);
+  
   renderPNLChart(pnlData);
 }
 
@@ -228,8 +227,3 @@ function renderPNLChart(pnlData) {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const priceRange = generatePriceRange(1000, 3000, 100); // Replace with your helper function
-  const pnlData = createStrangle(1800, 2200, 50, 50, 1, priceRange); // Replace with your actual strategy logic
-  renderPNLChart(pnlData);
-});
