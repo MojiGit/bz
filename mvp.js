@@ -1,3 +1,4 @@
+Chart.register(window['chartjs-plugin-annotation']);
 
 /* 
 Hide navbar on scroll down, show on scroll up
@@ -64,14 +65,14 @@ async function updateChartForToken(tokenSymbol) {
   const currentPrice = await fetchCurrentPrice(tokenId);
   if (!currentPrice) return;
   const priceRange = generateDynamicPriceRange(currentPrice);
-  // Example: using strangle strategy, adjust as needed
+  // deploying a long call option strategy as default
   const pnlData = calculateOptionPNL(
     'call', 
     currentPrice, 
     currentPrice * 0.09, // Example premium
     1, 
     priceRange);
-  
+  // Render the PNL chart
   renderPNLChart([
     { label: `${tokenSymbol} Long Call`, data: pnlData, color: '#00E083', bgColor: 'rgba(0, 224, 131, 0.1)' },
   ], Math.round(currentPrice));
@@ -153,7 +154,7 @@ function createStrangle(longPutStrike, longCallStrike, premiumPut, premiumCall, 
 }
 
 // === Predefined Strategy: Short Condor ===
-// Sell OTM put spread + Sell OTM call spread (profit if price stays in the middle)
+/* Sell OTM put spread + Sell OTM call spread (profit if price stays in the middle)
 function createShortCondor(
   lowerPutStrike, longPutStrike,
   shortCallStrike, higherCallStrike,
@@ -168,7 +169,7 @@ function createShortCondor(
   const longCall = calculateOptionPNL('call', higherCallStrike, 0, quantity, priceRange); // assume zero premium
 
   return combinePNLCurves([shortPut, longPut, shortCall, longCall]);
-}
+}*/
 
 let chartInstance = null;
 
@@ -190,18 +191,19 @@ function renderPNLChart(datasets, strikePrice = null) {
     borderWidth: 2,
     pointRadius: 0,
     fill: true,
-    tension: 0.3,
+    tension: 0,
   }));
 
   if (strikePrice !== null) {
-    allDatasets.push({
+      allDatasets.push({
       label: 'Strike',
       data: [
-        { x: strikePrice, y: minY },
-        { x: strikePrice, y: maxY }
+      { x: strikePrice, y: minY },
+      { x: strikePrice, y: maxY }
       ],
       borderColor: 'gray',
       borderWidth: 2,
+      borderDash: [5, 5], // Dashed line: 5px dash, 5px gap
       pointRadius: 0,
       fill: false,
       tension: 0,
