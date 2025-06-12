@@ -175,14 +175,13 @@ let chartInstance = null;
 
 function renderPNLChart(datasets, strikePrice = null) {
   const ctx = document.getElementById('pnlChart').getContext('2d');
-  const labels = datasets[0].data.map(point => point.price);
 
-  // Find min/max Y for the vertical line
+  // Prepare Y range
   let allPNL = datasets.flatMap(ds => ds.data.map(point => point.pnl));
   let minY = Math.min(...allPNL);
   let maxY = Math.max(...allPNL);
 
-  // Add vertical line dataset if strikePrice is provided
+  // Format datasets for chart
   let allDatasets = datasets.map(ds => ({
     label: ds.label,
     data: ds.data.map(point => ({ x: point.price, y: point.pnl })),
@@ -194,26 +193,7 @@ function renderPNLChart(datasets, strikePrice = null) {
     tension: 0,
   }));
 
-  if (strikePrice !== null) {
-      allDatasets.push({
-      label: 'Strike',
-      data: [
-      { x: strikePrice, y: minY },
-      { x: strikePrice, y: maxY }
-      ],
-      borderColor: 'gray',
-      borderWidth: 2,
-      borderDash: [5, 5], // Dashed line: 5px dash, 5px gap
-      pointRadius: 0,
-      fill: false,
-      tension: 0,
-      showLine: true,
-      order: 0, // Draw behind other lines
-      type: 'line',
-      stepped: false,
-    });
-  }
-
+  // Clean up old chart
   if (chartInstance !== null) {
     chartInstance.destroy();
   }
@@ -224,7 +204,9 @@ function renderPNLChart(datasets, strikePrice = null) {
       datasets: allDatasets
     },
     options: {
-      parsing: false, // Needed for custom {x, y} points
+      parsing: false, // Allow custom {x, y}
+      responsive: true,
+      maintainAspectRatio: false,
       scales: {
         x: {
           type: 'linear',
@@ -248,10 +230,29 @@ function renderPNLChart(datasets, strikePrice = null) {
         },
         legend: {
           display: true,
-        }
-      },
-      responsive: true,
-      maintainAspectRatio: false,
+        },
+        annotation: strikePrice !== null ? {
+          annotations: {
+            strikeLine: {
+              type: 'line',
+              xMin: strikePrice,
+              xMax: strikePrice,
+              borderColor: 'gray',
+              borderWidth: 1,
+              borderDash: [5, 5],
+              label: {
+                display: true,
+                content: 'Strike',
+                position: 'start',
+                color: 'gray',
+                backgroundColor: 'transparent',
+              },
+              z: 0
+            }
+          }
+        } : {},
+      }
     }
   });
 }
+
