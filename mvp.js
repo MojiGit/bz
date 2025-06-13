@@ -23,9 +23,11 @@ window.addEventListener('scroll', () => {
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
+// Strategy Block Toggle
 document.querySelectorAll('.strategy-block').forEach(block => {
   block.addEventListener('click', function () {
     const content = block.querySelector('.strategy-content');
+    const strategyId = block.dataset.strategy;
     const isOpen = content.classList.contains('opacity-100');
 
     // Close all blocks
@@ -41,9 +43,46 @@ document.querySelectorAll('.strategy-block').forEach(block => {
       block.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
       content.classList.remove('opacity-0', 'max-h-0');
       content.classList.add('opacity-100', 'max-h-96');
+
+    // NEW: Load corresponding chart
+    const { datasets, strikePrices } = getStrategyPNLData(strategyId);
+    renderPNLChart(datasets, strikePrices);
     }
   });
 });
+
+function getStrategyPNLData(strategyId) {
+  // Dummy data; you should replace this with actual logic
+  switch (strategyId) {
+    case 'bull-put-spread':
+      return {
+        datasets: [
+          {
+            label: 'Bull Put Spread',
+            data: [
+              { price: 1000, pnl: -50 },
+              { price: 1100, pnl: 0 },
+              { price: 1200, pnl: 100 },
+              { price: 1300, pnl: 100 },
+              { price: 1400, pnl: 100 }
+            ],
+            color: '#00E083',
+            bgColor: 'rgba(0, 224, 131, 0.1)'
+          }
+        ],
+        strikePrices: [1100, 1200] // Example strike prices
+      };
+
+    // Add more strategies here...
+
+    default:
+      return {
+        datasets: [],
+        strikePrices: []
+      };
+  }
+}
+
 
 
 Chart.register(window['chartjs-plugin-annotation']);
@@ -103,7 +142,7 @@ async function updateChartForToken(tokenSymbol) {
   // Render the PNL chart
   const strikePrices = [Math.round(currentPrice)]; // Use current price as strike for simplicity
   renderPNLChart([
-    { label: `${tokenSymbol} Long Call`, data: pnlData, color: '#00E083', bgColor: 'rgba(0, 224, 131, 0.1)' },
+    { label: `${tokenSymbol} Long Call`, data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)' },
   ], strikePrices);
 }
 
@@ -175,7 +214,17 @@ function combinePNLCurves(pnlArrays) {
 
 // === Predefined Strategy: Long Strangle (Neutral Volatility Bet) ===
 // Buy OTM Put + Buy OTM Call
-function createStrangle(longPutStrike, longCallStrike, premiumPut, premiumCall, quantity, priceRange) {
+function createStrangle() {
+  const tokenId = tokenIdMap[tokenSymbol];
+  const currentPrice = fetchCurrentPrice(tokenId);
+
+  const longPutStrike = currentPrice * 0.9;  // Example strike prices
+  const longCallStrike = currentPrice * 1.1;
+  const premiumPut = currentPrice * 0.05;     // Example premiums
+  const premiumCall = currentPrice * 0.05;
+  const quantity = 1;
+  const priceRange = generateDynamicPriceRange(currentPrice);
+
   const putPNL = calculateOptionPNL('put', longPutStrike, premiumPut, quantity, priceRange);
   const callPNL = calculateOptionPNL('call', longCallStrike, premiumCall, quantity, priceRange);
 

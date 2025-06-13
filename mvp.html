@@ -88,7 +88,8 @@
             <!-- Strategy Selection Section -->
             <div class="w-full grid grid-cols-1 gap-4">
                 <!--  Strategy empty  -->
-                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden">
+                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
+                    strategy="empty">
                     <div class="flex flex-row gap-2 strategy-header">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">
                             Empty Strategy
@@ -104,8 +105,9 @@
                     </div>
                 </div>
 
-                <!--  Neutral Strategy  -->
-                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden">
+                <!--  Neutral Strategy - Strangle  -->
+                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
+                    strategy="strangle">
                     
                     <div class="flex flex-row gap-2 strategy-header">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">
@@ -126,8 +128,9 @@
                     </div>
                 </div>
 
-                <!--  Bullish Strategy  -->
-                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden">
+                <!--  Bullish Strategy - Bull Put Spread  -->
+                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
+                    strategy="bull-put-spread">
                     <div class="flex flex-row gap-2 strategy-header">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">Bull Put Spread</h1>
                         <label class="text-gray-400">|</label>
@@ -147,8 +150,9 @@
                 </div>
 
 
-                <!--  Bearish Strategy  -->
-                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden">
+                <!--  Bearish Strategy - Bear Call Spread  -->
+                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
+                    strategy="bear-call-spread">
                     <div class="flex flex-row gap-2 strategy-header">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">
                             Bear Call Spread
