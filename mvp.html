@@ -88,11 +88,13 @@
             <!-- Strategy Selection Section -->
             <div class="w-full grid grid-cols-1 gap-4">
                 <!--  Strategy empty  -->
-                <div class="grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
-                    <h1 class="text-[18px] font-bold text-[#191308] mb-2">
-                        Empty Strategy
-                    </h1>
-                    <div class="hidden p-2">
+                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden">
+                    <div class="flex flex-row gap-2 strategy-header">
+                        <h1 class="text-[18px] font-bold text-[#191308] mb-2">
+                            Empty Strategy
+                        </h1>
+                    </div>
+                    <div class="strategy-content mt-2 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
                         <p class="text-[16px] text-gray-400 mb-2">
                             Design your strategy from scratch by adding assets and defining their parameters.
                         </p>
@@ -103,19 +105,19 @@
                 </div>
 
                 <!--  Neutral Strategy  -->
-                <div class="grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
+                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden">
                     
-                    <div class="flex flex-row gap-2">
+                    <div class="flex flex-row gap-2 strategy-header">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">
                         Strangle
                         </h1>
                         <label class="text-gray-400">|</label>
                         <span class="text-[18px] text-gray-400">Neutral</span>
                     </div>
-                    <div class="p-2">
+                    <div class="strategy-content mt-2 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
                         <p class="text-[16px] text-gray-400 mb-2">
                             We simply buy lower strike puts
-                            nd higher strike calls with the same expiration date so that we can profit from the
+                            and higher strike calls with the same expiration date so that we can profit from the
                             stock soaring up or plummeting down.
                         </p>
                         <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
@@ -125,19 +127,18 @@
                 </div>
 
                 <!--  Bullish Strategy  -->
-                <div class="grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
-                    <div class="flex flex-row gap-2">
-                        <h1 class="text-[18px] font-bold text-[#191308] mb-2">
-                            Bull Put Spread
-                        </h1>
+                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden">
+                    <div class="flex flex-row gap-2 strategy-header">
+                        <h1 class="text-[18px] font-bold text-[#191308] mb-2">Bull Put Spread</h1>
                         <label class="text-gray-400">|</label>
                         <span class="text-[18px] text-[#00E083]">Bullish</span>
                     </div>
-                    <div>
+
+                    <div class="strategy-content mt-2 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
                         <p class="text-[16px] text-gray-400 mb-2">
                             Protect the downside of a Naked Put by buying a lower strike
                             put to insure the one you sold. Both put strikes should be lower than the current
-                            market price so as to ensure a profit even if the stock doesn’t move at all. 
+                            market price so as to ensure a profit even if the stock doesn’t move at all.
                         </p>
                         <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
                             Build
@@ -145,16 +146,17 @@
                     </div>
                 </div>
 
-                <!--  Beaarish Strategy  -->
-                <div class="grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl">
-                    <div class="flex flex-row  gap-2">
+
+                <!--  Bearish Strategy  -->
+                <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden">
+                    <div class="flex flex-row gap-2 strategy-header">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">
                             Bear Call Spread
                         </h1>
                         <label class="text-gray-400">|</label>
                         <span class="text-[18px] text-[#C70039]">Bearish</span>
                     </div>
-                    <div>
+                    <div class="strategy-content mt-2 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
                         <p class="text-[16px] text-gray-400 mb-2">
                             The concept is to protect the downside of a Naked Call by buying a higher strike
                             call to insure the one you sold. Both call strikes should be higher than the current

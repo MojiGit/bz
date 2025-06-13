@@ -23,6 +23,28 @@ window.addEventListener('scroll', () => {
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
+document.querySelectorAll('.strategy-block').forEach(block => {
+  block.addEventListener('click', function () {
+    const content = block.querySelector('.strategy-content');
+    const isOpen = content.classList.contains('opacity-100');
+
+    // Close all blocks
+    document.querySelectorAll('.strategy-block').forEach(otherBlock => {
+      const otherContent = otherBlock.querySelector('.strategy-content');
+      otherBlock.classList.remove('bg-[#F4FFF9]', 'border-[#52FFB8]');
+      otherContent.classList.remove('opacity-100', 'max-h-96');
+      otherContent.classList.add('opacity-0', 'max-h-0');
+    });
+
+    // Toggle current one (if not already open)
+    if (!isOpen) {
+      block.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
+      content.classList.remove('opacity-0', 'max-h-0');
+      content.classList.add('opacity-100', 'max-h-96');
+    }
+  });
+});
+
 
 Chart.register(window['chartjs-plugin-annotation']);
 // JavaScript button for token selection 
