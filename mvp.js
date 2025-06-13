@@ -1,4 +1,3 @@
-Chart.register(window['chartjs-plugin-annotation']);
 
 /* 
 Hide navbar on scroll down, show on scroll up
@@ -25,7 +24,7 @@ window.addEventListener('scroll', () => {
 });
 
 
-
+Chart.register(window['chartjs-plugin-annotation']);
 // JavaScript button for token selection 
 
 const buttons = document.querySelectorAll('.token-btn');
@@ -55,6 +54,12 @@ function generateDynamicPriceRange(currentPrice) {
   for (let price = min; price <= max; price += step) {
     prices.push(Math.round(price));
   }
+  // Ensure current price is included in the range
+  const roundedCurrent = Math.round(currentPrice);
+  if (!prices.includes(roundedCurrent)) {
+    prices.push(roundedCurrent);
+    prices.sort((a, b) => a - b); // Sort to maintain order
+  }
   return prices;
 }
 
@@ -65,7 +70,8 @@ async function updateChartForToken(tokenSymbol) {
   const currentPrice = await fetchCurrentPrice(tokenId);
   if (!currentPrice) return;
   const priceRange = generateDynamicPriceRange(currentPrice);
-  // deploying a long call option strategy as default
+
+  // deploying a long call option ATM as default
   const pnlData = calculateOptionPNL(
     'call', 
     currentPrice, 
@@ -73,9 +79,10 @@ async function updateChartForToken(tokenSymbol) {
     1, 
     priceRange);
   // Render the PNL chart
+  const strikePrices = [Math.round(currentPrice)]; // Use current price as strike for simplicity
   renderPNLChart([
     { label: `${tokenSymbol} Long Call`, data: pnlData, color: '#00E083', bgColor: 'rgba(0, 224, 131, 0.1)' },
-  ], Math.round(currentPrice));
+  ], strikePrices);
 }
 
 // 5. token buttons
@@ -150,38 +157,47 @@ function createStrangle(longPutStrike, longCallStrike, premiumPut, premiumCall, 
   const putPNL = calculateOptionPNL('put', longPutStrike, premiumPut, quantity, priceRange);
   const callPNL = calculateOptionPNL('call', longCallStrike, premiumCall, quantity, priceRange);
 
-  return combinePNLCurves([putPNL, callPNL]);
+  return {
+  legs: [putPNL, callPNL],
+  combined: combinePNLCurves([putPNL, callPNL])
+  };
 }
 
-// === Predefined Strategy: Short Condor ===
-/* Sell OTM put spread + Sell OTM call spread (profit if price stays in the middle)
-function createShortCondor(
-  lowerPutStrike, longPutStrike,
-  shortCallStrike, higherCallStrike,
-  putSpreadPremium, callSpreadPremium,
-  quantity,
-  priceRange
-) {
-  const shortPut = calculateOptionPNL('put', longPutStrike, putSpreadPremium / 2, -quantity, priceRange);
-  const longPut = calculateOptionPNL('put', lowerPutStrike, 0, quantity, priceRange); // assume zero premium for simplicity
+// === Predefined Strategy: Bull Put Spread (bullish capital gain) ===
+// Buy OTM Put + sell OTM Put
 
-  const shortCall = calculateOptionPNL('call', shortCallStrike, callSpreadPremium / 2, -quantity, priceRange);
-  const longCall = calculateOptionPNL('call', higherCallStrike, 0, quantity, priceRange); // assume zero premium
+function createBullPutSpread(longPutStrike, shortPutStrike, premiumLong, premiumShort, quantity, priceRange) {
+  const Shortput = calculateOptionPNL('put', shortPutStrike, premiumShort, quantity, priceRange);
+  const Longput = calculateOptionPNL('put', longPutStrike, premiumLong, quantity, priceRange);
+  
+  return {
+    legs: [Shortput, Longput],
+    combined: combinePNLCurves([Shortput, Longput])
+  };
+}
+// === Predefined Strategy: Bear Call Spread (bearish capital gain) ===
+// Buy OTM Call + sell OTM Call
+function createBearCallSpread(longCallStrike, shortCallStrike, premiumLong, premiumShort, quantity, priceRange) {
+  const ShortCall = calculateOptionPNL('call', shortCallStrike, premiumShort, quantity, priceRange);
+  const LongCall = calculateOptionPNL('call', longCallStrike, premiumLong, quantity, priceRange);
 
-  return combinePNLCurves([shortPut, longPut, shortCall, longCall]);
-}*/
+  return {
+    legs: [ShortCall, LongCall],
+    combined: combinePNLCurves([ShortCall, LongCall])
+  };
+}
 
 let chartInstance = null;
 
-function renderPNLChart(datasets, strikePrice = null) {
+function renderPNLChart(datasets, strikePrices) {
   const ctx = document.getElementById('pnlChart').getContext('2d');
 
-  // Prepare Y range
+  // Prepare Y range from all PNL values
   let allPNL = datasets.flatMap(ds => ds.data.map(point => point.pnl));
   let minY = Math.min(...allPNL);
   let maxY = Math.max(...allPNL);
 
-  // Format datasets for chart
+  // Format user datasets for Chart.js
   let allDatasets = datasets.map(ds => ({
     label: ds.label,
     data: ds.data.map(point => ({ x: point.price, y: point.pnl })),
@@ -193,18 +209,43 @@ function renderPNLChart(datasets, strikePrice = null) {
     tension: 0,
   }));
 
+  // Build annotation objects for each strike price
+  const annotations = {};
+  strikePrices.forEach((price, index) => {
+    annotations[`strikeLine${index}`] = {
+      type: 'line',
+      xMin: price,
+      xMax: price,
+      borderColor: 'gray',
+      borderWidth: 1,
+      borderDash: [5, 5],
+      label: {
+        display: true,
+        content: `Strike ${price}`,
+        position: 'start',
+        color: 'gray',
+        backgroundColor: 'transparent',
+        font: {
+          size: 10
+        }
+      },
+      z: 0
+    };
+  });
+
   // Clean up old chart
   if (chartInstance !== null) {
     chartInstance.destroy();
   }
 
+  // Create the new chart
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
       datasets: allDatasets
     },
     options: {
-      parsing: false, // Allow custom {x, y}
+      parsing: false,
       responsive: true,
       maintainAspectRatio: false,
       scales: {
@@ -231,28 +272,10 @@ function renderPNLChart(datasets, strikePrice = null) {
         legend: {
           display: true,
         },
-        annotation: strikePrice !== null ? {
-          annotations: {
-            strikeLine: {
-              type: 'line',
-              xMin: strikePrice,
-              xMax: strikePrice,
-              borderColor: 'gray',
-              borderWidth: 1,
-              borderDash: [5, 5],
-              label: {
-                display: true,
-                content: 'Strike',
-                position: 'start',
-                color: 'gray',
-                backgroundColor: 'transparent',
-              },
-              z: 0
-            }
-          }
-        } : {},
+        annotation: {
+          annotations: annotations
+        }
       }
     }
   });
 }
-
