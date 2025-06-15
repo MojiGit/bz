@@ -16,6 +16,7 @@ const navbar = document.querySelector('nav');
 Chart.register(window['chartjs-plugin-annotation']);
 const buttons = document.querySelectorAll('.token-btn');
 
+let selectedTokenSymbol = null;
 // Mapping from button symbol to CoinGecko ID
 const tokenIdMap = {
   WBTC: 'wrapped-bitcoin',
@@ -40,42 +41,18 @@ window.addEventListener('scroll', () => {
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
-// Strategy Block Toggle
-document.querySelectorAll('.strategy-block').forEach(block => {
-  block.addEventListener('click', function () {
-    const content = block.querySelector('.strategy-content');
-    const strategyId = block.dataset.strategy;
-    const isOpen = content.classList.contains('opacity-100');
+// token's buttons (ETH, WBTC, etc.), Dynamically update chart scale 
+buttons.forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    buttons.forEach(b => b.classList.remove('bg-[#00E083]', 'border-[#00E083]', 'text-[#191308]'));
+    btn.classList.add('bg-[#00E083]', 'text-[#191308]', 'border-[#00E083]');
 
-    // Close all blocks
-    document.querySelectorAll('.strategy-block').forEach(otherBlock => {
-      const otherContent = otherBlock.querySelector('.strategy-content');
-      otherBlock.classList.remove('bg-[#F4FFF9]', 'border-[#52FFB8]');
-      otherContent.classList.remove('opacity-100', 'max-h-96');
-      otherContent.classList.add('opacity-0', 'max-h-0');
-    });
+    const token = btn.getAttribute('data-token');
+    selectedTokenSymbol = token;
 
-    // Toggle current one (if not already open)
-    if (!isOpen) {
-      block.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
-      content.classList.remove('opacity-0', 'max-h-0');
-      content.classList.add('opacity-100', 'max-h-96');
-    }
-
-    // NEW: Load corresponding chart
-    const { datasets, strikePrices } = createStrangle();
-    return renderPNLChart(datasets, strikePrices);
-
+    await updateChartForToken(selectedTokenSymbol);
   });
 });
-
-// Get the PNL data for the selected strategy
-function getStrategyPNLData(strategyId) {
-  if (strategyId === 'strangle') {
-    return createStrangle();
-  };
-}
-
 
 // Fetch current price from CoinGecko
 async function fetchCurrentPrice(tokenId) {
@@ -104,8 +81,8 @@ function generateDynamicPriceRange(currentPrice) {
 }
 
 // Generate default chart - long call option ATM
-async function updateChartForToken(tokenSymbol) {
-  const tokenId = tokenIdMap[tokenSymbol];
+async function updateChartForToken() {
+  const tokenId = tokenIdMap[selectedTokenSymbol];
   if (!tokenId) return;
   const currentPrice = await fetchCurrentPrice(tokenId);
   if (!currentPrice) return;
@@ -121,19 +98,9 @@ async function updateChartForToken(tokenSymbol) {
   // Render the PNL chart
   const strikePrices = [Math.round(currentPrice)]; // Use current price as strike for simplicity
   renderPNLChart([
-    { label: `${tokenSymbol} Long Call`, data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)' },
+    { label: `${selectedTokenSymbol} Long Call`, data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)' },
   ], strikePrices);
 }
-
-// token's buttons (ETH, WBTC, etc.)
-buttons.forEach((btn) => {
-  btn.addEventListener('click', async () => {
-    buttons.forEach(b => b.classList.remove('bg-[#00E083]', 'border-[#00E083]', 'text-[#191308]'));
-    btn.classList.add('bg-[#00E083]', 'text-[#191308]', 'border-[#00E083]');
-    const token = btn.getAttribute('data-token');
-    await updateChartForToken(token);
-  });
-});
 
 // Select WBTC by default on page load and render its chart
 document.addEventListener('DOMContentLoaded', async () => {
@@ -141,10 +108,48 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (defaultBtn) {
     defaultBtn.classList.add('bg-[#00E083]', 'text-[#191308]', 'border-[#00E083]');
   }
-  await updateChartForToken('WBTC');
+  selectedTokenSymbol = 'WBTC';
+  await updateChartForToken();
 });
 
 
+// Strategy Block Toggle
+document.querySelectorAll('.strategy-block').forEach(block => {
+  block.addEventListener('click', async function () {
+    const content = block.querySelector('.strategy-content');
+    const strategyId = block.dataset.strategy; //dopo
+    const isOpen = content.classList.contains('opacity-100');
+
+    // Close all blocks
+    document.querySelectorAll('.strategy-block').forEach(otherBlock => {
+      const otherContent = otherBlock.querySelector('.strategy-content');
+      otherBlock.classList.remove('bg-[#F4FFF9]', 'border-[#52FFB8]');
+      otherContent.classList.remove('opacity-100', 'max-h-96');
+      otherContent.classList.add('opacity-0', 'max-h-0');
+    });
+
+    // Toggle current one (if not already open)
+    if (!isOpen) {
+      block.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
+      content.classList.remove('opacity-0', 'max-h-0');
+      content.classList.add('opacity-100', 'max-h-96');
+    }
+
+    // NEW: Load corresponding chart
+    const { datasets, strikePrices } = await createStrangle();
+    return renderPNLChart(datasets, strikePrices);
+
+  });
+});
+
+/* Get the PNL data for the selected strategy
+function getStrategyPNLData(strategyId) {
+  if (strategyId === 'strangle') {
+    return createStrangle();
+  };
+}
+*/
+// ==================================================================================== //
 
 /*
 === PNL Calculation Functions ===
@@ -200,13 +205,14 @@ function combinePNLCurves(pnlArrays) {
 
 // === Predefined Strategy: Long Strangle (Neutral Volatility Bet) ===
 // Buy OTM Put + Buy OTM Call
-function createStrangle() {
-  const tokenId = tokenIdMap[tokenSymbol];
-  const currentPrice = fetchCurrentPrice(tokenId);
+async function createStrangle() {
 
-  const longPutStrike = currentPrice * 0.9;  // Example strike prices
+  const tokenId = tokenIdMap[selectedTokenSymbol];
+  const currentPrice = await fetchCurrentPrice(tokenId); 
+
+  const longPutStrike = currentPrice * 0.9;
   const longCallStrike = currentPrice * 1.1;
-  const premiumPut = currentPrice * 0.05;     // Example premiums
+  const premiumPut = currentPrice * 0.05;
   const premiumCall = currentPrice * 0.05;
   const quantity = 1;
   const priceRange = generateDynamicPriceRange(currentPrice);
@@ -214,11 +220,18 @@ function createStrangle() {
   const putPNL = calculateOptionPNL('put', longPutStrike, premiumPut, quantity, priceRange);
   const callPNL = calculateOptionPNL('call', longCallStrike, premiumCall, quantity, priceRange);
 
+  const combinedPNL = combinePNLCurves([putPNL, callPNL]);
+
   return {
-  datasets: [putPNL, callPNL, combinePNLCurves([putPNL, callPNL])],
-  strikePrices: [Math.round(longPutStrike), Math.round(longCallStrike)],
+    datasets: [
+      { label: `Long Put`, data: putPNL, color: '#FF6B6B', bgColor: 'rgba(255, 107, 107, 0)' },
+      { label: `Long Call`, data: callPNL, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0)' },
+      { label: `Compound`, data: combinedPNL, color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.16)' },
+    ],
+    strikePrices: [Math.round(longPutStrike), Math.round(longCallStrike)],
   };
 }
+
 
 // === Predefined Strategy: Bull Put Spread (bullish capital gain) ===
 // Buy OTM Put + sell OTM Put
@@ -244,31 +257,42 @@ function createBearCallSpread(longCallStrike, shortCallStrike, premiumLong, prem
   };
 }
 
+
+
+
+
 let chartInstance = null;
 
 function renderPNLChart(datasets, strikePrices) {
-  const ctx = document.getElementById('pnlChart').getContext('2d');
+  if (!Array.isArray(datasets) || datasets.length === 0) {
+    console.warn("Empty or invalid datasets.");
+    return;
+  }
 
-  // Prepare Y range from all PNL values
-  let allPNL = datasets.flatMap(ds => ds.data.map(point => point.pnl));
-  let minY = Math.min(...allPNL);
-  let maxY = Math.max(...allPNL);
+  const ctx = document.getElementById('pnlChart')?.getContext('2d');
+  if (!ctx) {
+    console.error("Chart canvas not found.");
+    return;
+  }
 
-  // Format user datasets for Chart.js
-  let allDatasets = datasets.map(ds => ({
-    label: ds.label,
-    data: ds.data.map(point => ({ x: point.price, y: point.pnl })),
-    borderColor: ds.color,
-    backgroundColor: ds.bgColor,
+  // Safely extract PNL values
+  const allPNL = datasets.flatMap(ds => ds.data?.map(point => point.pnl) || []);
+  const minY = Math.min(...allPNL);
+  const maxY = Math.max(...allPNL);
+
+  const allDatasets = datasets.map(ds => ({
+    label: ds.label || '',
+    data: ds.data?.map(point => ({ x: point.price, y: point.pnl })) || [],
+    borderColor: ds.color || 'blue',
+    backgroundColor: ds.bgColor || 'rgba(0, 0, 255, 0.1)',
     borderWidth: 2,
     pointRadius: 0,
     fill: true,
     tension: 0,
   }));
 
-  // Build annotation objects for each strike price
   const annotations = {};
-  strikePrices.forEach((price, index) => {
+  (strikePrices || []).forEach((price, index) => {
     annotations[`strikeLine${index}`] = {
       type: 'line',
       xMin: price,
@@ -290,16 +314,12 @@ function renderPNLChart(datasets, strikePrices) {
     };
   });
 
-  // Clean up old chart
-  if (chartInstance !== null) {
-    chartInstance.destroy();
-  }
+  if (chartInstance) chartInstance.destroy();
 
-  // Create the new chart
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-      datasets: allDatasets
+      datasets: allDatasets,
     },
     options: {
       parsing: false,
@@ -330,9 +350,10 @@ function renderPNLChart(datasets, strikePrices) {
           display: true,
         },
         annotation: {
-          annotations: annotations
+          annotations
         }
       }
     }
   });
 }
+
