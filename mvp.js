@@ -1,12 +1,29 @@
 
-/* 
-Hide navbar on scroll down, show on scroll up
 
+/*
+This section of code is responsible for the dynamic behavior of the MVP page.
+It includes the following functionalities:
+  1. **Navbar Visibility**: The navbar hides when scrolling down and shows when scrolling up.
+  2. **Strategy Block Toggle**: Clicking on a strategy block expands it and loads the corresponding PNL chart.
+  3. **Dynamic Price Range**: Fetches current token prices from CoinGecko and generates a dynamic price range for the PNL chart.
+  4. **Token Selection**: Allows users to select different tokens, updating the PNL chart accordingly.
+  5. **Default Token Selection**: Automatically selects WBTC on page load.
+  6. **Chart Rendering**: Utilizes Chart.js to render the PNL chart based on selected strategies and tokens.
 */
+
 let lastScrollTop = 0;
 const navbar = document.querySelector('nav');
+Chart.register(window['chartjs-plugin-annotation']);
+const buttons = document.querySelectorAll('.token-btn');
 
+// Mapping from button symbol to CoinGecko ID
+const tokenIdMap = {
+  WBTC: 'wrapped-bitcoin',
+  ETH: 'ethereum',
+  // Add more tokens 
+};
 
+// Navbar Visibility on Scroll
 window.addEventListener('scroll', () => {
   const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
@@ -43,62 +60,24 @@ document.querySelectorAll('.strategy-block').forEach(block => {
       block.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
       content.classList.remove('opacity-0', 'max-h-0');
       content.classList.add('opacity-100', 'max-h-96');
+    }
 
     // NEW: Load corresponding chart
-    const { datasets, strikePrices } = getStrategyPNLData(strategyId);
-    renderPNLChart(datasets, strikePrices);
-    }
+    const { datasets, strikePrices } = createStrangle();
+    return renderPNLChart(datasets, strikePrices);
+
   });
 });
 
+// Get the PNL data for the selected strategy
 function getStrategyPNLData(strategyId) {
-  // Dummy data; you should replace this with actual logic
-  switch (strategyId) {
-    case 'bull-put-spread':
-      return {
-        datasets: [
-          {
-            label: 'Bull Put Spread',
-            data: [
-              { price: 1000, pnl: -50 },
-              { price: 1100, pnl: 0 },
-              { price: 1200, pnl: 100 },
-              { price: 1300, pnl: 100 },
-              { price: 1400, pnl: 100 }
-            ],
-            color: '#00E083',
-            bgColor: 'rgba(0, 224, 131, 0.1)'
-          }
-        ],
-        strikePrices: [1100, 1200] // Example strike prices
-      };
-
-    // Add more strategies here...
-
-    default:
-      return {
-        datasets: [],
-        strikePrices: []
-      };
-  }
+  if (strategyId === 'strangle') {
+    return createStrangle();
+  };
 }
 
 
-
-Chart.register(window['chartjs-plugin-annotation']);
-// JavaScript button for token selection 
-
-const buttons = document.querySelectorAll('.token-btn');
-
-
-// 1. Mapping from button symbol to CoinGecko ID
-const tokenIdMap = {
-  WBTC: 'wrapped-bitcoin',
-  ETH: 'ethereum',
-  // Add more tokens as needed
-};
-
-// 2. Fetch current price from CoinGecko
+// Fetch current price from CoinGecko
 async function fetchCurrentPrice(tokenId) {
   const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`;
   const res = await fetch(url);
@@ -106,8 +85,9 @@ async function fetchCurrentPrice(tokenId) {
   return data[tokenId]?.usd || null;
 }
 
-// 3. Generate price range based on current price
+// Generate price range based on current price
 function generateDynamicPriceRange(currentPrice) {
+  const roundedCurrent = Math.round(currentPrice);
   const min = currentPrice * 0.8;
   const max = currentPrice * 1.4;
   const step = currentPrice * 0.03;
@@ -116,7 +96,6 @@ function generateDynamicPriceRange(currentPrice) {
     prices.push(Math.round(price));
   }
   // Ensure current price is included in the range
-  const roundedCurrent = Math.round(currentPrice);
   if (!prices.includes(roundedCurrent)) {
     prices.push(roundedCurrent);
     prices.sort((a, b) => a - b); // Sort to maintain order
@@ -124,7 +103,7 @@ function generateDynamicPriceRange(currentPrice) {
   return prices;
 }
 
-// 4. Update chart for selected token
+// Generate default chart - long call option ATM
 async function updateChartForToken(tokenSymbol) {
   const tokenId = tokenIdMap[tokenSymbol];
   if (!tokenId) return;
@@ -146,7 +125,7 @@ async function updateChartForToken(tokenSymbol) {
   ], strikePrices);
 }
 
-// 5. token buttons
+// token's buttons (ETH, WBTC, etc.)
 buttons.forEach((btn) => {
   btn.addEventListener('click', async () => {
     buttons.forEach(b => b.classList.remove('bg-[#00E083]', 'border-[#00E083]', 'text-[#191308]'));
@@ -156,7 +135,7 @@ buttons.forEach((btn) => {
   });
 });
 
-// Select WBTC by default on page load
+// Select WBTC by default on page load and render its chart
 document.addEventListener('DOMContentLoaded', async () => {
   const defaultBtn = document.querySelector('.token-btn[data-token="WBTC"]');
   if (defaultBtn) {
@@ -164,6 +143,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   await updateChartForToken('WBTC');
 });
+
+
+
+/*
+=== PNL Calculation Functions ===
+These functions calculate PNL for different trading strategies, including spot, perpetual futures, and options.
+*/
 
 
 // Perpetual PNL
@@ -229,8 +215,8 @@ function createStrangle() {
   const callPNL = calculateOptionPNL('call', longCallStrike, premiumCall, quantity, priceRange);
 
   return {
-  legs: [putPNL, callPNL],
-  combined: combinePNLCurves([putPNL, callPNL])
+  datasets: [putPNL, callPNL, combinePNLCurves([putPNL, callPNL])],
+  strikePrices: [Math.round(longPutStrike), Math.round(longCallStrike)],
   };
 }
 
