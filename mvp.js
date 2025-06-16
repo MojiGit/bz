@@ -206,7 +206,7 @@ document.querySelectorAll('.strategy-block').forEach(block => {
       if (Array.isArray(breakeven)) {
         breakevenP.textContent = `$ ${breakeven.join(' / $ ')}`;
       } else {
-        breakevenP.textContent = `$ ${breakeven}`;
+        breakevenP.textContent = `$ ${breakeven.toFixed(0)}`;
       }
     }
     
@@ -275,10 +275,30 @@ function combinePNLCurves(pnlArrays) {
   return combined;
 }
 
+function findBreakevenPoints(pnlArray) {
+  const breakevens = [];
+  for (let i = 1; i < pnlArray.length; i++) {
+    const prev = pnlArray[i - 1];
+    const curr = pnlArray[i];
+    // Busca un cruce de signo (de negativo a positivo o viceversa)
+    if ((prev.pnl < 0 && curr.pnl >= 0) || (prev.pnl > 0 && curr.pnl <= 0)) {
+      // Interpolación lineal para mayor precisión
+      const ratio = Math.abs(prev.pnl) / (Math.abs(prev.pnl) + Math.abs(curr.pnl));
+      const breakevenPrice = prev.price + (curr.price - prev.price) * ratio;
+      breakevens.push(Math.round(breakevenPrice));
+    }
+    // También puedes agregar el caso exacto de PNL = 0
+    if (curr.pnl === 0) {
+      breakevens.push(curr.price);
+    }
+  }
+  return breakevens;
+}
+
+
 // === Default Strategy: Long Call ATM ===
 // This strategy buys a call option at the money (ATM) with a dynamic price range
 async function defaultStrategy() {
-  const tokenId = tokenIdMap[selectedTokenSymbol];
   const priceRange = generateDynamicPriceRange();
 
   // Default strategy: Long Call ATM
@@ -287,15 +307,14 @@ async function defaultStrategy() {
   const quantity = 1;
 
   const pnlData = calculateOptionPNL('call', strikePrice, premium, quantity, priceRange);
-  const breakevenPrice = strikePrice + premium; // Break-even price for the long call
+  const breakeven = findBreakevenPoints(pnlData); // Break-even price for the long call
 
-  
   return {
     datasets: [
-      { label: `${selectedTokenSymbol} Long Call`, data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)' },
+      { label: `${selectedTokenSymbol} Long Call`, data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)'},
     ],
     strikePrices: [Math.round(strikePrice)],
-    breakeven: breakevenPrice,
+    breakeven: breakeven,
   };
 }
 
@@ -303,7 +322,6 @@ async function defaultStrategy() {
 // Buy OTM Put + Buy OTM Call
 async function createStrangle() {
 
-  const tokenId = tokenIdMap[selectedTokenSymbol];
   const priceRange = generateDynamicPriceRange();
 
   const longPutStrike = currentPrice * 0.95;
@@ -317,17 +335,16 @@ async function createStrangle() {
   const callPNL = calculateOptionPNL('call', longCallStrike, premiumCall, quantity, priceRange);
   const combinedPNL = combinePNLCurves([putPNL, callPNL]);
 
-  const breakevenPut = longPutStrike - premiumPut; // Breakeven for Put
-  const breakevenCall = longCallStrike + premiumCall; // Breakeven for Call
+  const breakeven = findBreakevenPoints(combinedPNL);
 
   return {
     datasets: [
-      { label: `Long Put`, data: putPNL, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)' },
-      { label: `Long Call`, data: callPNL, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0)' },
-      { label: `Compound`, data: combinedPNL, color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.16)' },
+      { label: `Long Put`, data: putPNL, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Long Call`, data: callPNL, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0)', borderDash: [5, 5] },
+      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)' },
     ],
     strikePrices: [Math.round(longPutStrike), Math.round(longCallStrike)],
-    breakeven: [breakevenPut, breakevenCall],
+    breakeven: breakeven,
   };
 }
 
@@ -337,7 +354,6 @@ async function createStrangle() {
 
 async function createBullPutSpread() {
 
-  const tokenId = tokenIdMap[selectedTokenSymbol];
   const priceRange = generateDynamicPriceRange();
 
   const longPutStrike = currentPrice * 0.9; // Long Put Strike
@@ -350,16 +366,16 @@ async function createBullPutSpread() {
   const Longput = calculateOptionPNL('put', longPutStrike, premiumLong, quantity, priceRange);
   const combinedPNL = combinePNLCurves([Shortput, Longput]);
 
-  const breakevenPrice = longPutStrike + (premiumShort - premiumLong); // Breakeven for the Bull Put Spread
+  const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bull Put Spread
 
   return {
     datasets: [
-      { label: `Short Put`, data: Shortput, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)' },
-      { label: `Long Put`, data: Longput, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)' },
-      { label: `Compound`, data: combinedPNL, color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.16)' },
+      { label: `Short Put`, data: Shortput, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Long Put`, data: Longput, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)' },
     ],
     strikePrices: [Math.round(longPutStrike), Math.round(shortPutStrike)],
-    breakeven: breakevenPrice,
+    breakeven: breakeven,
   };
   
 }
@@ -367,7 +383,6 @@ async function createBullPutSpread() {
 // === Predefined Strategy: Bear Call Spread (bearish capital gain) ===
 // Buy OTM Call + sell OTM Call
 async function createBearCallSpread() {
-  const tokenId = tokenIdMap[selectedTokenSymbol];
   const priceRange = generateDynamicPriceRange();
 
   const longCallStrike = currentPrice * 1.05;
@@ -380,16 +395,16 @@ async function createBearCallSpread() {
   const LongCall = calculateOptionPNL('call', longCallStrike, premiumLong, quantity, priceRange);
   const combinedPNL = combinePNLCurves([ShortCall, LongCall]);
 
-  const breakevenPrice = longCallStrike - (premiumShort - premiumLong); // Breakeven for the Bear Call Spread
+  const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bear Call Spread
 
   return {
     datasets: [
-      { label: `Short Call`, data: ShortCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)' },
-      { label: `Long Call`, data: LongCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)' },
-      { label: `Compound`, data: combinedPNL, color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.16)' },
+      { label: `Short Call`, data: ShortCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Long Call`, data: LongCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)'},
     ],
     strikePrices: [Math.round(longCallStrike), Math.round(shortCallStrike)],
-    breakeven: breakevenPrice,
+    breakeven: breakeven,
   };
 }
 
@@ -420,6 +435,8 @@ function renderPNLChart(datasets, strikePrices) {
     borderWidth: 2,
     pointRadius: 0,
     fill: true,
+    type: 'line',
+    borderDash: ds.borderDash || [],
     tension: 0,
   }));
 
@@ -431,7 +448,7 @@ function renderPNLChart(datasets, strikePrices) {
       xMax: price,
       borderColor: 'gray',
       borderWidth: 1,
-      borderDash: [5, 5],
+      borderDash: [],
       label: {
         display: true,
         content: `Strike ${price}`,
