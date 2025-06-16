@@ -27,10 +27,34 @@ const tokenIdMap = {
 
 // Mapping from strategy ID to strategy functions
 const strategiesIdMap = {
-  'empty': defaultStrategy,
-  'strangle': createStrangle,
-  'bull-put-spread': createBullPutSpread,
-  'bear-call-spread': createBearCallSpread,
+  'empty': {
+    fn: defaultStrategy,
+    maxProfit: 'Unlimited',
+    maxLoss: 'Capped',
+    strategyType: 'Capital Gain',
+    direction: 'Bullish',
+  },
+  'strangle': {
+    fn: createStrangle,
+    maxProfit: 'Unlimited',
+    maxLoss: 'Capped',
+    strategyType: 'Capital Gain',
+    direction: 'Neutral',
+  },
+  'bull-put-spread': {
+    fn: createBullPutSpread,
+    maxProfit: 'Limited',
+    maxLoss: 'Limited',
+    strategyType: 'Income',
+    direction: 'Bullish',
+  },
+  'bear-call-spread': {
+    fn: createBearCallSpread,
+    maxProfit: 'Limited',
+    maxLoss: 'Limited',
+    strategyType: 'Income',
+    direction: 'Bearish',
+  },
   // Add more strategies
 };
 
@@ -70,6 +94,13 @@ async function fetchCurrentPrice(tokenId) {
   const res = await fetch(url);
   const data = await res.json();
   currentPrice = data[tokenId]?.usd;
+
+  const currentPriceDisplay = document.querySelector('.current-price-display');
+  const currentPriceP = currentPriceDisplay.querySelector('p');
+  if (currentPriceP) {
+    currentPriceP.textContent = `$ ${currentPrice.toFixed(0)}`;
+  }
+
   return data[tokenId]?.usd || null;
 }
 
@@ -79,8 +110,8 @@ function generateDynamicPriceRange() {
     throw new Error('Invalid currentPrice for price range');
   }
   const roundedCurrent = Math.round(currentPrice);
-  const min = currentPrice * 0.5;
-  const max = currentPrice * 1.5;
+  const min = currentPrice * 0.7;
+  const max = currentPrice * 1.3;
   const step = currentPrice * 0.01;
   const prices = [];
   for (let price = min; price <= max; price += step) {
@@ -125,7 +156,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   await updateChartForToken();
 });
 
-
 // Strategy Block Toggle
 document.querySelectorAll('.strategy-block').forEach(block => {
   block.addEventListener('click', async function () {
@@ -148,9 +178,27 @@ document.querySelectorAll('.strategy-block').forEach(block => {
       content.classList.add('opacity-100', 'max-h-96');
     }
 
+    // Update strategy details
+    const maxLossDisplay = document.querySelector('.max-loss-display');
+    const maxLossP = maxLossDisplay.querySelector('p');
+    if (maxLossP) {
+      maxLossP.textContent = `${strategiesIdMap[strategyId].maxLoss}`;
+    }
+
+    const maxProfitDisplay = document.querySelector('.max-profit-display');
+    const maxProfitP = maxProfitDisplay.querySelector('p');
+    if (maxProfitP) {
+      maxProfitP.textContent = `${strategiesIdMap[strategyId].maxProfit}`;
+    }
+
+    const strategyTypeDisplay = document.querySelector('.strategy-type-display');
+    const strategyTypeP = strategyTypeDisplay.querySelector('p');
+    if (strategyTypeP) {
+      strategyTypeP.textContent = `${strategiesIdMap[strategyId].strategyType}`;
+    }
+
     // NEW: Load corresponding chart
-    console.log(`Loading strategy: ${strategyId}`);
-    const { datasets, strikePrices } = await strategiesIdMap[strategyId]();
+    const { datasets, strikePrices } = await strategiesIdMap[strategyId].fn();
     return renderPNLChart(datasets, strikePrices);
   });
 });
@@ -244,8 +292,8 @@ async function createStrangle() {
   const tokenId = tokenIdMap[selectedTokenSymbol];
   const priceRange = generateDynamicPriceRange();
 
-  const longPutStrike = currentPrice * 0.9;
-  const longCallStrike = currentPrice * 1.1;
+  const longPutStrike = currentPrice * 0.95;
+  const longCallStrike = currentPrice * 1.05;
   const premiumPut = currentPrice * 0.05;
   const premiumCall = currentPrice * 0.05;
   const quantity = 1;
