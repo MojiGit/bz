@@ -17,11 +17,21 @@ Chart.register(window['chartjs-plugin-annotation']);
 const buttons = document.querySelectorAll('.token-btn');
 
 let selectedTokenSymbol = null;
+let currentPrice = null;
 // Mapping from button symbol to CoinGecko ID
 const tokenIdMap = {
   WBTC: 'wrapped-bitcoin',
   ETH: 'ethereum',
   // Add more tokens 
+};
+
+// Mapping from strategy ID to strategy functions
+const strategiesIdMap = {
+  'empty': defaultStrategy,
+  'strangle': createStrangle,
+  'bull-put-spread': createBullPutSpread,
+  'bear-call-spread': createBearCallSpread,
+  // Add more strategies
 };
 
 // Navbar Visibility on Scroll
@@ -59,14 +69,18 @@ async function fetchCurrentPrice(tokenId) {
   const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`;
   const res = await fetch(url);
   const data = await res.json();
+  currentPrice = data[tokenId]?.usd;
   return data[tokenId]?.usd || null;
 }
 
 // Generate price range based on current price
-function generateDynamicPriceRange(currentPrice) {
+function generateDynamicPriceRange() {
+  if (!currentPrice || isNaN(currentPrice) || currentPrice <= 0) {
+    throw new Error('Invalid currentPrice for price range');
+  }
   const roundedCurrent = Math.round(currentPrice);
-  const min = currentPrice * 0.6;
-  const max = currentPrice * 1.4;
+  const min = currentPrice * 0.5;
+  const max = currentPrice * 1.5;
   const step = currentPrice * 0.01;
   const prices = [];
   for (let price = min; price <= max; price += step) {
@@ -86,7 +100,7 @@ async function updateChartForToken() {
   if (!tokenId) return;
   const currentPrice = await fetchCurrentPrice(tokenId);
   if (!currentPrice) return;
-  const priceRange = generateDynamicPriceRange(currentPrice);
+  const priceRange = generateDynamicPriceRange();
 
   // deploying a long call option ATM as default
   const pnlData = calculateOptionPNL(
@@ -116,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 document.querySelectorAll('.strategy-block').forEach(block => {
   block.addEventListener('click', async function () {
     const content = block.querySelector('.strategy-content');
-    const strategyId = block.dataset.strategy; //dopo
+    const strategyId = block.getAttribute('strategy');
     const isOpen = content.classList.contains('opacity-100');
 
     // Close all blocks
@@ -135,20 +149,11 @@ document.querySelectorAll('.strategy-block').forEach(block => {
     }
 
     // NEW: Load corresponding chart
-    const { datasets, strikePrices } = await createBullPutSpread();
+    console.log(`Loading strategy: ${strategyId}`);
+    const { datasets, strikePrices } = await strategiesIdMap[strategyId]();
     return renderPNLChart(datasets, strikePrices);
-
   });
 });
-
-/* Get the PNL data for the selected strategy
-function getStrategyPNLData(strategyId) {
-  if (strategyId === 'strangle') {
-    return createStrangle();
-  };
-}
-*/
-
 
 
 
@@ -215,8 +220,7 @@ function combinePNLCurves(pnlArrays) {
 // This strategy buys a call option at the money (ATM) with a dynamic price range
 async function defaultStrategy() {
   const tokenId = tokenIdMap[selectedTokenSymbol];
-  const currentPrice = await fetchCurrentPrice(tokenId);
-  const priceRange = generateDynamicPriceRange(currentPrice);
+  const priceRange = generateDynamicPriceRange();
 
   // Default strategy: Long Call ATM
   const strikePrice = currentPrice;
@@ -238,8 +242,7 @@ async function defaultStrategy() {
 async function createStrangle() {
 
   const tokenId = tokenIdMap[selectedTokenSymbol];
-  const currentPrice = await fetchCurrentPrice(tokenId); 
-  const priceRange = generateDynamicPriceRange(currentPrice);
+  const priceRange = generateDynamicPriceRange();
 
   const longPutStrike = currentPrice * 0.9;
   const longCallStrike = currentPrice * 1.1;
@@ -270,8 +273,7 @@ async function createStrangle() {
 async function createBullPutSpread() {
 
   const tokenId = tokenIdMap[selectedTokenSymbol];
-  const currentPrice = await fetchCurrentPrice(tokenId);
-  const priceRange = generateDynamicPriceRange(currentPrice);
+  const priceRange = generateDynamicPriceRange();
 
   const longPutStrike = currentPrice * 0.9; // Long Put Strike
   const shortPutStrike = currentPrice * 0.95; // Short Put Strike
@@ -297,8 +299,7 @@ async function createBullPutSpread() {
 // Buy OTM Call + sell OTM Call
 async function createBearCallSpread() {
   const tokenId = tokenIdMap[selectedTokenSymbol];
-  const currentPrice = await fetchCurrentPrice(tokenId);
-  const priceRange = generateDynamicPriceRange(currentPrice);
+  const priceRange = generateDynamicPriceRange();
 
   const longCallStrike = currentPrice * 1.05;
   const shortCallStrike = currentPrice;
