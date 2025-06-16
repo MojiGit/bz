@@ -135,7 +135,7 @@ document.querySelectorAll('.strategy-block').forEach(block => {
     }
 
     // NEW: Load corresponding chart
-    const { datasets, strikePrices } = await createStrangle();
+    const { datasets, strikePrices } = await createBullPutSpread();
     return renderPNLChart(datasets, strikePrices);
 
   });
@@ -170,7 +170,7 @@ function calculatePerpPNL(entryPrice, quantity, leverage, priceRange) {
 }
 
 // Option PNL (Call or Put)
-function calculateOptionPNL(optionType, strikePrice, premium, quantity, priceRange) {
+function calculateOptionPNL(optionType, strikePrice, premium, quantity, priceRange, position = 'long') {
   return priceRange.map(currentPrice => {
     let intrinsicValue;
     if (optionType === 'call') {
@@ -182,6 +182,10 @@ function calculateOptionPNL(optionType, strikePrice, premium, quantity, priceRan
     }
 
     const totalPNL = (intrinsicValue - premium) * quantity;
+    if (position === 'short') {
+      // If the position is short, we invert the PNL
+      return { price: currentPrice, pnl: -totalPNL };
+    }
     return { price: currentPrice, pnl: totalPNL };
   });
 }
@@ -235,13 +239,14 @@ async function createStrangle() {
 
   const tokenId = tokenIdMap[selectedTokenSymbol];
   const currentPrice = await fetchCurrentPrice(tokenId); 
+  const priceRange = generateDynamicPriceRange(currentPrice);
 
   const longPutStrike = currentPrice * 0.9;
   const longCallStrike = currentPrice * 1.1;
   const premiumPut = currentPrice * 0.05;
   const premiumCall = currentPrice * 0.05;
   const quantity = 1;
-  const priceRange = generateDynamicPriceRange(currentPrice);
+  
 
   const putPNL = calculateOptionPNL('put', longPutStrike, premiumPut, quantity, priceRange);
   const callPNL = calculateOptionPNL('call', longCallStrike, premiumCall, quantity, priceRange);
@@ -262,30 +267,58 @@ async function createStrangle() {
 // === Predefined Strategy: Bull Put Spread (bullish capital gain) ===
 // Buy OTM Put + sell OTM Put
 
-function createBullPutSpread(longPutStrike, shortPutStrike, premiumLong, premiumShort, quantity, priceRange) {
-  const Shortput = calculateOptionPNL('put', shortPutStrike, premiumShort, quantity, priceRange);
+async function createBullPutSpread() {
+
+  const tokenId = tokenIdMap[selectedTokenSymbol];
+  const currentPrice = await fetchCurrentPrice(tokenId);
+  const priceRange = generateDynamicPriceRange(currentPrice);
+
+  const longPutStrike = currentPrice * 0.9; // Long Put Strike
+  const shortPutStrike = currentPrice * 0.95; // Short Put Strike
+  const premiumLong = currentPrice * 0.05;
+  const premiumShort = currentPrice * 0.09;
+  const quantity = 1;
+
+  const Shortput = calculateOptionPNL('put', shortPutStrike, premiumShort, quantity, priceRange, 'short');
   const Longput = calculateOptionPNL('put', longPutStrike, premiumLong, quantity, priceRange);
-  
+  const combinedPNL = combinePNLCurves([Shortput, Longput]);
+
   return {
-    legs: [Shortput, Longput],
-    combined: combinePNLCurves([Shortput, Longput])
+    datasets: [
+      { label: `Short Put`, data: Shortput, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)' },
+      { label: `Long Put`, data: Longput, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)' },
+      { label: `Compound`, data: combinedPNL, color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.16)' },
+    ],
+    strikePrices: [Math.round(longPutStrike), Math.round(shortPutStrike)],
   };
+  
 }
 // === Predefined Strategy: Bear Call Spread (bearish capital gain) ===
 // Buy OTM Call + sell OTM Call
-function createBearCallSpread(longCallStrike, shortCallStrike, premiumLong, premiumShort, quantity, priceRange) {
-  const ShortCall = calculateOptionPNL('call', shortCallStrike, premiumShort, quantity, priceRange);
+async function createBearCallSpread() {
+  const tokenId = tokenIdMap[selectedTokenSymbol];
+  const currentPrice = await fetchCurrentPrice(tokenId);
+  const priceRange = generateDynamicPriceRange(currentPrice);
+
+  const longCallStrike = currentPrice * 1.05;
+  const shortCallStrike = currentPrice;
+  const premiumLong = currentPrice * 0.06;
+  const premiumShort = currentPrice * 0.09;
+  const quantity = 1;
+
+  const ShortCall = calculateOptionPNL('call', shortCallStrike, premiumShort, quantity, priceRange, 'short');
   const LongCall = calculateOptionPNL('call', longCallStrike, premiumLong, quantity, priceRange);
+  const combinedPNL = combinePNLCurves([ShortCall, LongCall]);
 
   return {
-    legs: [ShortCall, LongCall],
-    combined: combinePNLCurves([ShortCall, LongCall])
+    datasets: [
+      { label: `Short Call`, data: ShortCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)' },
+      { label: `Long Call`, data: LongCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)' },
+      { label: `Compound`, data: combinedPNL, color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.16)' },
+    ],
+    strikePrices: [Math.round(longCallStrike), Math.round(shortCallStrike)],
   };
 }
-
-
-
-
 
 let chartInstance = null;
 
