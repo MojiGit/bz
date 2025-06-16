@@ -65,9 +65,9 @@ async function fetchCurrentPrice(tokenId) {
 // Generate price range based on current price
 function generateDynamicPriceRange(currentPrice) {
   const roundedCurrent = Math.round(currentPrice);
-  const min = currentPrice * 0.8;
+  const min = currentPrice * 0.6;
   const max = currentPrice * 1.4;
-  const step = currentPrice * 0.03;
+  const step = currentPrice * 0.01;
   const prices = [];
   for (let price = min; price <= max; price += step) {
     prices.push(Math.round(price));
@@ -95,11 +95,10 @@ async function updateChartForToken() {
     currentPrice * 0.09, // Example premium
     1, 
     priceRange);
-  // Render the PNL chart
-  const strikePrices = [Math.round(currentPrice)]; // Use current price as strike for simplicity
-  renderPNLChart([
-    { label: `${selectedTokenSymbol} Long Call`, data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)' },
-  ], strikePrices);
+  // Render  the chart with the default strategy
+
+  const { datasets, strikePrices } = await defaultStrategy();
+  return renderPNLChart(datasets, strikePrices);
 }
 
 // Select WBTC by default on page load and render its chart
@@ -149,6 +148,11 @@ function getStrategyPNLData(strategyId) {
   };
 }
 */
+
+
+
+
+
 // ==================================================================================== //
 
 /*
@@ -203,6 +207,28 @@ function combinePNLCurves(pnlArrays) {
   return combined;
 }
 
+// === Default Strategy: Long Call ATM ===
+// This strategy buys a call option at the money (ATM) with a dynamic price range
+async function defaultStrategy() {
+  const tokenId = tokenIdMap[selectedTokenSymbol];
+  const currentPrice = await fetchCurrentPrice(tokenId);
+  const priceRange = generateDynamicPriceRange(currentPrice);
+
+  // Default strategy: Long Call ATM
+  const strikePrice = currentPrice;
+  const premium = currentPrice * 0.09; // Example premium
+  const quantity = 1;
+
+  const pnlData = calculateOptionPNL('call', strikePrice, premium, quantity, priceRange);
+  
+  return {
+    datasets: [
+      { label: `${selectedTokenSymbol} Long Call`, data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)' },
+    ],
+    strikePrices: [Math.round(strikePrice)],
+  };
+}
+
 // === Predefined Strategy: Long Strangle (Neutral Volatility Bet) ===
 // Buy OTM Put + Buy OTM Call
 async function createStrangle() {
@@ -224,7 +250,7 @@ async function createStrangle() {
 
   return {
     datasets: [
-      { label: `Long Put`, data: putPNL, color: '#FF6B6B', bgColor: 'rgba(255, 107, 107, 0)' },
+      { label: `Long Put`, data: putPNL, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)' },
       { label: `Long Call`, data: callPNL, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0)' },
       { label: `Compound`, data: combinedPNL, color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.16)' },
     ],
