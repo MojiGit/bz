@@ -32,28 +32,28 @@ const strategiesIdMap = {
     maxProfit: 'Unlimited',
     maxLoss: 'Capped',
     strategyType: 'Capital Gain',
-    direction: 'Bullish',
+    sentiment: 'Bullish',
   },
   'strangle': {
     fn: createStrangle,
     maxProfit: 'Unlimited',
     maxLoss: 'Capped',
     strategyType: 'Capital Gain',
-    direction: 'Neutral',
+    sentiment: 'Neutral',
   },
   'bull-put-spread': {
     fn: createBullPutSpread,
     maxProfit: 'Limited',
     maxLoss: 'Limited',
     strategyType: 'Income',
-    direction: 'Bullish',
+    sentiment: 'Bullish',
   },
   'bear-call-spread': {
     fn: createBearCallSpread,
     maxProfit: 'Limited',
     maxLoss: 'Limited',
     strategyType: 'Income',
-    direction: 'Bearish',
+    sentiment: 'Bearish',
   },
   // Add more strategies
 };
@@ -154,6 +154,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   selectedTokenSymbol = 'WBTC';
   await updateChartForToken();
+});
+
+document.querySelectorAll('.sentiment-filter').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sentiment = btn.getAttribute('data-sentiment');
+    document.querySelectorAll('.sentiment-filter').forEach(b => b.classList.remove('bg-[#00E083]', 'text-white'));
+    btn.classList.add('bg-[#00E083]', 'text-white');
+
+    document.querySelectorAll('.strategy-block').forEach(block => {
+      const blockSentiment = block.getAttribute('data-sentiment');
+      if (sentiment === 'all' || blockSentiment === sentiment) {
+        block.style.display = '';
+      } else {
+        block.style.display = 'none';
+      }
+    });
+  });
 });
 
 // Strategy Block Toggle
@@ -347,7 +364,6 @@ async function createStrangle() {
     breakeven: breakeven,
   };
 }
-
 
 // === Predefined Strategy: Bull Put Spread (bullish capital gain) ===
 // Buy OTM Put + sell OTM Put
