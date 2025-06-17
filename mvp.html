@@ -50,8 +50,13 @@
 
             <!-- Desktop Links -->
             <ul class="space-x-6 text-[#00E083] text-[18px] hidden md:flex items-center">
-                <li><a href="#" class="hover:text-[#52FFB8] transition font-bold">Whitepaper</a></li>
-                <li><a target="_blank" rel="noopener noreferrer" href="https://m-mojica-mateuss-organization.gitbook.io/betazero-1/" class="hover:text-[#52FFB8] transition font-bold">Docs</a></li>
+                <li><a href="#" class="hover:text-[#52FFB8] transition font-bold">My strategies</a></li>
+                <li><a href="#" target="_blank" rel="noopener noreferrer" class="hover:text-[#00E083] transition">
+                    <button class="text-[16px] font-bold text-[#191308] bg-[#00E083] px-4 py-2 rounded-full hover:bg-[#52FFB8]">
+                        Connect Wallet
+                    </button>   
+                    </a>
+                </li>
             </ul>
         </nav>
             <!-- space to avoid navbar overlap with hero section -->
@@ -85,11 +90,20 @@
                 </button>
             </div>
 
+            <!-- Sentiment Filters Section -->
+            <div id="sentiment-filters" class="flex gap-2 mb-2" >
+                <button class="sentiment-filter px-3 py-1 rounded border border-[#D8DDEF] bg-white text-[#191308]" data-sentiment="all"> All </button>
+                <button class="sentiment-filter px-3 py-1 rounded border border-[#D8DDEF] bg-white text-[#191308]" data-sentiment="bullish"> Bullish </button>
+                <button class="sentiment-filter px-3 py-1 rounded border border-[#D8DDEF] bg-white text-[#191308]" data-sentiment="bearish"> Bearish </button>
+                <button class="sentiment-filter px-3 py-1 rounded border border-[#D8DDEF] bg-white text-[#191308]" data-sentiment="high-volatility"> High Volatility </button>
+                <button class="sentiment-filter px-3 py-1 rounded border border-[#D8DDEF] bg-white text-[#191308]" data-sentiment="low-volatility"> Low Volatility </button>
+            </div>
+
             <!-- Strategy Selection Section -->
             <div class="w-full grid grid-cols-1 gap-4">
                 <!--  Strategy empty  -->
                 <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
-                    strategy="empty">
+                    strategy="empty" data-sentiment="">
                     <div class="flex flex-row gap-2 strategy-header">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">
                             Empty Strategy
@@ -104,10 +118,9 @@
                         </button>
                     </div>
                 </div>
-
                 <!--  Neutral Strategy - Strangle  -->
                 <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
-                    strategy="strangle">
+                    strategy="strangle" data-sentiment="high-volatility">
                     
                     <div class="flex flex-row gap-2 strategy-header">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">
@@ -127,10 +140,9 @@
                         </button>
                     </div>
                 </div>
-
                 <!--  Bullish Strategy - Bull Put Spread  -->
                 <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
-                    strategy="bull-put-spread">
+                    strategy="bull-put-spread" data-sentiment="bullish">
                     <div class="flex flex-row gap-2 strategy-header">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">Bull Put Spread</h1>
                         <label class="text-gray-400">|</label>
@@ -148,11 +160,9 @@
                         </button>
                     </div>
                 </div>
-
-
                 <!--  Bearish Strategy - Bear Call Spread  -->
                 <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
-                    strategy="bear-call-spread">
+                    strategy="bear-call-spread" data-sentiment="bearish">
                     <div class="flex flex-row gap-2 strategy-header">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">
                             Bear Call Spread
