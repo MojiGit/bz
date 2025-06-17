@@ -40,7 +40,7 @@
     <!-- Navbar -->
     <div class="relative z-50">        
         <nav id="main-navbar"
-            class="fixed top-4 left-2 right-2 z-50 px-4 backdrop-blur-md bg-white/10 border border-[#D8DDEF] rounded-full flex items-center justify-between transition-opacity duration-500 ease-in-out opacity-100">
+            class="fixed top-4 left-2 right-2 z-50 px-4 backdrop-blur-3xl bg-white/10 border border-[#D8DDEF] rounded-full flex items-center justify-between transition-opacity duration-500 ease-in-out opacity-100">
             <!-- Logo -->
             <a href="./index.html">
             <img src="./images/svgs/logo_green.svg" alt="Beta" class="w-16 h-12 lg:w-24 lg:h-16">
@@ -64,39 +64,46 @@
 
     </div>
 
-    <div class="flex flex-row ">
-        <h1 class="text-[24px] md:text-[32px] font-bold text-[#191308] px-4 my-6">
-        Option Strategy Builder
-        </h1>
-    </div>
-
+    <!-- Dashboard -->
     <section id="dashboard" class="flex flex-col md:flex-row max-h-screen px-4">
 
         <div id="menu" class="max-w-xl"> 
+
+            <h1 class="text-[24px] md:text-[32px] font-bold text-[#191308] my-6">
+            Option Strategy Builder
+            </h1>
             
-            <div id="token-buttons" class="flex gap-2 mb-4 text-gray-400">
-                <button
-                    data-token="WBTC"
-                    class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300"
-                >
-                    WBTC
-                </button>
-                <label class="text-gray-400">|</label>
-                <button
-                    data-token="ETH"
-                    class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300"
-                >
-                    ETH
-                </button>
+            <!-- Token selection -->
+            <div id="token-buttons" class="grid grid-cols-2 gap-2 mb-4 text-gray-400">
+                <div>
+                    <button
+                        data-token="WBTC"
+                        class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300"
+                    >
+                        WBTC
+                    </button>
+                    <label class="text-gray-400">|</label>
+                    <button
+                        data-token="ETH"
+                        class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300"
+                    >
+                        ETH
+                    </button>
+                </div>
+
+                <div class="current-price-display flex flex-row items-center justify-center"> 
+                    <h2 class=" font-bold px-1 text-[#191308]">Current Price :</h2>
+                    <p class="text-[#191308]">#</p>
+                </div>
             </div>
 
             <!-- Sentiment Filters Section -->
             <div id="sentiment-filters" class="flex gap-2 mb-2" >
-                <button class="sentiment-filter px-3 py-1 rounded border border-[#D8DDEF] bg-white text-[#191308]" data-sentiment="all"> All </button>
-                <button class="sentiment-filter px-3 py-1 rounded border border-[#D8DDEF] bg-white text-[#191308]" data-sentiment="bullish"> Bullish </button>
-                <button class="sentiment-filter px-3 py-1 rounded border border-[#D8DDEF] bg-white text-[#191308]" data-sentiment="bearish"> Bearish </button>
-                <button class="sentiment-filter px-3 py-1 rounded border border-[#D8DDEF] bg-white text-[#191308]" data-sentiment="high-volatility"> High Volatility </button>
-                <button class="sentiment-filter px-3 py-1 rounded border border-[#D8DDEF] bg-white text-[#191308]" data-sentiment="low-volatility"> Low Volatility </button>
+                <button class="sentiment-filter px-3 py-1 rounded-2xl text-[#191308]" data-sentiment="all"> All </button>
+                <button class="sentiment-filter px-3 py-1 rounded-2xl text-[#191308]" data-sentiment="bullish"> Bullish </button>
+                <button class="sentiment-filter px-3 py-1 rounded-2xl text-[#191308]" data-sentiment="bearish"> Bearish </button>
+                <button class="sentiment-filter px-3 py-1 rounded-2xl text-[#191308]" data-sentiment="high-volatility"> High Volatility </button>
+                <button class="sentiment-filter px-3 py-1 rounded-2xl text-[#191308]" data-sentiment="low-volatility"> Low Volatility </button>
             </div>
 
             <!-- Strategy Selection Section -->
@@ -104,30 +111,59 @@
                 <!--  Strategy empty  -->
                 <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
                     strategy="empty" data-sentiment="">
-                    <div class="flex flex-row gap-2 strategy-header">
+                    <div class="flex flex-row gap-2 strategy-header justify-between">
                         <h1 class="text-[18px] font-bold text-[#191308] mb-2">
                             Empty Strategy
                         </h1>
+                        <button class="text-[20px] bg-[#D8DDEF] font-semibold text-black px-2 rounded-xl hover:bg-[#52FFB8] transition-colors duration-300">
+                            Build
+                        </button>
                     </div>
                     <div class="strategy-content mt-2 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
                         <p class="text-[16px] text-gray-400 mb-2">
                             Design your strategy from scratch by adding assets and defining their parameters.
                         </p>
-                        <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
-                            Build
-                        </button>
-                    </div>
+                        
+                        <div class="flex flex-row py-2 justify-between gap-4">   
+
+                            <div class="proficiency-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Proficiency</h2>
+                                <p class="text-[14px]">#</p>
+                            </div>
+
+                            <div class="strategy-type-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Strategy Type</h2>
+                                <p class="text-[14px]">Capital Gain</p>
+                            </div>
+                
+                            <div class="max-profit-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Max Profit</h2>
+                                <p class="text-[14px]">Uncapped</p>
+                            </div>
+
+                            <div class="max-loss-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Max Loss</h2>
+                                <p class="text-[14px]">Capped</p>
+                            </div>
+                            
+                        </div>
+                    </div>                    
                 </div>
                 <!--  Neutral Strategy - Strangle  -->
                 <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
                     strategy="strangle" data-sentiment="high-volatility">
                     
-                    <div class="flex flex-row gap-2 strategy-header">
-                        <h1 class="text-[18px] font-bold text-[#191308] mb-2">
-                        Strangle
-                        </h1>
-                        <label class="text-gray-400">|</label>
-                        <span class="text-[18px] text-gray-400">Neutral</span>
+                    <div class="flex flex-row gap-2 strategy-header justify-between">
+                        <div class="flex flex-row gap-2">
+                            <h1 class="text-[18px] font-bold text-[#191308] mb-2">
+                            Strangle
+                            </h1>
+                            <label class="text-gray-400">|</label>
+                            <span class="text-[18px] text-gray-400">Neutral</span>
+                        </div>
+                        <button class="text-[20px] bg-[#D8DDEF] font-semibold text-black px-2 rounded-xl hover:bg-[#52FFB8] transition-colors duration-300">
+                            Build
+                        </button>
                     </div>
                     <div class="strategy-content mt-2 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
                         <p class="text-[16px] text-gray-400 mb-2">
@@ -135,18 +171,43 @@
                             and higher strike calls with the same expiration date so that we can profit from the
                             stock soaring up or plummeting down.
                         </p>
-                        <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
-                            Build
-                        </button>
+                        <div class="flex flex-row py-2 justify-between gap-4">   
+
+                            <div class="proficiency-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Proficiency</h2>
+                                <p class="text-[14px]">#</p>
+                            </div>
+
+                            <div class="strategy-type-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Strategy Type</h2>
+                                <p class="text-[14px]">Capital Gain</p>
+                            </div>
+                
+                            <div class="max-profit-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Max Profit</h2>
+                                <p class="text-[14px]">Uncapped</p>
+                            </div>
+
+                            <div class="max-loss-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Max Loss</h2>
+                                <p class="text-[14px]">Capped</p>
+                            </div>
+                            
+                        </div>
                     </div>
                 </div>
                 <!--  Bullish Strategy - Bull Put Spread  -->
                 <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
                     strategy="bull-put-spread" data-sentiment="bullish">
-                    <div class="flex flex-row gap-2 strategy-header">
-                        <h1 class="text-[18px] font-bold text-[#191308] mb-2">Bull Put Spread</h1>
-                        <label class="text-gray-400">|</label>
-                        <span class="text-[18px] text-[#00E083]">Bullish</span>
+                    <div class="flex flex-row gap-2 strategy-header justify-between">
+                        <div class="flex flex-row gap-2">
+                            <h1 class="text-[18px] font-bold text-[#191308] mb-2">Bull Put Spread</h1>
+                            <label class="text-gray-400">|</label>
+                            <span class="text-[18px] text-[#00E083]">Bullish</span>
+                        </div>
+                        <button class="text-[20px] bg-[#D8DDEF] font-semibold text-black px-2 rounded-xl hover:bg-[#52FFB8] transition-colors duration-300">
+                            Build
+                        </button>
                     </div>
 
                     <div class="strategy-content mt-2 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
@@ -155,20 +216,45 @@
                             put to insure the one you sold. Both put strikes should be lower than the current
                             market price so as to ensure a profit even if the stock doesn’t move at all.
                         </p>
-                        <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
-                            Build
-                        </button>
+                        <div class="flex flex-row py-2 justify-between gap-4">   
+
+                            <div class="proficiency-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Proficiency</h2>
+                                <p class="text-[14px]">#</p>
+                            </div>
+
+                            <div class="strategy-type-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Strategy Type</h2>
+                                <p class="text-[14px]">Capital Gain</p>
+                            </div>
+                
+                            <div class="max-profit-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Max Profit</h2>
+                                <p class="text-[14px]">Uncapped</p>
+                            </div>
+
+                            <div class="max-loss-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Max Loss</h2>
+                                <p class="text-[14px]">Capped</p>
+                            </div>
+                            
+                        </div>
                     </div>
                 </div>
                 <!--  Bearish Strategy - Bear Call Spread  -->
                 <div class="strategy-block grid grid-cols-1 divide-y-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden"
                     strategy="bear-call-spread" data-sentiment="bearish">
-                    <div class="flex flex-row gap-2 strategy-header">
-                        <h1 class="text-[18px] font-bold text-[#191308] mb-2">
-                            Bear Call Spread
-                        </h1>
-                        <label class="text-gray-400">|</label>
-                        <span class="text-[18px] text-[#C70039]">Bearish</span>
+                    <div class="flex flex-row gap-2 strategy-header justify-between">
+                        <div class="flex flex-row gap-2">
+                            <h1 class="text-[18px] font-bold text-[#191308] mb-2">
+                                Bear Call Spread
+                            </h1>
+                            <label class="text-gray-400">|</label>
+                            <span class="text-[18px] text-[#C70039]">Bearish</span>
+                        </div>
+                        <button class="text-[20px] bg-[#D8DDEF] font-semibold text-black px-2 rounded-xl hover:bg-[#52FFB8] transition-colors duration-300">
+                            Build
+                        </button>
                     </div>
                     <div class="strategy-content mt-2 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
                         <p class="text-[16px] text-gray-400 mb-2">
@@ -176,9 +262,30 @@
                             call to insure the one you sold. Both call strikes should be higher than the current
                             stock price so as to ensure a profit even if the stock doesn’t move at all. 
                         </p>
-                        <button class="text-[18px] bg-[#D8DDEF] text-black px-2 rounded hover:bg-[#52FFB8] transition-colors duration-300">
-                            Build
-                        </button>
+                        <div class="flex flex-row py-2 justify-between gap-4">   
+
+                            <div class="proficiency-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Proficiency</h2>
+                                <p class="text-[14px]">#</p>
+                            </div>
+
+                            <div class="strategy-type-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Strategy Type</h2>
+                                <p class="text-[14px]">Capital Gain</p>
+                            </div>
+                
+                            <div class="max-profit-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Max Profit</h2>
+                                <p class="text-[14px]">Uncapped</p>
+                            </div>
+
+                            <div class="max-loss-display flex flex-col items-center justify-center">
+                                <h2 class="font-bold text-[16px]">Max Loss</h2>
+                                <p class="text-[14px]">Capped</p>
+                            </div>
+                            
+                        </div>
+                        
                     </div>
                 </div>
 
@@ -186,37 +293,11 @@
             
         </div>
 
+        <!-- Chart -->
         <div class="w-full max-w-4xl mx-auto my-10">
             <canvas id="pnlChart" class="w-full max-h-screen "></canvas>
             <!-- Info section -->
-            <div class="flex flex-row border border-2 border-[#D8DDEF] shadow-md rounded-2xl px-4 py-2 justify-between">   
-                
-                <div class="current-price-display flex flex-col items-center justify-center"> 
-                    <h2 class=" font-bold">Underlying Price</h2>
-                    <p>#</p>
-                </div>
-
-                <div class="max-profit-display flex flex-col items-center justify-center">
-                    <h2 class="font-bold">Max Profit</h2>
-                    <p>Uncapped</p>
-                </div>
-
-                <div class="max-loss-display flex flex-col items-center justify-center">
-                    <h2 class="font-bold">Max Loss</h2>
-                    <p>Capped</p>
-                </div>
-
-                <div class="breakeven-display flex flex-col items-center justify-center">
-                    <h2 class="font-bold">Breakeven</h2>
-                    <p>#</p>
-                </div>
-
-                <div class="strategy-type-display flex flex-col items-center justify-center">
-                    <h2 class="font-bold">Strategy Type</h2>
-                    <p>Capital Gain</p>
-                </div>
-
-            </div>
+            
         </div>
     </section>
 
