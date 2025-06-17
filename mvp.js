@@ -98,7 +98,7 @@ async function fetchCurrentPrice(tokenId) {
   const currentPriceDisplay = document.querySelector('.current-price-display');
   const currentPriceP = currentPriceDisplay.querySelector('p');
   if (currentPriceP) {
-    currentPriceP.textContent = `$ ${currentPrice.toFixed(0)}`;
+    currentPriceP.textContent = `US $ ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
   }
 
   return data[tokenId]?.usd || null;
@@ -134,13 +134,6 @@ async function updateChartForToken() {
   const priceRange = generateDynamicPriceRange();
 
   // deploying a long call option ATM as default
-  const pnlData = calculateOptionPNL(
-    'call', 
-    currentPrice, 
-    currentPrice * 0.09, // Example premium
-    1, 
-    priceRange);
-  // Render  the chart with the default strategy
 
   const { datasets, strikePrices } = await defaultStrategy();
   return renderPNLChart(datasets, strikePrices);
@@ -217,6 +210,7 @@ document.querySelectorAll('.strategy-block').forEach(block => {
     // NEW: Load corresponding chart
     const { datasets, strikePrices, breakeven } = await strategiesIdMap[strategyId].fn();
     
+    /* Breakeven diplay, not used right now 
     const breakevenDisplay = document.querySelector('.breakeven-display');
     const breakevenP = breakevenDisplay.querySelector('p');
     if (breakevenP) {
@@ -226,6 +220,7 @@ document.querySelectorAll('.strategy-block').forEach(block => {
         breakevenP.textContent = `$ ${breakeven.toFixed(0)}`;
       }
     }
+    */
     
     return renderPNLChart(datasets, strikePrices);
   });
@@ -291,7 +286,7 @@ function combinePNLCurves(pnlArrays) {
 
   return combined;
 }
-
+// Find breakeven points in a PNL array
 function findBreakevenPoints(pnlArray) {
   const breakevens = [];
   for (let i = 1; i < pnlArray.length; i++) {
@@ -312,9 +307,8 @@ function findBreakevenPoints(pnlArray) {
   return breakevens;
 }
 
-
 // === Default Strategy: Long Call ATM ===
-// This strategy buys a call option at the money (ATM) with a dynamic price range
+// buy ATM call 
 async function defaultStrategy() {
   const priceRange = generateDynamicPriceRange();
 
@@ -367,7 +361,6 @@ async function createStrangle() {
 
 // === Predefined Strategy: Bull Put Spread (bullish capital gain) ===
 // Buy OTM Put + sell OTM Put
-
 async function createBullPutSpread() {
 
   const priceRange = generateDynamicPriceRange();
@@ -424,6 +417,8 @@ async function createBearCallSpread() {
   };
 }
 
+
+// Chart.js instance for rendering the PNL chart
 let chartInstance = null;
 
 function renderPNLChart(datasets, strikePrices) {
@@ -438,11 +433,7 @@ function renderPNLChart(datasets, strikePrices) {
     return;
   }
 
-  // Safely extract PNL values
-  const allPNL = datasets.flatMap(ds => ds.data?.map(point => point.pnl) || []);
-  const minY = Math.min(...allPNL);
-  const maxY = Math.max(...allPNL);
-
+  // create datasets for Chart.js
   const allDatasets = datasets.map(ds => ({
     label: ds.label || '',
     data: ds.data?.map(point => ({ x: point.price, y: point.pnl })) || [],
@@ -456,6 +447,7 @@ function renderPNLChart(datasets, strikePrices) {
     tension: 0,
   }));
 
+  // Prepare annotations for strike prices
   const annotations = {};
   (strikePrices || []).forEach((price, index) => {
     annotations[`strikeLine${index}`] = {
@@ -479,6 +471,27 @@ function renderPNLChart(datasets, strikePrices) {
     };
   });
 
+  // Add current price line if available
+  if (typeof currentPrice === 'number' && !isNaN(currentPrice)) {
+  annotations.currentPriceLine = {
+    type: 'line',
+    xMin: Math.round(currentPrice),
+    xMax: Math.round(currentPrice),
+    borderColor: '#00E083',
+    borderWidth: 1,
+    borderDash: [0],
+    label: {
+      display: true,
+      content: `Current $${Math.round(currentPrice)}`,
+      position: 'end',
+      color: '#00E083',
+      backgroundColor: 'transparent',
+      font: { size: 12, weight: 'bold' }
+    },
+    z: 1
+  };
+  }
+
   if (chartInstance) chartInstance.destroy();
 
   chartInstance = new Chart(ctx, {
@@ -495,7 +508,7 @@ function renderPNLChart(datasets, strikePrices) {
           type: 'linear',
           title: {
             display: true,
-            text: 'Price',
+            text: 'Subjacent Price',
           },
         },
         y: {
