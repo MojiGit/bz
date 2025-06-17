@@ -417,7 +417,6 @@ async function createBearCallSpread() {
   };
 }
 
-
 // Chart.js instance for rendering the PNL chart
 let chartInstance = null;
 
