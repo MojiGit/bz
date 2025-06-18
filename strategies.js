@@ -153,7 +153,7 @@ export async function defaultStrategy() {
 
   return {
     datasets: [
-      { label: `${selectedTokenSymbol} Long Call`, data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)'},
+      { data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)'},
     ],
     strikePrices: [Math.round(strikePrice)],
     breakeven: breakeven,
