@@ -78,14 +78,14 @@
                 <div>
                     <button
                         data-token="WBTC"
-                        class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300"
+                        class="token-btn text-[18px] px-2 rounded transition-colors font-semibold duration-300"
                     >
                         WBTC
                     </button>
-                    <label class="text-gray-400">|</label>
+                    <label class="text-gray-400 text-[20px]">|</label>
                     <button
                         data-token="ETH"
-                        class="token-btn text-[18px] px-2 py-1 rounded-2xl transition-colors border border-2 font-semibold border-[#D8DDEF] duration-300"
+                        class="token-btn text-[18px] px-2 rounded transition-colors font-semibold duration-300"
                     >
                         ETH
                     </button>
@@ -98,12 +98,20 @@
             </div>
 
             <!-- Sentiment Filters Section -->
-            <div id="sentiment-filters" class="flex gap-2 mb-2" >
-                <button class="sentiment-filter px-3 py-1 rounded-2xl text-[#191308]" data-sentiment="all"> All </button>
-                <button class="sentiment-filter px-3 py-1 rounded-2xl text-[#191308]" data-sentiment="bullish"> Bullish </button>
-                <button class="sentiment-filter px-3 py-1 rounded-2xl text-[#191308]" data-sentiment="bearish"> Bearish </button>
-                <button class="sentiment-filter px-3 py-1 rounded-2xl text-[#191308]" data-sentiment="high-volatility"> High Volatility </button>
-                <button class="sentiment-filter px-3 py-1 rounded-2xl text-[#191308]" data-sentiment="low-volatility"> Low Volatility </button>
+            <div id="sentiment-filters" class="flex flex-row justify-between w-full gap-2 mb-2" >
+                <div>
+                    <input
+                        id="strategy-name-filter"
+                        type="text"
+                        placeholder="Search"
+                        class="w-full px-3 py-2 border border-[#D8DDEF] rounded"
+                    />
+                </div>
+                <button class="sentiment-filter px-2 rounded text-[#191308]" data-sentiment="all"> All </button>
+                <button class="sentiment-filter px-2 rounded text-[#191308]" data-sentiment="bullish"> Bullish </button>
+                <button class="sentiment-filter px-2 rounded text-[#191308]" data-sentiment="bearish"> Bearish </button>
+                <button class="sentiment-filter px-2 rounded text-[#191308]" data-sentiment="high-volatility"> High Volatility </button>
+                <button class="sentiment-filter px-2 rounded text-[#191308]" data-sentiment="low-volatility"> Low Volatility </button>
             </div>
 
             <!-- Strategy Selection Section -->
@@ -123,30 +131,6 @@
                         <p class="text-[16px] text-gray-400 mb-2">
                             Design your strategy from scratch by adding assets and defining their parameters.
                         </p>
-                        
-                        <div class="flex flex-row py-2 justify-between gap-4">   
-
-                            <div class="proficiency-display flex flex-col items-center justify-center">
-                                <h2 class="font-bold text-[16px]">Proficiency</h2>
-                                <p class="text-[14px]">#</p>
-                            </div>
-
-                            <div class="strategy-type-display flex flex-col items-center justify-center">
-                                <h2 class="font-bold text-[16px]">Strategy Type</h2>
-                                <p class="text-[14px]">Capital Gain</p>
-                            </div>
-                
-                            <div class="max-profit-display flex flex-col items-center justify-center">
-                                <h2 class="font-bold text-[16px]">Max Profit</h2>
-                                <p class="text-[14px]">Uncapped</p>
-                            </div>
-
-                            <div class="max-loss-display flex flex-col items-center justify-center">
-                                <h2 class="font-bold text-[16px]">Max Loss</h2>
-                                <p class="text-[14px]">Capped</p>
-                            </div>
-                            
-                        </div>
                     </div>                    
                 </div>
                 <!--  Neutral Strategy - Strangle  -->
@@ -175,22 +159,22 @@
 
                             <div class="proficiency-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Proficiency</h2>
-                                <p class="text-[14px]">#</p>
+                                <p class="text-[14px]"></p>
                             </div>
 
                             <div class="strategy-type-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Strategy Type</h2>
-                                <p class="text-[14px]">Capital Gain</p>
+                                <p class="text-[14px]"></p>
                             </div>
                 
                             <div class="max-profit-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Max Profit</h2>
-                                <p class="text-[14px]">Uncapped</p>
+                                <p class="text-[14px]"></p>
                             </div>
 
                             <div class="max-loss-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Max Loss</h2>
-                                <p class="text-[14px]">Capped</p>
+                                <p class="text-[14px]"></p>
                             </div>
                             
                         </div>
@@ -220,22 +204,22 @@
 
                             <div class="proficiency-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Proficiency</h2>
-                                <p class="text-[14px]">#</p>
+                                <p class="text-[14px]"></p>
                             </div>
 
                             <div class="strategy-type-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Strategy Type</h2>
-                                <p class="text-[14px]">Capital Gain</p>
+                                <p class="text-[14px]"></p>
                             </div>
                 
                             <div class="max-profit-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Max Profit</h2>
-                                <p class="text-[14px]">Uncapped</p>
+                                <p class="text-[14px]"></p>
                             </div>
 
                             <div class="max-loss-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Max Loss</h2>
-                                <p class="text-[14px]">Capped</p>
+                                <p class="text-[14px]"></p>
                             </div>
                             
                         </div>
@@ -266,22 +250,22 @@
 
                             <div class="proficiency-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Proficiency</h2>
-                                <p class="text-[14px]">#</p>
+                                <p class="text-[14px]"></p>
                             </div>
 
                             <div class="strategy-type-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Strategy Type</h2>
-                                <p class="text-[14px]">Capital Gain</p>
+                                <p class="text-[14px]"></p>
                             </div>
                 
                             <div class="max-profit-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Max Profit</h2>
-                                <p class="text-[14px]">Uncapped</p>
+                                <p class="text-[14px]"></p>
                             </div>
 
                             <div class="max-loss-display flex flex-col items-center justify-center">
                                 <h2 class="font-bold text-[16px]">Max Loss</h2>
-                                <p class="text-[14px]">Capped</p>
+                                <p class="text-[14px]"></p>
                             </div>
                             
                         </div>

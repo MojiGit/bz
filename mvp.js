@@ -30,16 +30,18 @@ const strategiesIdMap = {
   'empty': {
     fn: defaultStrategy,
     maxProfit: 'Unlimited',
-    maxLoss: 'Capped',
+    maxLoss: 'Limited',
     strategyType: 'Capital Gain',
     sentiment: 'Bullish',
+    proficiency: 'N/A'
   },
   'strangle': {
     fn: createStrangle,
     maxProfit: 'Unlimited',
-    maxLoss: 'Capped',
+    maxLoss: 'Limited',
     strategyType: 'Capital Gain',
     sentiment: 'Neutral',
+    proficiency: 'Intermediate'
   },
   'bull-put-spread': {
     fn: createBullPutSpread,
@@ -47,6 +49,7 @@ const strategiesIdMap = {
     maxLoss: 'Limited',
     strategyType: 'Income',
     sentiment: 'Bullish',
+    proficiency: 'Intermediate'
   },
   'bear-call-spread': {
     fn: createBearCallSpread,
@@ -54,6 +57,7 @@ const strategiesIdMap = {
     maxLoss: 'Limited',
     strategyType: 'Income',
     sentiment: 'Bearish',
+    proficiency: 'Intermediate'
   },
   // Add more strategies
 };
@@ -149,21 +153,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   await updateChartForToken();
 });
 
+let currentSentiment = 'all';
+let currentNameFilter = '';
+
+const nameFilterInput = document.getElementById('strategy-name-filter');
+
+// Function to apply both filters
+function applyStrategyFilters() {
+  document.querySelectorAll('.strategy-block').forEach(block => {
+    const blockSentiment = block.getAttribute('data-sentiment') || '';
+    const strategyName = block.querySelector('h1')?.textContent?.toLowerCase() || '';
+    const matchesSentiment = (currentSentiment === 'all' || blockSentiment === currentSentiment);
+    const matchesName = strategyName.includes(currentNameFilter);
+    block.style.display = (matchesSentiment && matchesName) ? '' : 'none';
+  });
+}
+
+// Sentiment filter
 document.querySelectorAll('.sentiment-filter').forEach(btn => {
   btn.addEventListener('click', () => {
-    const sentiment = btn.getAttribute('data-sentiment');
-    document.querySelectorAll('.sentiment-filter').forEach(b => b.classList.remove('bg-[#00E083]', 'text-white'));
-    btn.classList.add('bg-[#00E083]', 'text-white');
-
-    document.querySelectorAll('.strategy-block').forEach(block => {
-      const blockSentiment = block.getAttribute('data-sentiment');
-      if (sentiment === 'all' || blockSentiment === sentiment) {
-        block.style.display = '';
-      } else {
-        block.style.display = 'none';
-      }
-    });
+    currentSentiment = btn.getAttribute('data-sentiment');
+    document.querySelectorAll('.sentiment-filter').forEach(b => b.classList.remove('bg-[#00E083]', 'text-black'));
+    btn.classList.add('bg-[#00E083]', 'text-black');
+    applyStrategyFilters();
   });
+});
+
+// Name filter
+nameFilterInput.addEventListener('input', function () {
+  currentNameFilter = nameFilterInput.value.trim().toLowerCase();
+  applyStrategyFilters();
 });
 
 // Strategy Block Toggle
@@ -189,26 +208,28 @@ document.querySelectorAll('.strategy-block').forEach(block => {
     }
 
     // Update strategy details
-    const maxLossDisplay = document.querySelector('.max-loss-display');
-    const maxLossP = maxLossDisplay.querySelector('p');
+    const maxLossP = block.querySelector('.max-loss-display p');
     if (maxLossP) {
       maxLossP.textContent = `${strategiesIdMap[strategyId].maxLoss}`;
     }
 
-    const maxProfitDisplay = document.querySelector('.max-profit-display');
-    const maxProfitP = maxProfitDisplay.querySelector('p');
+    const maxProfitP = block.querySelector('.max-profit-display p');
     if (maxProfitP) {
       maxProfitP.textContent = `${strategiesIdMap[strategyId].maxProfit}`;
     }
 
-    const strategyTypeDisplay = document.querySelector('.strategy-type-display');
-    const strategyTypeP = strategyTypeDisplay.querySelector('p');
+    const strategyTypeP = block.querySelector('.strategy-type-display p');
     if (strategyTypeP) {
       strategyTypeP.textContent = `${strategiesIdMap[strategyId].strategyType}`;
     }
 
+    const proficiencyP = block.querySelector('.proficiency-display p');
+    if (proficiencyP){
+      proficiencyP.textContent = `${strategiesIdMap[strategyId].proficiency}`;
+    }
+
     // NEW: Load corresponding chart
-    const { datasets, strikePrices, breakeven } = await strategiesIdMap[strategyId].fn();
+    const { datasets, strikePrices} = await strategiesIdMap[strategyId].fn();
     
     /* Breakeven diplay, not used right now 
     const breakevenDisplay = document.querySelector('.breakeven-display');
