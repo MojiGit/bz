@@ -81,8 +81,8 @@ function generateDynamicPriceRange() {
     throw new Error('Invalid currentPrice for price range');
   }
   const roundedCurrent = Math.round(currentPrice);
-  const min = currentPrice * 0.7;
-  const max = currentPrice * 1.3;
+  const min = currentPrice * 0.8;
+  const max = currentPrice * 1.2;
   const step = currentPrice * 0.01;
   const prices = [];
   for (let price = min; price <= max; price += step) {
@@ -160,8 +160,8 @@ export async function createStrangle() {
 
   const priceRange = generateDynamicPriceRange();
 
-  const longPutStrike = currentPrice * 0.95;
-  const longCallStrike = currentPrice * 1.05;
+  const longPutStrike = currentPrice * 0.98;
+  const longCallStrike = currentPrice * 1.02;
   const premiumPut = currentPrice * 0.05;
   const premiumCall = currentPrice * 0.05;
   const quantity = 1;
