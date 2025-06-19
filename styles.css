@@ -12,6 +12,10 @@ body {
   scrollbar-width: none; 
 }
 
+.sentiment-filter.bg-\[\#00E083\]:hover {
+  background-color: #00E083 !important;
+}
+
 @keyframes scroll-left {
   0% {
     transform: translateX(0);

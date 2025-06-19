@@ -11,8 +11,6 @@ It includes the following functionalities:
 
 import * as Strategies from './strategies.js';
 
-let lastScrollTop = 0;
-const navbar = document.querySelector('nav');
 Chart.register(window['chartjs-plugin-annotation']);
 const buttons = document.querySelectorAll('.token-btn');
 
@@ -27,21 +25,45 @@ const tokenIdMap = {
 };
 
 // Navbar Visibility on Scroll
+let lastScrollTop = 0;
+const navbar = document.querySelector('nav');
+const mobileMenu = document.getElementById('mobile-menu');
+
 window.addEventListener('scroll', () => {
   const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
   if (currentScroll > lastScrollTop) {
-    // Scroll Down — hide navbar 
+    // Scroll Down — hide navbar and dropdown (if open)
     navbar.classList.add('opacity-0', 'pointer-events-none');
     navbar.classList.remove('opacity-100');
+
+    if (!mobileMenu.classList.contains('hidden')) {
+      mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+      mobileMenu.classList.remove('opacity-100');
+    }
   } else {
     // Scroll Up — show navbar ONLY
     navbar.classList.remove('opacity-0', 'pointer-events-none');
     navbar.classList.add('opacity-100');
+
+    // Do NOT show the dropdown here — leave it hidden unless manually triggered
   }
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
+
+
+  const menu = document.getElementById('mobile-menu');
+  const button = document.getElementById('mobile-menu-button');
+
+  let menuOpen = false;
+
+  button.addEventListener('click', () => {
+    menuOpen = !menuOpen;
+    menu.classList.toggle('opacity-0', !menuOpen);
+    menu.classList.toggle('pointer-events-none', !menuOpen);
+    menu.classList.toggle('opacity-100', menuOpen);
+  });
 
 // token's buttons (ETH, WBTC, etc.), Dynamically update chart scale 
 buttons.forEach((btn) => {
@@ -82,7 +104,7 @@ async function updateChartForToken() {
   // deploying a long call option ATM as default
 
   const { datasets, strikePrices } = await Strategies.defaultStrategy();
-  return renderPNLChart(datasets, strikePrices);
+  return renderPNLChart(datasets);// i removed the strikePrices for now
 }
 
 // Select WBTC by default on page load and render its chart
@@ -118,8 +140,10 @@ function applyStrategyFilters() {
 document.querySelectorAll('.sentiment-filter').forEach(btn => {
   btn.addEventListener('click', () => {
     currentSentiment = btn.getAttribute('data-sentiment');
-    document.querySelectorAll('.sentiment-filter').forEach(b => b.classList.remove('bg-[#00E083]', 'text-black'));
-    btn.classList.add('bg-[#00E083]', 'text-black');
+    document.querySelectorAll('.sentiment-filter').forEach(b => {
+      b.classList.remove('bg-[#00E083]', 'active-filter');
+    });
+    btn.classList.add('bg-[#00E083]', 'active-filter');
     applyStrategyFilters();
   });
 });
@@ -130,7 +154,7 @@ nameFilterInput.addEventListener('input', function () {
   applyStrategyFilters();
 });
 
-
+// creates the strategies cards
 function generateStrategyCards(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -197,7 +221,7 @@ function generateStrategyCards(containerId) {
       if (typeof info.fn === 'function') {
         try {
           const { datasets, strikePrices } = await info.fn(); // pass current token
-          renderPNLChart(datasets, strikePrices);
+          renderPNLChart(datasets);// i removed the strikePrices for now
         } catch (err) {
           console.error(`Error building strategy "${strategyId}":`, err);
         }
@@ -252,7 +276,7 @@ document.querySelectorAll('.strategy-block').forEach(block => {
     }
     */
     
-    return renderPNLChart(datasets, strikePrices);
+    return renderPNLChart(datasets); // i removed the strikePrices for now
   });
 });
 
@@ -262,7 +286,7 @@ document.querySelectorAll('.strategy-block').forEach(block => {
 // Chart.js instance for rendering the PNL chart
 let chartInstance = null;
 
-function renderPNLChart(datasets, strikePrices) {
+function renderPNLChart(datasets, strikePrices = []) {
   if (!Array.isArray(datasets) || datasets.length === 0) {
     console.warn("Empty or invalid datasets.");
     return;
@@ -288,50 +312,82 @@ function renderPNLChart(datasets, strikePrices) {
     tension: 0,
   }));
 
+  const allPNL = allDatasets.flatMap(ds => ds.data.map(point => point.y));
+
+  let minY = Math.round(Math.min(...allPNL)/1000) * 1100 ;
+  let maxY = Math.round(Math.max(...allPNL)/1000) * 1100 ;
+
+  console.log(minY)
+  console.log(maxY)
+
   // Prepare annotations for strike prices
   const annotations = {};
-  (strikePrices || []).forEach((price, index) => {
-    annotations[`strikeLine${index}`] = {
-      type: 'line',
-      xMin: price,
-      xMax: price,
-      borderColor: 'gray',
-      borderWidth: 1,
-      borderDash: [],
-      label: {
-        display: true,
-        content: `Strike ${price}`,
-        position: 'start',
-        color: 'gray',
-        backgroundColor: 'transparent',
-        font: {
-          size: 10
-        }
-      },
-      z: 0
-    };
-  });
+  if (strikePrices.length > 0) {
+      (strikePrices || []).forEach((price, index) => {
+      annotations[`strikeLine${index}`] = {
+        type: 'line',
+        xMin: price,
+        xMax: price,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderDash: [],
+        label: {
+          display: true,
+          content: `Strike ${price}`,
+          position: 'start',
+          color: 'gray',
+          backgroundColor: 'transparent',
+          font: {
+            size: 10
+          }
+        },
+        z: 0
+      };
+    }); 
+  }
+  
 
   // Add current price line if available
   if (typeof currentPrice === 'number' && !isNaN(currentPrice)) {
-  annotations.currentPriceLine = {
+    annotations.currentPriceLine = {
+      type: 'line',
+      xMin: Math.round(currentPrice),
+      xMax: Math.round(currentPrice),
+      borderColor: '#00E083',
+      borderWidth: 1,
+      borderDash: [5,5],
+      label: {
+        display: true,
+        content: `Current $${Math.round(currentPrice)}`,
+        position: 'end',
+        color: '#00E083',
+        backgroundColor: 'transparent',
+        font: { size: 12, weight: 'bold' }
+      },
+      z: 1
+    };
+  }
+
+  annotations.breakEvenLine = {
     type: 'line',
-    xMin: Math.round(currentPrice),
-    xMax: Math.round(currentPrice),
-    borderColor: '#00E083',
+    yMin: 0,
+    yMax: 0,
+    borderColor: 'black',
     borderWidth: 1,
-    borderDash: [0],
+    borderDash: [5,5],
     label: {
       display: true,
-      content: `Current $${Math.round(currentPrice)}`,
-      position: 'end',
-      color: '#00E083',
+      content: 'Break-even',
+      position: 'start',
+      color: 'black',
       backgroundColor: 'transparent',
-      font: { size: 12, weight: 'bold' }
+      font: {
+        size: 10,
+        weight: 'bold',
+      }
     },
     z: 1
   };
-  }
 
   if (chartInstance) chartInstance.destroy();
 
@@ -354,10 +410,12 @@ function renderPNLChart(datasets, strikePrices) {
         },
         y: {
           title: {
-            display: true,
+            display: false,
             text: 'PnL',
           },
           beginAtZero: false,
+          min: minY,
+          max: maxY
         }
       },
       plugins: {

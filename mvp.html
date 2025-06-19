@@ -34,7 +34,7 @@
 
 </head>
 
-<body class="bg-white text-[#191308] text-[18px]">
+<body class="bg-white text-black text-[18px]">
 
 
     <!-- Navbar -->
@@ -43,22 +43,44 @@
             class="fixed top-4 left-2 right-2 z-50 px-4 backdrop-blur-3xl bg-white/10 border border-[#D8DDEF] rounded-full flex items-center justify-between transition-opacity duration-500 ease-in-out opacity-100">
             <!-- Logo -->
             <a href="./index.html">
-            <img src="./images/svgs/logo_green.svg" alt="Beta" class="w-16 h-12 lg:w-24 lg:h-16">
+            <img src="./images/svgs/logo__black.svg" alt="Beta" class="w-16 h-12 lg:w-24 lg:h-16">
             </a>
 
             <div class="flex-1"></div>
 
             <!-- Desktop Links -->
-            <ul class="space-x-6 text-[#00E083] text-[18px] hidden md:flex items-center">
-                <li><a href="#" class="hover:text-[#52FFB8] transition font-bold">My strategies</a></li>
-                <li><a href="#" target="_blank" rel="noopener noreferrer" class="hover:text-[#00E083] transition">
-                    <button class="text-[16px] font-bold text-[#191308] bg-[#00E083] px-4 py-2 rounded-full hover:bg-[#52FFB8]">
+            <ul class="space-x-6 text-black text-[18px] hidden md:flex items-center">
+                <li><a href="#" class="hover:text-[#00E083] transition font-bold">My strategies</a></li>
+                <li><a href="#" target="_blank" rel="noopener noreferrer" class="transition">
+                    <button class="text-[16px] font-bold text-black bg-[#00E083] px-4 py-2 rounded-full hover:bg-[#52FFB8]">
                         Connect Wallet
                     </button>   
                     </a>
                 </li>
             </ul>
+
+            <div class="md:hidden flex items-center p-2">
+                <button id="mobile-menu-button" class="text-black focus:outline-none">
+                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                </button>
+            </div>
         </nav>
+        <!-- mobile menu -->
+        <div id="mobile-menu"
+            class="fixed top-[72px] left-0 right-0 mx-5 p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-black font-semibold opacity-0 pointer-events-none transition-all duration-300 ease-in-out z-40">
+            <ul class="space-y-4 text-[18px]">
+            <li><a href="#" class="px-1">My Strategies</a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://m-mojica-mateuss-organization.gitbook.io/betazero-1/" class="px-1">Docs</a></li>
+            <li><a href="#" target="_blank" rel="noopener noreferrer" class="hover:text-[#00E083] transition">
+                    <button class="text-[16px] font-bold text-black bg-[#00E083] p-1 rounded-md hover:bg-[#52FFB8]">
+                        Connect Wallet
+                    </button>   
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 
     <!--section to avoid overlaping-->
@@ -66,18 +88,18 @@
     
     <!--Title-->
     <div class="p-4">
-        <h1 class="text-[24px] md:text-[32px] font-bold text-[#191308]">
+        <h1 class="text-[24px] md:text-[32px] font-bold text-black">
                 Option Strategy Builder
         </h1>
     </div>
 
     <!-- Dashboard -->
-    <section id="dashboard" class="flex flex-col md:flex-row min-h-screen px-4">
+    <section id="dashboard" class="flex flex-col md:flex-row gap-8 min-h-screen px-4">
 
         <!--Chart section-->
         <div>
             <!-- Token selection -->
-            <div id="token-buttons" class="flex flex-col gap-2 mb-4 text-gray-400">
+            <div id="token-buttons" class="flex flex-col gap-2 mb-4 text-black">
                 <div>
                     <button
                         data-token="WBTC"
@@ -85,7 +107,7 @@
                     >
                         WBTC
                     </button>
-                    <label class="text-gray-400">|</label>
+                    <label>|</label>
                     <button
                         data-token="ETH"
                         class="token-btn text-[16px] px-2 rounded transition-colors font-semibold duration-300"
@@ -95,12 +117,12 @@
                 </div>
 
                 <div class="current-price-display flex flex-row items-center"> 
-                    <h2 class=" font-semibold px-1 text-[16px] text-[#191308]">Current Price :</h2>
-                    <p class="text-[#191308] text-[16px]">#</p>
+                    <h2 class=" font-semibold px-1 text-[16px] text-black">Current Price :</h2>
+                    <p class="text-black text-[16px]">#</p>
                 </div>
             </div>
             <!--Chart-->
-            <div class="w-full max-w-4xl mx-auto py-4">
+            <div class="w-full max-w-4xl mx-auto py-4 border border-2 rounded-2xl p-2">
                 <canvas id="pnlChart" class="w-full min-h-[400px] max-h-screen "></canvas>           
             </div>
         </div>
@@ -108,19 +130,21 @@
         <!--menu options-->
         <div id="menu" class="max-w-xl mb-10"> 
             <!-- Sentiment Filters Section -->
-            <div id="sentiment-filters" class="flex flex-row justify-between w-full gap-2 mb-2 overflow-hidden" >
+            <div id="sentiment-filters" class="flex flex-row justify-between w-full gap-8 mb-2 overflow-hidden" >
                 <div>
                     <input
                         id="strategy-name-filter"
                         type="text"
                         placeholder="Search"
-                        class="w-full px-3 py-2 border border-[#D8DDEF] rounded"
+                        class="w-full min-w-[130px] px-2 border border-[#D8DDEF] rounded"
                     />
                 </div>
-                <button class="sentiment-filter px-2 rounded text-[#191308]" data-sentiment="all"> All </button>
-                <button class="sentiment-filter px-2 rounded text-[#191308]" data-sentiment="bullish"> Bullish </button>
-                <button class="sentiment-filter px-2 rounded text-[#191308]" data-sentiment="bearish"> Bearish </button>
-                <button class="sentiment-filter px-2 rounded text-[#191308]" data-sentiment="neutral"> Neutral </button>
+                <div class="flex flex-row gap-2 overflow-x-auto no-scrollbar whitespace-nowrap text-[16px] text-black font-semibold">
+                    <button class="sentiment-filter px-1 rounded hover:bg-[#D8DDEF]" data-sentiment="all"> All </button>
+                    <button class="sentiment-filter px-1 rounded hover:bg-[#D8DDEF]" data-sentiment="bullish"> Bullish </button>
+                    <button class="sentiment-filter px-1 rounded hover:bg-[#D8DDEF]" data-sentiment="bearish"> Bearish </button>
+                    <button class="sentiment-filter px-1 rounded hover:bg-[#D8DDEF]" data-sentiment="neutral"> Neutral </button>
+                </div>
             </div>
 
             <!-- Strategy Selection Section -->
@@ -129,8 +153,8 @@
                 <div class="strategy-block grid grid-cols-1 divide-y-2 px-2 pt-2 gap-2 border border-2 border-[#D8DDEF] shadow-md rounded-xl transition-all duration-300 cursor-pointer overflow-hidden"
                     strategy="empty" data-sentiment="">
                     <div class="flex flex-row gap-2 strategy-header justify-between">
-                        <h1 class="text-[18px] font-bold text-[#191308]">
-                            Empty Strategy
+                        <h1 class="text-[18px] font-bold text-black">
+                            Custom
                         </h1>
                     </div>
                     <div class="strategy-content opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
