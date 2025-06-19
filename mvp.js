@@ -18,6 +18,7 @@ const buttons = document.querySelectorAll('.token-btn');
 
 export let selectedTokenSymbol = null;
 export let currentPrice = null;
+
 // Mapping from button symbol to CoinGecko ID
 const tokenIdMap = {
   WBTC: 'wrapped-bitcoin',
@@ -86,6 +87,9 @@ async function updateChartForToken() {
 
 // Select WBTC by default on page load and render its chart
 document.addEventListener('DOMContentLoaded', async () => {
+
+  generateStrategyCards('strategy-container');
+
   const defaultBtn = document.querySelector('.token-btn[data-token="WBTC"]');
   if (defaultBtn) {
     defaultBtn.classList.add('bg-[#00E083]', 'text-[#191308]', 'border-[#00E083]');
@@ -126,6 +130,91 @@ nameFilterInput.addEventListener('input', function () {
   applyStrategyFilters();
 });
 
+
+function generateStrategyCards(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  Object.entries(Strategies.strategiesIdMap).forEach(([strategyId, info]) => {
+    const card = document.createElement('div');
+    card.className = 'strategy-block grid grid-cols-1 divide-y-2 px-2 pt-2 gap-2 border border-2 border-[#D8DDEF] shadow-md rounded-xl transition-all duration-300 cursor-pointer overflow-hidden';
+    card.setAttribute('data-strategy', strategyId);
+    card.setAttribute('data-sentiment', info.sentiment);
+
+    card.innerHTML = `
+      <div class="flex flex-row strategy-header justify-between">
+        <div class="flex flex-row gap-2 items-center">
+          <h1 class="text-[18px] font-bold text-[#191308]">${info.name}</h1>
+          <label class="text-gray-400">|</label>
+          <span class="text-[16px] text-gray-400">${capitalize(info.sentiment)}</span>
+        </div>
+      </div>
+      <div class="strategy-content opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+        <div class="description-display py-2">
+          <p class="text-[16px] text-gray-400">${info.description}</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 py-2 justify-between gap-4">
+          <div class="proficiency-display flex flex-col">
+            <h2 class="font-bold text-[14px]">Proficiency</h2>
+            <p class="text-[14px]">${info.proficiency}</p>
+          </div>
+          <div class="strategy-type-display flex flex-col">
+            <h2 class="font-bold text-[14px]">Strategy Type</h2>
+            <p class="text-[14px]">${info.type}</p>
+          </div>
+          <div class="max-profit-display flex flex-col">
+            <h2 class="font-bold text-[14px]">Max Profit</h2>
+            <p class="text-[14px]">${info.maxProfit}</p>
+          </div>
+          <div class="max-loss-display flex flex-col">
+            <h2 class="font-bold text-[14px]">Max Loss</h2>
+            <p class="text-[14px]">${info.maxLoss}</p>
+          </div>
+        </div>
+        <button class="text-[16px] bg-[#D8DDEF] font-semibold text-black px-2 mb-2 rounded-md hover:bg-[#52FFB8] transition-colors duration-300">
+          Build
+        </button>
+      </div>
+    `;
+
+    // Chart trigger on card click
+    card.addEventListener('click', async () => {
+      // Collapse all other cards
+      document.querySelectorAll('.strategy-block').forEach(other => {
+        const content = other.querySelector('.strategy-content');
+        other.classList.remove('bg-[#F4FFF9]', 'border-[#52FFB8]');
+        content.classList.remove('opacity-100', 'max-h-96');
+        content.classList.add('opacity-0', 'max-h-0');
+      });
+
+      // Expand current card
+      const content = card.querySelector('.strategy-content');
+      card.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
+      content.classList.remove('opacity-0', 'max-h-0');
+      content.classList.add('opacity-100', 'max-h-96');
+
+      // Render chart
+      if (typeof info.fn === 'function') {
+        try {
+          const { datasets, strikePrices } = await info.fn(); // pass current token
+          renderPNLChart(datasets, strikePrices);
+        } catch (err) {
+          console.error(`Error building strategy "${strategyId}":`, err);
+        }
+      }
+    });
+
+    container.appendChild(card);
+  });
+
+  applyStrategyFilters();
+
+}
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // Strategy Block Toggle
 document.querySelectorAll('.strategy-block').forEach(block => {
   block.addEventListener('click', async function () {
@@ -146,32 +235,6 @@ document.querySelectorAll('.strategy-block').forEach(block => {
       block.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
       content.classList.remove('opacity-0', 'max-h-0');
       content.classList.add('opacity-100', 'max-h-96');
-    }
-
-    // Update strategy details
-    const descriptionP = block.querySelector('.description-display p');
-    if (descriptionP){
-      descriptionP.textContent = `${Strategies.strategiesIdMap[strategyId].description}`;
-    }
-
-    const maxLossP = block.querySelector('.max-loss-display p');
-    if (maxLossP) {
-      maxLossP.textContent = `${Strategies.strategiesIdMap[strategyId].maxLoss}`;
-    }
-
-    const maxProfitP = block.querySelector('.max-profit-display p');
-    if (maxProfitP) {
-      maxProfitP.textContent = `${Strategies.strategiesIdMap[strategyId].maxProfit}`;
-    }
-
-    const strategyTypeP = block.querySelector('.strategy-type-display p');
-    if (strategyTypeP) {
-      strategyTypeP.textContent = `${Strategies.strategiesIdMap[strategyId].strategyType}`;
-    }
-
-    const proficiencyP = block.querySelector('.proficiency-display p');
-    if (proficiencyP){
-      proficiencyP.textContent = `${Strategies.strategiesIdMap[strategyId].proficiency}`;
     }
 
     // NEW: Load corresponding chart

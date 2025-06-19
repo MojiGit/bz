@@ -99,40 +99,34 @@ function generateDynamicPriceRange() {
 
 // Mapping from strategy ID to strategy functions
 export const strategiesIdMap = {
-  'empty': {
-    fn: defaultStrategy,
-    description:'Design your strategy from scratch by adding assets and defining their parameters.',
-    maxProfit: 'Unlimited',
-    maxLoss: 'Limited',
-    strategyType: 'Capital Gain',
-    sentiment: 'Bullish',
-    proficiency: 'N/A'
-  },
   'strangle': {
     fn: createStrangle,
+    name: 'Strangle',
     description:'We simply buy lower strike puts and higher strike calls with the same expiration date so that we can profit from the stock soaring up or plummeting down.',
     maxProfit: 'Unlimited',
     maxLoss: 'Limited',
     strategyType: 'Capital Gain',
-    sentiment: 'Neutral',
+    sentiment: 'neutral',
     proficiency: 'Intermediate'
   },
   'bull-put-spread': {
     fn: createBullPutSpread,
+    name: 'Bull Put Spread',
     description:'Protect the downside of a Naked Put by buying a lower strike put to insure the one you sold. Both put strikes should be lower than the current market price so as to ensure a profit even if the stock doesn’t move at all.',
     maxProfit: 'Limited',
     maxLoss: 'Limited',
     strategyType: 'Income',
-    sentiment: 'Bullish',
+    sentiment: 'bullish',
     proficiency: 'Intermediate'
   },
   'bear-call-spread': {
     fn: createBearCallSpread,
+    name: 'Bear Call Spread',
     description:'The concept is to protect the downside of a Naked Call by buying a higher strike call to insure the one you sold. Both call strikes should be higher than the current stock price so as to ensure a profit even if the stock doesn’t move at all. ',
     maxProfit: 'Limited',
     maxLoss: 'Limited',
     strategyType: 'Income',
-    sentiment: 'Bearish',
+    sentiment: 'bearish',
     proficiency: 'Intermediate'
   },
   // Add more strategies
@@ -153,7 +147,7 @@ export async function defaultStrategy() {
 
   return {
     datasets: [
-      { data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)'},
+      {data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)'},
     ],
     strikePrices: [Math.round(strikePrice)],
     breakeven: breakeven,
