@@ -5,8 +5,12 @@ These functions calculate PNL for different trading strategies, including spot, 
 import { currentPrice, selectedTokenSymbol } from "./mvp.js";
 
 // Perpetual PNL
-function calculatePerpPNL(entryPrice, quantity, leverage, priceRange) {
+function calculatePerpPNL(entryPrice, quantity, leverage, priceRange, position = 'long') {
   return priceRange.map(currentPrice => {
+    if(position === 'short'){
+      const pnl = (entryPrice - currentPrice) * quantity * leverage;
+      return { price: currentPrice, pnl};
+    }
     const pnl = (currentPrice - entryPrice) * quantity * leverage;
     return { price: currentPrice, pnl };
   });
@@ -156,20 +160,12 @@ export const strategiesIdMap = {
   // Add more strategies
 };
 
-// === Default Strategy: Long Call ATM ===
-// buy ATM call 
-export async function defaultStrategy() {
-  const priceRange = generateDynamicPriceRange();
-
-  return longCall();
-
-}
-
-export async function longCall(strike = currentPrice, quantity = 1, lineColor = '#D8DDEF'){
+// === Long Call ===
+export async function longCall(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
   const priceRange = generateDynamicPriceRange();
   const premium = generatePremium(strike, 'call'); 
 
-  const pnlData = calculateOptionPNL('call', strike, premium, quantity, priceRange, 'long');
+  const pnlData = calculateOptionPNL('call', strike, premium, size, priceRange, 'long');
   const breakeven = findBreakevenPoints(pnlData)
 
   return {
@@ -177,6 +173,86 @@ export async function longCall(strike = currentPrice, quantity = 1, lineColor = 
       {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'},
     ],
     strikePrices: [Math.round(strike)],
+    breakeven: breakeven,
+  };
+}
+// == Short Call ==
+export async function nakedcall(strike = currentPrice, size = 1, lineColor = '#D8DDEF') {
+  const priceRange = generateDynamicPriceRange();
+  const premium = generatePremium(strike, 'call');
+
+  const pnlData = calculateOptionPNL('call',strike,premium,size,priceRange,'short');
+  const breakeven = findBreakevenPoints(pnlData);
+
+  return {
+    datasets: [
+      {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'},
+    ],
+    strikePrice: [Math.round(strike)],
+    breakeven: breakeven,
+  };
+}
+
+// == Long Put ==
+export async function longPut(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
+  const priceRange = generateDynamicPriceRange();
+  const premium = generatePremium(strike,'put');
+
+  const pnlData = calculateOptionPNL('put', strike, premium, size, priceRange, 'long');
+  const breakeven = findBreakevenPoints(pnlData)
+
+  return {
+    datasets: [
+      {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'}
+    ],
+    strikePrice: [Math.round(strike)],
+    breakeven: breakeven,
+  };
+}
+
+// == Short Put ==
+export async function shortPut(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
+  const priceRange = generateDynamicPriceRange();
+  const premium = generatePremium(strike,'put');
+
+  const pnlData = calculateOptionPNL('put', strike, premium, size, priceRange, 'short');
+  const breakeven = findBreakevenPoints(pnlData)
+
+  return {
+    datasets: [
+      {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'}
+    ],
+    strikePrice: [Math.round(strike)],
+    breakeven: breakeven,
+  };
+}
+
+// == long perp ==
+export async function longPerp(entryPrice = currentPrice, size = 1, leverage = 1,lineColor = '#D8DDEF'){
+  const priceRange = generateDynamicPriceRange();
+  
+  const pnlData = calculatePerpPNL(entryPrice,size,leverage,priceRange,);
+  const breakeven = findBreakevenPoints(pnlData);
+  return {
+    datasets: [
+      {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'}
+    ],
+    strikePrice: ['N/A'],
+    breakeven: breakeven,
+  };
+}
+
+// == Short perp ==
+export async function shortPerp(entryPrice = currentPrice, size = 1, leverage = 1,lineColor = '#D8DDEF'){
+  const priceRange = generateDynamicPriceRange();
+  
+  const pnlData = calculatePerpPNL(entryPrice,size,leverage,priceRange,'short');
+  const breakeven = findBreakevenPoints(pnlData);
+  return {
+    datasets: [
+      {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'}
+    ],
+    strikePrice: ['N/A'],
     breakeven: breakeven,
   };
 }

@@ -102,8 +102,7 @@ async function updateChartForToken() {
   if (!currentPrice) return;
 
   // deploying a long call option ATM as default
-
-  const { datasets, strikePrices } = await Strategies.defaultStrategy();
+  const { datasets, strikePrices } = await Strategies.shortPerp();
   return renderPNLChart(datasets);// i removed the strikePrices for now
 }
 
@@ -314,9 +313,6 @@ function renderPNLChart(datasets, strikePrices = []) {
 
   const allPNL = allDatasets.flatMap(ds => ds.data.map(point => point.y));
 
-  let minY = Math.round(Math.min(...allPNL)/1000) * 1300 ;
-  let maxY = Math.round(Math.max(...allPNL)/1000) * 1300 ;
-
   // Prepare annotations for strike prices
   const annotations = {};
   if (strikePrices.length > 0) {
@@ -411,8 +407,6 @@ function renderPNLChart(datasets, strikePrices = []) {
             text: 'PnL',
           },
           beginAtZero: false,
-          min: minY,
-          max: maxY
         }
       },
       plugins: {
