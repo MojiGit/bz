@@ -96,6 +96,30 @@ function generateDynamicPriceRange() {
   return prices;
 }
 
+function generatePremium(strike, position){
+
+  if (position === 'call'){
+    if (strike < currentPrice * 0.9 || strike > currentPrice * 0.9){
+      return Math.max(currentPrice - strike, 0) + strike * 0.02; 
+    };
+    if (strike < currentPrice * 0.95 || strike > currentPrice * 0.95){
+      return Math.max(currentPrice - strike, 0) + strike * 0.04; 
+    };
+    if (strike === currentPrice){
+      return strike * 0.08;
+    };
+  } else {
+    if (strike < currentPrice * 0.9 || strike > currentPrice * 0.9){
+      return Math.max(strike - currentPrice, 0) + strike * 0.02; 
+    };
+    if (strike < currentPrice * 0.95 || strike > currentPrice * 0.95){
+      return Math.max(strike - currentPrice, 0) + strike * 0.04; 
+    };
+    if (strike === currentPrice){
+      return strike * 0.08;
+    };
+  }
+};
 
 // Mapping from strategy ID to strategy functions
 export const strategiesIdMap = {
@@ -137,19 +161,22 @@ export const strategiesIdMap = {
 export async function defaultStrategy() {
   const priceRange = generateDynamicPriceRange();
 
-  // Default strategy: Long Call ATM
-  const strikePrice = currentPrice;
-  const premium = currentPrice * 0.09; // Example premium
-  const quantity = 1;
+  return longCall();
 
-  const pnlData = calculateOptionPNL('call', strikePrice, premium, quantity, priceRange);
-  const breakeven = findBreakevenPoints(pnlData); // Break-even price for the long call
+}
+
+export async function longCall(strike = currentPrice, quantity = 1, lineColor = '#D8DDEF'){
+  const priceRange = generateDynamicPriceRange();
+  const premium = generatePremium(strike, 'call'); 
+
+  const pnlData = calculateOptionPNL('call', strike, premium, quantity, priceRange, 'long');
+  const breakeven = findBreakevenPoints(pnlData)
 
   return {
     datasets: [
-      {data: pnlData, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0.16)'},
+      {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'},
     ],
-    strikePrices: [Math.round(strikePrice)],
+    strikePrices: [Math.round(strike)],
     breakeven: breakeven,
   };
 }

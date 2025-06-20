@@ -314,11 +314,8 @@ function renderPNLChart(datasets, strikePrices = []) {
 
   const allPNL = allDatasets.flatMap(ds => ds.data.map(point => point.y));
 
-  let minY = Math.round(Math.min(...allPNL)/1000) * 1100 ;
-  let maxY = Math.round(Math.max(...allPNL)/1000) * 1100 ;
-
-  console.log(minY)
-  console.log(maxY)
+  let minY = Math.round(Math.min(...allPNL)/1000) * 1300 ;
+  let maxY = Math.round(Math.max(...allPNL)/1000) * 1300 ;
 
   // Prepare annotations for strike prices
   const annotations = {};
