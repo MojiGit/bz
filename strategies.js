@@ -103,20 +103,20 @@ function generateDynamicPriceRange() {
 function generatePremium(strike, position){
 
   if (position === 'call'){
-    if (strike < currentPrice * 0.9 || strike > currentPrice * 0.9){
+    if (strike < currentPrice * 0.9 || strike > currentPrice * 1.1){
       return Math.max(currentPrice - strike, 0) + strike * 0.02; 
     };
-    if (strike < currentPrice * 0.95 || strike > currentPrice * 0.95){
+    if (strike < currentPrice * 0.95 || strike > currentPrice * 1.05){
       return Math.max(currentPrice - strike, 0) + strike * 0.04; 
     };
     if (strike === currentPrice){
       return strike * 0.08;
     };
   } else {
-    if (strike < currentPrice * 0.9 || strike > currentPrice * 0.9){
+    if (strike < currentPrice * 0.9 || strike > currentPrice * 1.1){
       return Math.max(strike - currentPrice, 0) + strike * 0.02; 
     };
-    if (strike < currentPrice * 0.95 || strike > currentPrice * 0.95){
+    if (strike < currentPrice * 0.95 || strike > currentPrice * 1.05){
       return Math.max(strike - currentPrice, 0) + strike * 0.04; 
     };
     if (strike === currentPrice){
@@ -157,6 +157,18 @@ export const strategiesIdMap = {
     sentiment: 'bearish',
     proficiency: 'Intermediate'
   },
+
+  'covered-call': {
+    fn: coveredCall,
+    name: 'Covered Call',
+    description: 'The concept is that in owning the stock, you then sell an Out of the Money call option on a monthly basis as a means of collecting rent (or a dividend) while you own the stock. If the stock rises above the call strike, you’ll be exercised, and the stock will be sold . . . but you make a profit anyway. (You’re covered because you own the stock in the first place.) If the stock remains static, then you’re better off because you col￾lected the call premium. If the stock falls, you have the cushion of the call premium you collected.',
+    maxProfit: 'Limited',
+    maxLoss: 'Unlimted',
+    strategyType: 'Income',
+    sentiment: 'bullish',
+    proficiency: 'Novice'
+
+  }
   // Add more strategies
 };
 
@@ -177,7 +189,7 @@ export async function longCall(strike = currentPrice, size = 1, lineColor = '#D8
   };
 }
 // == Short Call ==
-export async function nakedcall(strike = currentPrice, size = 1, lineColor = '#D8DDEF') {
+export async function nakedCall(strike = currentPrice, size = 1, lineColor = '#D8DDEF') {
   const priceRange = generateDynamicPriceRange();
   const premium = generatePremium(strike, 'call');
 
@@ -211,7 +223,7 @@ export async function longPut(strike = currentPrice, size = 1, lineColor = '#D8D
 }
 
 // == Short Put ==
-export async function shortPut(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
+export async function nakedPut(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
   const priceRange = generateDynamicPriceRange();
   const premium = generatePremium(strike,'put');
 
@@ -253,6 +265,31 @@ export async function shortPerp(entryPrice = currentPrice, size = 1, leverage = 
       {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'}
     ],
     strikePrice: ['N/A'],
+    breakeven: breakeven,
+  };
+}
+
+// == covered call
+export async function coveredCall() {
+
+  const priceRange = generateDynamicPriceRange();
+  const entryPrice = currentPrice;
+  const strike = currentPrice * 1.1;
+  const premiumCall = generatePremium(strike, 'call');
+
+  const perpPnl = calculatePerpPNL(entryPrice, 1, 1, priceRange, 'long');
+  const callPnl = calculateOptionPNL('call', strike, premiumCall, 1, priceRange, 'short');
+
+  const combinedPNL = combinePNLCurves([perpPnl, callPnl]);
+  const breakeven = findBreakevenPoints(combinedPNL);
+
+  return {
+    datasets: [
+      { label: `Long Call`, data: callPnl, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Long Perp`, data: perpPnl, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0)', borderDash: [5, 5] },
+      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)' },
+    ],
+    strikePrices: [Math.round(strike), Math.round(entryPrice)],
     breakeven: breakeven,
   };
 }
