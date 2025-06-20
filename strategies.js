@@ -100,77 +100,31 @@ function generateDynamicPriceRange() {
   return prices;
 }
 
-function generatePremium(strike, position){
+function generatePremium(strike, position) {
+  const nearRate = 0.08;
+  const midRate = 0.04;
+  const farRate = 0.02;
 
-  if (position === 'call'){
-    if (strike < currentPrice * 0.9 || strike > currentPrice * 1.1){
-      return Math.max(currentPrice - strike, 0) + strike * 0.02; 
-    };
-    if (strike < currentPrice * 0.95 || strike > currentPrice * 1.05){
-      return Math.max(currentPrice - strike, 0) + strike * 0.04; 
-    };
-    if (strike === currentPrice){
-      return strike * 0.08;
-    };
+  if (position === 'call') {
+    if (strike <= currentPrice * 0.9 || strike >= currentPrice * 1.1) {
+      return Math.max(currentPrice - strike, 0) + strike * farRate;
+    }
+    if (strike <= currentPrice * 0.95 || strike >= currentPrice * 1.05) {
+      return Math.max(currentPrice - strike, 0) + strike * midRate;
+    }
+    return strike * nearRate;
+  } else if (position === 'put') {
+    if (strike <= currentPrice * 0.9 || strike >= currentPrice * 1.1) {
+      return Math.max(strike - currentPrice, 0) + strike * farRate;
+    }
+    if (strike <= currentPrice * 0.95 || strike >= currentPrice * 1.05) {
+      return Math.max(strike - currentPrice, 0) + strike * midRate;
+    }
+    return strike * nearRate;
   } else {
-    if (strike < currentPrice * 0.9 || strike > currentPrice * 1.1){
-      return Math.max(strike - currentPrice, 0) + strike * 0.02; 
-    };
-    if (strike < currentPrice * 0.95 || strike > currentPrice * 1.05){
-      return Math.max(strike - currentPrice, 0) + strike * 0.04; 
-    };
-    if (strike === currentPrice){
-      return strike * 0.08;
-    };
+    throw new Error("Invalid position type. Use 'call' or 'put'.");
   }
-};
-
-// Mapping from strategy ID to strategy functions
-export const strategiesIdMap = {
-  'strangle': {
-    fn: createStrangle,
-    name: 'Strangle',
-    description:'We simply buy lower strike puts and higher strike calls with the same expiration date so that we can profit from the stock soaring up or plummeting down.',
-    maxProfit: 'Unlimited',
-    maxLoss: 'Limited',
-    strategyType: 'Capital Gain',
-    sentiment: 'neutral',
-    proficiency: 'Intermediate'
-  },
-  'bull-put-spread': {
-    fn: createBullPutSpread,
-    name: 'Bull Put Spread',
-    description:'Protect the downside of a Naked Put by buying a lower strike put to insure the one you sold. Both put strikes should be lower than the current market price so as to ensure a profit even if the stock doesn’t move at all.',
-    maxProfit: 'Limited',
-    maxLoss: 'Limited',
-    strategyType: 'Income',
-    sentiment: 'bullish',
-    proficiency: 'Intermediate'
-  },
-  'bear-call-spread': {
-    fn: createBearCallSpread,
-    name: 'Bear Call Spread',
-    description:'The concept is to protect the downside of a Naked Call by buying a higher strike call to insure the one you sold. Both call strikes should be higher than the current stock price so as to ensure a profit even if the stock doesn’t move at all. ',
-    maxProfit: 'Limited',
-    maxLoss: 'Limited',
-    strategyType: 'Income',
-    sentiment: 'bearish',
-    proficiency: 'Intermediate'
-  },
-
-  'covered-call': {
-    fn: coveredCall,
-    name: 'Covered Call',
-    description: 'The concept is that in owning the stock, you then sell an Out of the Money call option on a monthly basis as a means of collecting rent (or a dividend) while you own the stock. If the stock rises above the call strike, you’ll be exercised, and the stock will be sold . . . but you make a profit anyway. (You’re covered because you own the stock in the first place.) If the stock remains static, then you’re better off because you col￾lected the call premium. If the stock falls, you have the cushion of the call premium you collected.',
-    maxProfit: 'Limited',
-    maxLoss: 'Unlimted',
-    strategyType: 'Income',
-    sentiment: 'bullish',
-    proficiency: 'Novice'
-
-  }
-  // Add more strategies
-};
+}
 
 // === Long Call ===
 export async function longCall(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
@@ -330,10 +284,10 @@ export async function createBullPutSpread() {
 
   const priceRange = generateDynamicPriceRange();
 
-  const longPutStrike = currentPrice * 0.9; // Long Put Strike
-  const shortPutStrike = currentPrice * 0.95; // Short Put Strike
-  const premiumLong = currentPrice * 0.05;
-  const premiumShort = currentPrice * 0.09;
+  const longPutStrike = currentPrice * 0.90; // Long Put Strike
+  const shortPutStrike = currentPrice * 1; // Short Put Strike
+  const premiumLong = generatePremium(longPutStrike,'put');
+  const premiumShort = generatePremium(shortPutStrike,'put');
   const quantity = 1;
 
   const Shortput = calculateOptionPNL('put', shortPutStrike, premiumShort, quantity, priceRange, 'short');
@@ -359,10 +313,10 @@ export async function createBullPutSpread() {
 export async function createBearCallSpread() {
   const priceRange = generateDynamicPriceRange();
 
-  const longCallStrike = currentPrice * 1.05;
-  const shortCallStrike = currentPrice;
-  const premiumLong = currentPrice * 0.06;
-  const premiumShort = currentPrice * 0.09;
+  const longCallStrike = currentPrice * 1.1;
+  const shortCallStrike = currentPrice * 1.02;
+  const premiumLong = generatePremium(longCallStrike,'call');
+  const premiumShort = generatePremium(shortCallStrike,'call');
   const quantity = 1;
 
   const ShortCall = calculateOptionPNL('call', shortCallStrike, premiumShort, quantity, priceRange, 'short');
@@ -381,3 +335,98 @@ export async function createBearCallSpread() {
     breakeven: breakeven,
   };
 }
+
+
+export async function createLongIronButterfly(){
+  
+  const priceRange = generateDynamicPriceRange();
+
+  const longCallStrike = currentPrice * 1.1;
+  const shortCallStrike = currentPrice * 1.02;
+  const premiumLongCall = generatePremium(longCallStrike,'call');
+  const premiumShortCall = generatePremium(shortCallStrike,'call');
+  const quantity = 1;
+  const longPutStrike = currentPrice * 0.90; // Long Put Strike
+  const shortPutStrike = currentPrice * 1; // Short Put Strike
+  const premiumLongPut = generatePremium(longPutStrike,'put');
+  const premiumShortPut = generatePremium(shortPutStrike,'put');
+
+  const ShortPut = calculateOptionPNL('put', shortPutStrike, premiumShortPut, quantity, priceRange, 'short');
+  const LongPut = calculateOptionPNL('put', longPutStrike, premiumLongPut, quantity, priceRange);
+  const ShortCall = calculateOptionPNL('call', shortCallStrike, premiumShortCall, quantity, priceRange, 'short');
+  const LongCall = calculateOptionPNL('call', longCallStrike, premiumLongCall, quantity, priceRange);
+  const combinedPNL = combinePNLCurves([ShortCall, LongCall, LongPut, ShortPut]);
+
+  const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bear Call Spread
+
+  return {
+    datasets: [
+      { label: `Short Call`, data: ShortCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Long Call`, data: LongCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Long Put`, data: LongPut, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Short Put`, data: ShortPut, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)'},
+    ],
+    strikePrices: [Math.round(longCallStrike), Math.round(shortCallStrike), Math.round(longPutStrike), Math.round(shortPutStrike)],
+    breakeven: breakeven,
+  };
+}
+
+
+
+// Mapping from strategy ID to strategy functions
+export const strategiesIdMap = {
+  'longIronButterfly':{
+    fn: createLongIronButterfly,
+    name: 'Long Iron Butterfly',
+    description: 'It is, in fact, the combination of a Bull Put Spread and a Bear Call Spread. The higher strike put shares the same strike as the lower strike call to create the butterfly shape. The combination of two income strategies also makes this an income strategy',
+    maxProfit:'Capped',
+    maxLoss:'Capped',
+    strategyType:'Income',
+    sentiment:'Neutral',
+    proficiency:'Intermediate'
+  },
+  'strangle': {
+    fn: createStrangle,
+    name: 'Strangle',
+    description:'We simply buy lower strike puts and higher strike calls with the same expiration date so that we can profit from the stock soaring up or plummeting down.',
+    maxProfit: 'Unlimited',
+    maxLoss: 'Limited',
+    strategyType: 'Capital Gain',
+    sentiment: 'neutral',
+    proficiency: 'Intermediate'
+  },
+  'bull-put-spread': {
+    fn: createBullPutSpread,
+    name: 'Bull Put Spread',
+    description:'Protect the downside of a Naked Put by buying a lower strike put to insure the one you sold. Both put strikes should be lower than the current market price so as to ensure a profit even if the stock doesn’t move at all.',
+    maxProfit: 'Limited',
+    maxLoss: 'Limited',
+    strategyType: 'Income',
+    sentiment: 'bullish',
+    proficiency: 'Intermediate'
+  },
+  'bear-call-spread': {
+    fn: createBearCallSpread,
+    name: 'Bear Call Spread',
+    description:'The concept is to protect the downside of a Naked Call by buying a higher strike call to insure the one you sold. Both call strikes should be higher than the current stock price so as to ensure a profit even if the stock doesn’t move at all. ',
+    maxProfit: 'Limited',
+    maxLoss: 'Limited',
+    strategyType: 'Income',
+    sentiment: 'bearish',
+    proficiency: 'Intermediate'
+  },
+
+  'covered-call': {
+    fn: coveredCall,
+    name: 'Covered Call',
+    description: 'The concept is that in owning the stock, you then sell an Out of the Money call option on a monthly basis as a means of collecting rent (or a dividend) while you own the stock. If the stock rises above the call strike, you’ll be exercised, and the stock will be sold . . . but you make a profit anyway. (You’re covered because you own the stock in the first place.) If the stock remains static, then you’re better off because you col￾lected the call premium. If the stock falls, you have the cushion of the call premium you collected.',
+    maxProfit: 'Limited',
+    maxLoss: 'Unlimted',
+    strategyType: 'Income',
+    sentiment: 'bullish',
+    proficiency: 'Novice'
+
+  }
+  // Add more strategies
+};
