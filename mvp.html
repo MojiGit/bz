@@ -87,44 +87,42 @@
     <div class="h-[80px]"></div>
     
     <!--Title-->
-    <div class="p-4">
+    <div class="p-4 flex flex-col gap-2">
         <h1 class="text-[24px] md:text-[32px] font-bold text-black">
                 Option Strategy Builder
         </h1>
+        
+        <!-- Token selection -->
+        <div id="token-buttons" class="flex flex-col gap-2 text-black">
+            <div>
+                <button
+                    data-token="WBTC"
+                    class="token-btn text-[16px] px-1 rounded hover:bg-gray-200 transition-colors font-semibold duration-300"
+                >
+                    WBTC
+                </button>
+                <label>|</label>
+                <button
+                    data-token="ETH"
+                    class="token-btn text-[16px] px-1 rounded hover:bg-gray-200 transition-colors font-semibold duration-300"
+                >
+                    ETH
+                </button>
+            </div>
+
+            <div class="current-price-display flex flex-row items-center"> 
+                <h2 class=" font-semibold px-1 text-[16px] text-black">Current Price :</h2>
+                <p class="text-black text-[16px]">#</p>
+            </div>
+        </div>
     </div>
 
     <!-- Dashboard -->
-    <section id="dashboard" class="flex flex-col md:flex-row gap-8 min-h-screen px-4">
+    <section id="dashboard" class="flex flex-col md:flex-row gap-8 px-4">
 
-        <!--Chart section-->
-        <div>
-            <!-- Token selection -->
-            <div id="token-buttons" class="flex flex-col gap-2 mb-4 text-black">
-                <div>
-                    <button
-                        data-token="WBTC"
-                        class="token-btn text-[16px] px-2 rounded transition-colors font-semibold duration-300"
-                    >
-                        WBTC
-                    </button>
-                    <label>|</label>
-                    <button
-                        data-token="ETH"
-                        class="token-btn text-[16px] px-2 rounded transition-colors font-semibold duration-300"
-                    >
-                        ETH
-                    </button>
-                </div>
-
-                <div class="current-price-display flex flex-row items-center"> 
-                    <h2 class=" font-semibold px-1 text-[16px] text-black">Current Price :</h2>
-                    <p class="text-black text-[16px]">#</p>
-                </div>
-            </div>
-            <!--Chart-->
-            <div class="w-full max-w-4xl mx-auto py-4 border border-2 rounded-2xl p-2">
-                <canvas id="pnlChart" class="w-full min-h-[400px] max-h-screen "></canvas>           
-            </div>
+        <!--Chart-->
+        <div class="w-full max-w-4xl mx-auto py-4 border border-2 rounded-2xl p-2">
+            <canvas id="pnlChart" class="w-full min-h-[400px] max-h-[600px] "></canvas>           
         </div>
         
         <!--menu options-->
@@ -136,14 +134,14 @@
                         id="strategy-name-filter"
                         type="text"
                         placeholder="Search"
-                        class="w-full min-w-[130px] px-2 border border-[#D8DDEF] rounded"
+                        class="w-full min-w-[130px] px-2 border border-[#D8DDEF] rounded-xl"
                     />
                 </div>
                 <div class="flex flex-row gap-2 overflow-x-auto no-scrollbar whitespace-nowrap text-[16px] text-black font-semibold">
-                    <button class="sentiment-filter px-1 rounded hover:bg-[#D8DDEF]" data-sentiment="all"> All </button>
-                    <button class="sentiment-filter px-1 rounded hover:bg-[#D8DDEF]" data-sentiment="bullish"> Bullish </button>
-                    <button class="sentiment-filter px-1 rounded hover:bg-[#D8DDEF]" data-sentiment="bearish"> Bearish </button>
-                    <button class="sentiment-filter px-1 rounded hover:bg-[#D8DDEF]" data-sentiment="neutral"> Neutral </button>
+                    <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="all"> All </button>
+                    <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="bullish"> Bullish </button>
+                    <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="bearish"> Bearish </button>
+                    <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="neutral"> Neutral </button>
                 </div>
             </div>
 
