@@ -102,7 +102,7 @@ async function updateChartForToken() {
   if (!currentPrice) return;
 
   // deploying a long call option ATM as default
-  const { datasets } = await Strategies.shortPerp();
+  const { datasets } = await Strategies.longCall();
   return renderPNLChart(datasets);// i removed the strikePrices for now
 }
 

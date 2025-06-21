@@ -336,17 +336,16 @@ export async function createBearCallSpread() {
   };
 }
 
-
 export async function createLongIronButterfly(){
   
   const priceRange = generateDynamicPriceRange();
 
   const longCallStrike = currentPrice * 1.1;
-  const shortCallStrike = currentPrice * 1.02;
+  const shortCallStrike = currentPrice * 1;
   const premiumLongCall = generatePremium(longCallStrike,'call');
   const premiumShortCall = generatePremium(shortCallStrike,'call');
   const quantity = 1;
-  const longPutStrike = currentPrice * 0.90; // Long Put Strike
+  const longPutStrike = currentPrice * 0.9; // Long Put Strike
   const shortPutStrike = currentPrice * 1; // Short Put Strike
   const premiumLongPut = generatePremium(longPutStrike,'put');
   const premiumShortPut = generatePremium(shortPutStrike,'put');
@@ -372,10 +371,54 @@ export async function createLongIronButterfly(){
   };
 }
 
+export async function createLongIronCondor() {
+
+  const priceRange = generateDynamicPriceRange();
+
+  const longCallStrike = currentPrice * 1.1;
+  const shortCallStrike = currentPrice * 1.05;
+  const premiumLongCall = generatePremium(longCallStrike,'call');
+  const premiumShortCall = generatePremium(shortCallStrike,'call');
+  const quantity = 1;
+  const longPutStrike = currentPrice * 0.9; // Long Put Strike
+  const shortPutStrike = currentPrice * 0.95; // Short Put Strike
+  const premiumLongPut = generatePremium(longPutStrike,'put');
+  const premiumShortPut = generatePremium(shortPutStrike,'put');
+
+  const ShortPut = calculateOptionPNL('put', shortPutStrike, premiumShortPut, quantity, priceRange, 'short');
+  const LongPut = calculateOptionPNL('put', longPutStrike, premiumLongPut, quantity, priceRange);
+  const ShortCall = calculateOptionPNL('call', shortCallStrike, premiumShortCall, quantity, priceRange, 'short');
+  const LongCall = calculateOptionPNL('call', longCallStrike, premiumLongCall, quantity, priceRange);
+  const combinedPNL = combinePNLCurves([ShortCall, LongCall, LongPut, ShortPut]);
+
+  const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bear Call Spread
+
+  return {
+    datasets: [
+      { label: `Short Call`, data: ShortCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Long Call`, data: LongCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Long Put`, data: LongPut, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Short Put`, data: ShortPut, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)'},
+    ],
+    strikePrices: [Math.round(longCallStrike), Math.round(shortCallStrike), Math.round(longPutStrike), Math.round(shortPutStrike)],
+    breakeven: breakeven,
+  };
+}
 
 
 // Mapping from strategy ID to strategy functions
 export const strategiesIdMap = {
+  'longIronCondor':{
+    fn: createLongIronCondor,
+    name: 'Long Iron Condor',
+    description: 'A variation of the Long Iron Butterfly, it is in fact the combi￾nation of a Bull Put Spread and a Bear Call Spread. The higher strike put is lower than the lower strike call in order to create the condor shape. The combination of two income strategies also makes this an income strategy',
+    maxProfit:'Capped',
+    maxLoss:'Capped',
+    strategyType:'Income',
+    sentiment:'Neutral',
+    proficiency: 'Intermediate'
+  },
   'longIronButterfly':{
     fn: createLongIronButterfly,
     name: 'Long Iron Butterfly',
