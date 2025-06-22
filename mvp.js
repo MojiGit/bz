@@ -24,6 +24,10 @@ const tokenIdMap = {
   // Add more tokens 
 };
 
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // Navbar Visibility on Scroll
 let lastScrollTop = 0;
 const navbar = document.querySelector('nav');
@@ -52,18 +56,19 @@ window.addEventListener('scroll', () => {
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
+const menu = document.getElementById('mobile-menu');
+const button = document.getElementById('mobile-menu-button');
 
-  const menu = document.getElementById('mobile-menu');
-  const button = document.getElementById('mobile-menu-button');
+let menuOpen = false;
 
-  let menuOpen = false;
-
-  button.addEventListener('click', () => {
+button.addEventListener('click', () => {
     menuOpen = !menuOpen;
     menu.classList.toggle('opacity-0', !menuOpen);
     menu.classList.toggle('pointer-events-none', !menuOpen);
     menu.classList.toggle('opacity-100', menuOpen);
-  });
+});
+
+let selectedStrategyId;
 
 // token's buttons (ETH, WBTC, etc.), Dynamically update chart scale 
 buttons.forEach((btn) => {
@@ -73,8 +78,20 @@ buttons.forEach((btn) => {
 
     const token = btn.getAttribute('data-token');
     selectedTokenSymbol = token;
+    // Fetch and update currentPrice for the new token
+    const tokenId = tokenIdMap[selectedTokenSymbol];
 
-    await updateChartForToken(selectedTokenSymbol);
+    if (tokenId) {
+      await fetchCurrentPrice(tokenId);
+    }
+    if (selectedStrategyId) {
+      const { datasets, strikePrices } = await Strategies.strategiesIdMap[selectedStrategyId].fn();
+      renderPNLChart(datasets);
+    } else {
+      const { datasets, strikePrices } = await Strategies.longCall();
+      renderPNLChart(datasets);
+    }   
+   
   });
 });
 
@@ -202,6 +219,7 @@ function generateStrategyCards(containerId) {
 
     // Chart trigger on card click
     card.addEventListener('click', async () => {
+
       // Collapse all other cards
       document.querySelectorAll('.strategy-block').forEach(other => {
         const content = other.querySelector('.strategy-content');
@@ -215,6 +233,8 @@ function generateStrategyCards(containerId) {
       card.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
       content.classList.remove('opacity-0', 'max-h-0');
       content.classList.add('opacity-100', 'max-h-96');
+
+      selectedStrategyId = strategyId;
 
       // Render chart
       if (typeof info.fn === 'function') {
@@ -232,18 +252,16 @@ function generateStrategyCards(containerId) {
 
   applyStrategyFilters();
 
-}
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+};
 
 // Strategy Block Toggle
 document.querySelectorAll('.strategy-block').forEach(block => {
   block.addEventListener('click', async function () {
     const content = block.querySelector('.strategy-content');
-    const strategyId = block.getAttribute('strategy');
+    const strategyId = block.getAttribute('data-strategy');
     const isOpen = content.classList.contains('opacity-100');
+
+    console.log(strategyId);
 
     // Close all blocks
     document.querySelectorAll('.strategy-block').forEach(otherBlock => {

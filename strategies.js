@@ -478,7 +478,7 @@ export const strategiesIdMap = {
     maxProfit:'Capped',
     maxLoss:'Uncapped',
     strategyType:'Income',
-    sentiment:'Bearish',
+    sentiment:'bearish',
     proficiency: 'Advance'
   },
   
@@ -489,7 +489,7 @@ export const strategiesIdMap = {
     maxProfit:'Capped',
     maxLoss:'Capped',
     strategyType:'Income',
-    sentiment:'Neutral',
+    sentiment:'neutral',
     proficiency: 'Intermediate'
   },
   'longIronButterfly':{
@@ -499,7 +499,7 @@ export const strategiesIdMap = {
     maxProfit:'Capped',
     maxLoss:'Capped',
     strategyType:'Income',
-    sentiment:'Neutral',
+    sentiment:'neutral',
     proficiency:'Intermediate'
   },
   'strangle': {
