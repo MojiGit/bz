@@ -406,9 +406,82 @@ export async function createLongIronCondor() {
   };
 }
 
+// == covered Put
+export async function createCoveredPut() {
+
+  const priceRange = generateDynamicPriceRange();
+  const entryPrice = currentPrice;
+  const strike = currentPrice * 0.95;
+  const premiumCall = generatePremium(strike, 'put');
+
+  const perpPnl = calculatePerpPNL(entryPrice, 1, 1, priceRange, 'short');
+  const callPnl = calculateOptionPNL('put', strike, premiumCall, 1, priceRange, 'short');
+
+  const combinedPNL = combinePNLCurves([perpPnl, callPnl]);
+  const breakeven = findBreakevenPoints(combinedPNL);
+
+  return {
+    datasets: [
+      { label: `Short Put`, data: callPnl, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
+      { label: `Short Perp`, data: perpPnl, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0)', borderDash: [5, 5] },
+      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)' },
+    ],
+    strikePrices: [Math.round(strike), Math.round(entryPrice)],
+    breakeven: breakeven,
+  };
+}
+
+/* This strategy involved different times, which is not included so far
+export async function createCalendarCall(){
+  const priceRange = generateDynamicPriceRange();
+
+  const strike = currentPrice * 1.05;
+  const premium = generatePremium(strike,'call')
+  const quantity = 1;
+
+  const longCall = calculateOptionPNL('call', strike, premium, quantity, priceRange, 'long' );
+  const shortCall = calculateOptionPNL('call', strike, premium, quantity, priceRange, 'short' );
+  const combinedPNL = combinePNLCurves([longCall, shortCall]);
+
+  const breakeven = findBreakevenPoints(combinedPNL);
+
+  return {
+    datasets: [
+      {label: 'Long Call', data: longCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5]},
+      {label: 'Short Call', data: shortCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5]},
+      {label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)'},
+    ],
+    strikePrices: [Math.round(strike)],
+    breakeven: breakeven,
+  };
+}
+'calendarCall':{
+    fn: createCalendarCall,
+    name: 'Calendar Call',
+    description: 'Calendar spreads are known as horizontal spreads, and the Calendar Call is a variation of a Covered Call, where you substitute the long stock with a long-term long call option instead. This has the effect of radically reducing the investment, thereby increasing the initial yield. ',
+    maxProfit:'Capped',
+    maxLoss: 'capped',
+    strategyType: 'Income',
+    sentiment: 'Neutral',
+    proficiency: 'Intermediate'
+  },  
+*/
+
 
 // Mapping from strategy ID to strategy functions
 export const strategiesIdMap = {
+
+  'coveredPut':{
+    fn: createCoveredPut,
+    name: 'Covered Put',
+    description:'The Covered Put is the opposite process to a Covered Call, and it achieves the oppo￾site risk profile. Whereas the Covered Call is bullish, the Covered Put is a bearish income strategy, where you receive a substantial net credit for shorting both the put and the stock simultaneously to create the spread. ',
+    maxProfit:'Capped',
+    maxLoss:'Uncapped',
+    strategyType:'Income',
+    sentiment:'Bearish',
+    proficiency: 'Advance'
+  },
+  
   'longIronCondor':{
     fn: createLongIronCondor,
     name: 'Long Iron Condor',
@@ -469,7 +542,7 @@ export const strategiesIdMap = {
     strategyType: 'Income',
     sentiment: 'bullish',
     proficiency: 'Novice'
-
-  }
+  },
+  
   // Add more strategies
 };

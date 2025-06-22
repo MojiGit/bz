@@ -118,15 +118,15 @@
     </div>
 
     <!-- Dashboard -->
-    <section id="dashboard" class="flex flex-col md:flex-row gap-8 px-4">
+    <section id="dashboard" class="flex flex-col md:flex-row gap-8 px-4 max-h-[600px]">
 
         <!--Chart-->
-        <div class="w-full max-w-4xl mx-auto py-4 border border-2 rounded-2xl p-2">
-            <canvas id="pnlChart" class="w-full min-h-[400px] max-h-[600px] "></canvas>           
+        <div class="w-full max-w-4xl mx-auto p-2">
+            <canvas id="pnlChart" class="w-full min-h-[400px]"></canvas>           
         </div>
         
         <!--menu options-->
-        <div id="menu" class="max-w-xl mb-10"> 
+        <div id="menu" class="max-w-xl"> 
             <!-- Sentiment Filters Section -->
             <div id="sentiment-filters" class="flex flex-row justify-between w-full gap-8 mb-2 overflow-hidden" >
                 <div>
@@ -146,7 +146,7 @@
             </div>
 
             <!-- Strategy Selection Section -->
-            <div class="w-full grid grid-cols-1 gap-4">
+            <div class="w-full grid grid-cols-1 gap-4 overflow-y-auto no-scrollbar">
                 <!--  Custom Strategy   -->
                 <div class="strategy-block grid grid-cols-1 divide-y-2 px-2 pt-2 gap-2 border border-2 border-[#D8DDEF] shadow-md rounded-xl transition-all duration-300 cursor-pointer overflow-hidden"
                     strategy="empty" data-sentiment="">
