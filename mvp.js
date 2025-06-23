@@ -217,6 +217,12 @@ function generateStrategyCards(containerId) {
       </div>
     `;
 
+    const buildBtn = card.querySelector('button');
+    buildBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent collapsing behavior
+      enterBuildMode(); // You can pass initial instrument if needed
+    });
+
     // Chart trigger on card click
     card.addEventListener('click', async () => {
 
@@ -296,6 +302,152 @@ document.querySelectorAll('.strategy-block').forEach(block => {
     return renderPNLChart(datasets); // i removed the strikePrices for now
   });
 });
+
+// === BUILD MODE =================================================================================
+const strategyBuilderBoard = document.getElementById('strategy-builder-board');
+const strategyMenu = document.getElementById('menu');
+const dashboardChart = document.getElementById('pnlChart');
+const exitBuilderBtn = document.getElementById('exit-builder');
+const instrumentList = document.getElementById('instrument-list');
+const addInstrumentBtn = document.getElementById('add-instrument');
+
+let customInstruments = [];
+
+// Launch build mode
+function enterBuildMode(initialInstrument = null) {
+  // Hide menu and filters
+  strategyMenu.classList.add('hidden');
+
+  // Show strategy builder UI
+  strategyBuilderBoard.classList.remove('hidden');
+
+  customInstruments = [];
+  instrumentList.innerHTML = '';
+
+  if (initialInstrument) {
+    addInstrument(initialInstrument);
+  }
+
+  updateBuilderChart();
+}
+
+// Exit build mode
+exitBuilderBtn.addEventListener('click', () => {
+  strategyMenu.classList.remove('hidden');
+  strategyBuilderBoard.classList.add('hidden');
+  customInstruments = [];
+});
+
+// Add instrument to list
+function addInstrument(type = 'long-call') {
+  const instrumentId = `inst-${Date.now()}`;
+  const instrument = {
+    id: instrumentId,
+    type,
+    strike: Math.round(currentPrice),
+    size: 1,
+    leverage: 1,
+    color: '#D8DDEF',
+  };
+  customInstruments.push(instrument);
+
+  const div = document.createElement('div');
+  div.className = 'flex flex-col gap-2 p-2 border rounded bg-[#F9FAFB]';
+  div.id = instrumentId;
+  div.innerHTML = `
+    <div class="flex justify-between">
+      <strong>${type.replace('-', ' ')}</strong>
+      <button data-remove="${instrumentId}" class="text-red-500 text-sm">Remove</button>
+    </div>
+    <label>Strike: <input type="number" class="strike-input border px-2" value="${instrument.strike}"></label>
+    <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>
+    ${type.includes('perp') ? `<label>Leverage: <input type="number" class="leverage-input border px-2" value="${instrument.leverage}"></label>` : ''}
+  `;
+  instrumentList.appendChild(div);
+
+  // Add event to remove
+  div.querySelector(`[data-remove="${instrumentId}"]`).addEventListener('click', () => {
+    customInstruments = customInstruments.filter(inst => inst.id !== instrumentId);
+    document.getElementById(instrumentId).remove();
+    updateBuilderChart();
+  });
+
+  // Listen to input changes
+  div.querySelector('.strike-input')?.addEventListener('input', e => {
+    instrument.strike = parseFloat(e.target.value);
+    updateBuilderChart();
+  });
+  div.querySelector('.size-input')?.addEventListener('input', e => {
+    instrument.size = parseFloat(e.target.value);
+    updateBuilderChart();
+  });
+  div.querySelector('.leverage-input')?.addEventListener('input', e => {
+    instrument.leverage = parseFloat(e.target.value);
+    updateBuilderChart();
+  });
+
+  updateBuilderChart();
+}
+
+// Add new instrument
+addInstrumentBtn.addEventListener('click', () => {
+  // For now default to long call
+  addInstrument('long-call');
+});
+
+// Render chart for current builder state
+async function updateBuilderChart() {
+  const priceRange = Strategies.generateDynamicPriceRange();
+  const datasets = [];
+  const strikePrices = [];
+
+  for (const inst of customInstruments) {
+    const color = inst.color || '#D8DDEF';
+    const size = inst.size || 1;
+    const strike = inst.strike;
+    const leverage = inst.leverage || 1;
+
+    let data = [];
+    let label = '';
+
+    if (inst.type === 'long-call') {
+      const premium = Strategies.generatePremium(strike, 'call');
+      data = Strategies.calculateOptionPNL('call', strike, premium, size, priceRange, 'long');
+      label = `Long Call`;
+      strikePrices.push(strike);
+    }
+
+    if (inst.type === 'long-put') {
+      const premium = Strategies.generatePremium(strike, 'put');
+      data = Strategies.calculateOptionPNL('put', strike, premium, size, priceRange, 'long');
+      label = `Long Put`;
+      strikePrices.push(strike);
+    }
+
+    if (inst.type === 'long-perp') {
+      data = Strategies.calculatePerpPNL(strike, size, leverage, priceRange, 'long');
+      label = `Long Perp`;
+      strikePrices.push(strike);
+    }
+
+    datasets.push({
+      label,
+      data,
+      color,
+      bgColor: 'rgba(0,0,255,0.1)'
+    });
+  }
+
+  const compound = Strategies.combinePNLCurves(datasets.map(d => d.data));
+  datasets.push({
+    label: 'Compound',
+    data: compound,
+    color: 'blue',
+    bgColor: 'rgba(0,0,255,0.05)'
+  });
+
+  renderPNLChart(datasets, strikePrices);
+}
 
 
 // ==================================================================================== //

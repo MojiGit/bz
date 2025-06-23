@@ -171,6 +171,24 @@
             </div>
         </div>
         
+        <!-- Strategy Builder UI -->
+        <div id="strategy-builder-board" class="hidden w-full p-4 border border-[#D8DDEF] rounded-xl shadow-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-[20px] font-bold">Strategy Builder</h2>
+                <button id="exit-builder" class="text-sm text-red-600 underline">Exit</button>
+            </div>
+
+            <!-- Instruments List -->
+            <div id="instrument-list" class="grid gap-4 mb-4">
+                <!-- Dynamically generated instruments will appear here -->
+            </div>
+
+            <!-- Add Instrument -->
+            <button id="add-instrument" class="px-4 py-2 text-black bg-[#00E083] rounded hover:bg-[#52FFB8] font-semibold text-[16px]">
+                + Add Instrument
+            </button>
+        </div>
+
     </section>
 
     <div id="strategy-container" class="grid gap-4"></div>
