@@ -73,8 +73,8 @@ let selectedStrategyId;
 // token's buttons (ETH, WBTC, etc.), Dynamically update chart scale 
 buttons.forEach((btn) => {
   btn.addEventListener('click', async () => {
-    buttons.forEach(b => b.classList.remove('bg-[#00E083]', 'border-[#00E083]', 'text-[#191308]'));
-    btn.classList.add('bg-[#00E083]', 'text-[#191308]', 'border-[#00E083]');
+    buttons.forEach(b => b.classList.remove('bg-[#00E083]', 'border-[#00E083]', 'active-token'));
+    btn.classList.add('bg-[#00E083]', 'border-[#00E083]', 'active-token');
 
     const token = btn.getAttribute('data-token');
     selectedTokenSymbol = token;

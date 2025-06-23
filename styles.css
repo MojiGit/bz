@@ -16,6 +16,10 @@ body {
   background-color: #00E083 !important;
 }
 
+.token-btn.active-token:hover {
+  background-color: #00E083 !important;
+}
+
 @keyframes scroll-left {
   0% {
     transform: translateX(0);
