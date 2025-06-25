@@ -21,9 +21,10 @@ export let currentPrice = null;
 const tokenIdMap = {
   WBTC: 'wrapped-bitcoin',
   ETH: 'ethereum',
-  // Add more tokens 
+  // Add more tokens (this will depend on the protocols i will connect)
 };
 
+// standard function to capitalize titles
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -33,6 +34,7 @@ let lastScrollTop = 0;
 const navbar = document.querySelector('nav');
 const mobileMenu = document.getElementById('mobile-menu');
 
+// listener to hide the navbar each time the user scrolls down, and show it again when scrolling up
 window.addEventListener('scroll', () => {
   const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
@@ -56,18 +58,35 @@ window.addEventListener('scroll', () => {
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
-const menu = document.getElementById('mobile-menu');
 const button = document.getElementById('mobile-menu-button');
-
 let menuOpen = false;
 
+// show the dropdown menu when clicking
 button.addEventListener('click', () => {
     menuOpen = !menuOpen;
-    menu.classList.toggle('opacity-0', !menuOpen);
-    menu.classList.toggle('pointer-events-none', !menuOpen);
-    menu.classList.toggle('opacity-100', menuOpen);
+    mobileMenu.classList.toggle('opacity-0', !menuOpen);
+    mobileMenu.classList.toggle('pointer-events-none', !menuOpen);
+    mobileMenu.classList.toggle('opacity-100', menuOpen);
 });
 
+// Fetch current price from CoinGecko
+async function fetchCurrentPrice(tokenId) {
+  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`;
+  const res = await fetch(url);
+  const data = await res.json();
+  //update the gobal variable
+  currentPrice = data[tokenId]?.usd;
+
+  const currentPriceDisplay = document.querySelector('.current-price-display');
+  const currentPriceP = currentPriceDisplay.querySelector('p');
+  if (currentPriceP) {
+    currentPriceP.textContent = `US $ ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+  }
+
+  return data[tokenId]?.usd || null;
+}
+
+//variable to store the current strategy dployed
 let selectedStrategyId;
 
 // token's buttons (ETH, WBTC, etc.), Dynamically update chart scale 
@@ -81,10 +100,12 @@ buttons.forEach((btn) => {
     // Fetch and update currentPrice for the new token
     const tokenId = tokenIdMap[selectedTokenSymbol];
 
+    //get current price
     if (tokenId) {
-      await fetchCurrentPrice(tokenId);
+      await fetchCurrentPrice(tokenId); //update the current price
     }
-    if (selectedStrategyId) {
+    //if there is a strategy selected then deploy it, otherwise run a long call option
+    if (selectedStrategyId) { 
       const { datasets, strikePrices } = await Strategies.strategiesIdMap[selectedStrategyId].fn();
       renderPNLChart(datasets);
     } else {
@@ -95,21 +116,6 @@ buttons.forEach((btn) => {
   });
 });
 
-// Fetch current price from CoinGecko
-async function fetchCurrentPrice(tokenId) {
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`;
-  const res = await fetch(url);
-  const data = await res.json();
-  currentPrice = data[tokenId]?.usd;
-
-  const currentPriceDisplay = document.querySelector('.current-price-display');
-  const currentPriceP = currentPriceDisplay.querySelector('p');
-  if (currentPriceP) {
-    currentPriceP.textContent = `US $ ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-  }
-
-  return data[tokenId]?.usd || null;
-}
 
 // Generate default chart - long call option ATM
 async function updateChartForToken() {
@@ -120,24 +126,29 @@ async function updateChartForToken() {
 
   // deploying a long call option ATM as default
   const { datasets } = await Strategies.longCall();
-  return renderPNLChart(datasets);// i removed the strikePrices for now
+  return renderPNLChart(datasets);// i removed the strikePrices for now !!
 }
 
 // Select WBTC by default on page load and render its chart
 document.addEventListener('DOMContentLoaded', async () => {
 
-  generateStrategyCards('strategy-container');
+  generateStrategyCards('strategy-container'); //initiates the creation of the strategies templates
 
+  //selecting WBTC by default and setting the current filter to 'ALL'
   const defaultBtn = document.querySelector('.token-btn[data-token="WBTC"]');
   if (defaultBtn) {
-    defaultBtn.classList.add('bg-[#00E083]', 'text-[#191308]', 'border-[#00E083]');
+    defaultBtn.classList.add('bg-[#00E083]', 'text-[#191308]', 'border-[#00E083]', 'active-token');
   }
-  selectedTokenSymbol = 'WBTC';
+  const defaultSentiment = document.querySelector('.sentiment-filter[data-sentiment="all"]');
+  if (defaultSentiment){
+    defaultSentiment.classList.add('bg-[#00E083]', 'active-filter');
+  }
+  selectedTokenSymbol = 'WBTC'; //default token WBTC
   await updateChartForToken();
 });
 
-let currentSentiment = 'all';
-let currentNameFilter = '';
+let currentSentiment = 'all'; //deploy all strategies by default
+let currentNameFilter = ''; //no filter by name
 
 const nameFilterInput = document.getElementById('strategy-name-filter');
 
@@ -155,7 +166,9 @@ function applyStrategyFilters() {
 // Sentiment filter
 document.querySelectorAll('.sentiment-filter').forEach(btn => {
   btn.addEventListener('click', () => {
-    currentSentiment = btn.getAttribute('data-sentiment');
+    //update sentiment value
+    currentSentiment = btn.getAttribute('data-sentiment'); 
+    //highlighs the selection
     document.querySelectorAll('.sentiment-filter').forEach(b => {
       b.classList.remove('bg-[#00E083]', 'active-filter');
     });
@@ -176,11 +189,14 @@ function generateStrategyCards(containerId) {
   if (!container) return;
 
   Object.entries(Strategies.strategiesIdMap).forEach(([strategyId, info]) => {
+
+    //for each strategy in IdMap creates a div with the atributes, sentiment and strategyid
     const card = document.createElement('div');
     card.className = 'strategy-block grid grid-cols-1 divide-y-2 px-2 pt-2 gap-2 border border-2 border-[#D8DDEF] shadow-md rounded-xl transition-all duration-300 cursor-pointer overflow-hidden';
     card.setAttribute('data-strategy', strategyId);
     card.setAttribute('data-sentiment', info.sentiment);
 
+    //Div content
     card.innerHTML = `
       <div class="flex flex-row strategy-header justify-between">
         <div class="flex flex-row gap-2 items-center">
@@ -240,7 +256,7 @@ function generateStrategyCards(containerId) {
       content.classList.remove('opacity-0', 'max-h-0');
       content.classList.add('opacity-100', 'max-h-96');
 
-      selectedStrategyId = strategyId;
+      selectedStrategyId = strategyId; //update global variable
 
       // Render chart
       if (typeof info.fn === 'function') {
@@ -260,48 +276,6 @@ function generateStrategyCards(containerId) {
 
 };
 
-// Strategy Block Toggle
-document.querySelectorAll('.strategy-block').forEach(block => {
-  block.addEventListener('click', async function () {
-    const content = block.querySelector('.strategy-content');
-    const strategyId = block.getAttribute('data-strategy');
-    const isOpen = content.classList.contains('opacity-100');
-
-    console.log(strategyId);
-
-    // Close all blocks
-    document.querySelectorAll('.strategy-block').forEach(otherBlock => {
-      const otherContent = otherBlock.querySelector('.strategy-content');
-      otherBlock.classList.remove('bg-[#F4FFF9]', 'border-[#52FFB8]');
-      otherContent.classList.remove('opacity-100', 'max-h-96');
-      otherContent.classList.add('opacity-0', 'max-h-0');
-    });
-
-    // Toggle current one (if not already open)
-    if (!isOpen) {
-      block.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
-      content.classList.remove('opacity-0', 'max-h-0');
-      content.classList.add('opacity-100', 'max-h-96');
-    }
-
-    // NEW: Load corresponding chart
-    const { datasets, strikePrices} = await Strategies.strategiesIdMap[strategyId].fn();
-    
-    /* Breakeven diplay, not used right now 
-    const breakevenDisplay = document.querySelector('.breakeven-display');
-    const breakevenP = breakevenDisplay.querySelector('p');
-    if (breakevenP) {
-      if (Array.isArray(breakeven)) {
-        breakevenP.textContent = `$ ${breakeven.join(' / $ ')}`;
-      } else {
-        breakevenP.textContent = `$ ${breakeven.toFixed(0)}`;
-      }
-    }
-    */
-    
-    return renderPNLChart(datasets); // i removed the strikePrices for now
-  });
-});
 
 // === BUILD MODE =================================================================================
 const strategyBuilderBoard = document.getElementById('strategy-builder-board');

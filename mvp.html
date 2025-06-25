@@ -59,6 +59,7 @@
                 </li>
             </ul>
 
+            <!--Menu button -->
             <div class="md:hidden flex items-center p-2">
                 <button id="mobile-menu-button" class="text-black focus:outline-none">
                 <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,12 +87,12 @@
     <!--section to avoid overlaping-->
     <div class="h-[80px]"></div>
     
-    <!--Title-->
+    <!--Title section -->
     <div class="p-4 flex flex-col gap-2">
+        <!--title-->
         <h1 class="text-[24px] md:text-[32px] font-bold text-black">
                 Option Strategy Builder
         </h1>
-        
         <!-- Token selection -->
         <div id="token-buttons" class="flex flex-col gap-2 text-black">
             <div>
@@ -109,7 +110,7 @@
                     ETH
                 </button>
             </div>
-
+            <!-- Current price display-->
             <div class="current-price-display flex flex-row items-center"> 
                 <h2 class=" font-semibold px-1 text-[16px] text-black">Current Price :</h2>
                 <p class="text-black text-[16px]">#</p>
@@ -173,8 +174,8 @@
         
         <!-- Strategy Builder UI -->
         <div id="strategy-builder-board" class="hidden w-full p-4 border border-[#D8DDEF] rounded-xl shadow-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-[20px] font-bold">Strategy Builder</h2>
+            <div class="flex justify-between items-center">
+                <h2 class="text-[20px] font-bold">Buildier</h2>
                 <button id="exit-builder" class="text-sm text-red-600 underline">Exit</button>
             </div>
 
@@ -183,14 +184,20 @@
                 <!-- Dynamically generated instruments will appear here -->
             </div>
 
-            <!-- Add Instrument -->
-            <button id="add-instrument" class="px-4 py-2 text-black bg-[#00E083] rounded hover:bg-[#52FFB8] font-semibold text-[16px]">
-                + Add Instrument
-            </button>
+            <!-- Add Instrument buttons -->
+            <div class="flex flex-row gap-4">
+                <button id="add-instrument" class="px-2 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] font-semibold text-[16px]">
+                    + Option
+                </button>
+                <button id="add-instrument" class="px-2 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] font-semibold text-[16px]">
+                    + Perp
+                </button> <!-- currently not working !!-->
+            </div>
         </div>
 
     </section>
 
+    <!-- pre-designed strategies cards-->
     <div id="strategy-container" class="grid gap-4"></div>
 
 
