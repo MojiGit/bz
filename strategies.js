@@ -470,6 +470,10 @@ export async function createCalendarCall(){
 
 // Mapping from strategy ID to strategy functions
 export const strategiesIdMap = {
+  'custom':{
+    name: 'Custom',
+    description: 'Design your strategy from scratch by adding assets and defining their parameters.',
+  },
 
   'coveredPut':{
     fn: createCoveredPut,

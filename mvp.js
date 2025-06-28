@@ -197,6 +197,23 @@ function generateStrategyCards(containerId) {
     card.setAttribute('data-sentiment', info.sentiment);
 
     //Div content
+    if(strategyId === 'custom'){
+      card.innerHTML = `
+      <div class="flex flex-row strategy-header justify-between">
+        <div class="flex flex-row gap-2 items-center">
+          <h1 class="text-[18px] font-bold text-[#191308]">${info.name}</h1>
+        </div>
+      </div>
+      <div class="strategy-content opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+        <div class="description-display py-2">
+          <p class="text-[16px] text-gray-400">${info.description}</p>
+        </div>
+        <button class="text-[16px] bg-[#D8DDEF] font-semibold text-black px-2 mb-2 rounded-md hover:bg-[#52FFB8] transition-colors duration-300">
+          Build
+        </button>
+      </div>
+    `;
+    } else {
     card.innerHTML = `
       <div class="flex flex-row strategy-header justify-between">
         <div class="flex flex-row gap-2 items-center">
@@ -232,6 +249,7 @@ function generateStrategyCards(containerId) {
         </button>
       </div>
     `;
+    }
 
     const buildBtn = card.querySelector('button');
     buildBtn.addEventListener('click', (e) => {
@@ -275,37 +293,6 @@ function generateStrategyCards(containerId) {
   applyStrategyFilters();
 
 };
-
-// Strategy Block Toggle -- keep it for now, just for the custom block - this is not needed
-document.querySelectorAll('.strategy-block').forEach(block => {
-  block.addEventListener('click', async function () {
-    const content = block.querySelector('.strategy-content');
-    const strategyId = block.getAttribute('data-strategy');
-    const isOpen = content.classList.contains('opacity-100');
-
-    console.log(strategyId);
-
-    // Close all blocks
-    document.querySelectorAll('.strategy-block').forEach(otherBlock => {
-      const otherContent = otherBlock.querySelector('.strategy-content');
-      otherBlock.classList.remove('bg-[#F4FFF9]', 'border-[#52FFB8]');
-      otherContent.classList.remove('opacity-100', 'max-h-96');
-      otherContent.classList.add('opacity-0', 'max-h-0');
-    });
-
-    // Toggle current one (if not already open)
-    if (!isOpen) {
-      block.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
-      content.classList.remove('opacity-0', 'max-h-0');
-      content.classList.add('opacity-100', 'max-h-96');
-    }
-
-    // NEW: Load corresponding chart
-    const { datasets, strikePrices} = await Strategies.strategiesIdMap[strategyId].fn();
-
-    return renderPNLChart(datasets); // i removed the strikePrices for now
-  });
-});
 
 // === BUILD MODE =================================================================================
 const strategyBuilderBoard = document.getElementById('strategy-builder-board');
