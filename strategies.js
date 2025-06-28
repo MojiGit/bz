@@ -5,7 +5,7 @@ These functions calculate PNL for different trading strategies, including spot, 
 import { currentPrice, selectedTokenSymbol } from "./mvp.js";
 
 // Perpetual PNL
-function calculatePerpPNL(entryPrice, quantity, leverage, priceRange, position = 'long') {
+export function calculatePerpPNL(entryPrice, quantity, leverage, priceRange, position = 'long') {
   return priceRange.map(currentPrice => {
     if(position === 'short'){
       const pnl = (entryPrice - currentPrice) * quantity * leverage;
@@ -17,7 +17,7 @@ function calculatePerpPNL(entryPrice, quantity, leverage, priceRange, position =
 }
 
 // Option PNL (Call or Put)
-function calculateOptionPNL(optionType, strikePrice, premium, quantity, priceRange, position = 'long') {
+export function calculateOptionPNL(optionType, strikePrice, premium, quantity, priceRange, position = 'long') {
   return priceRange.map(currentPrice => {
     let intrinsicValue;
     if (optionType === 'call') {
@@ -38,7 +38,7 @@ function calculateOptionPNL(optionType, strikePrice, premium, quantity, priceRan
 }
 
 // Combine multiple PNL datasets into a single compound curve
-function combinePNLCurves(pnlArrays) {
+export function combinePNLCurves(pnlArrays) {
   if (pnlArrays.length === 0) return [];
 
   const length = pnlArrays[0].length;
@@ -59,7 +59,7 @@ function combinePNLCurves(pnlArrays) {
 }
 
 // Find breakeven points in a PNL array
-function findBreakevenPoints(pnlArray) {
+export function findBreakevenPoints(pnlArray) {
   const breakevens = [];
   for (let i = 1; i < pnlArray.length; i++) {
     const prev = pnlArray[i - 1];
@@ -80,7 +80,7 @@ function findBreakevenPoints(pnlArray) {
 }
 
 // Generate price range based on current price
-function generateDynamicPriceRange() {
+export function generateDynamicPriceRange() {
   if (!currentPrice || isNaN(currentPrice) || currentPrice <= 0) {
     throw new Error('Invalid currentPrice for price range');
   }
@@ -100,7 +100,7 @@ function generateDynamicPriceRange() {
   return prices;
 }
 
-function generatePremium(strike, position) {
+export function generatePremium(strike, position) {
   const nearRate = 0.08;
   const midRate = 0.04;
   const farRate = 0.02;

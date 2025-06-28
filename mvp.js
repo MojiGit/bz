@@ -276,6 +276,36 @@ function generateStrategyCards(containerId) {
 
 };
 
+// Strategy Block Toggle -- keep it for now, just for the custom block - this is not needed
+document.querySelectorAll('.strategy-block').forEach(block => {
+  block.addEventListener('click', async function () {
+    const content = block.querySelector('.strategy-content');
+    const strategyId = block.getAttribute('data-strategy');
+    const isOpen = content.classList.contains('opacity-100');
+
+    console.log(strategyId);
+
+    // Close all blocks
+    document.querySelectorAll('.strategy-block').forEach(otherBlock => {
+      const otherContent = otherBlock.querySelector('.strategy-content');
+      otherBlock.classList.remove('bg-[#F4FFF9]', 'border-[#52FFB8]');
+      otherContent.classList.remove('opacity-100', 'max-h-96');
+      otherContent.classList.add('opacity-0', 'max-h-0');
+    });
+
+    // Toggle current one (if not already open)
+    if (!isOpen) {
+      block.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
+      content.classList.remove('opacity-0', 'max-h-0');
+      content.classList.add('opacity-100', 'max-h-96');
+    }
+
+    // NEW: Load corresponding chart
+    const { datasets, strikePrices} = await Strategies.strategiesIdMap[strategyId].fn();
+
+    return renderPNLChart(datasets); // i removed the strikePrices for now
+  });
+});
 
 // === BUILD MODE =================================================================================
 const strategyBuilderBoard = document.getElementById('strategy-builder-board');
@@ -289,12 +319,13 @@ let customInstruments = [];
 
 // Launch build mode
 function enterBuildMode(initialInstrument = null) {
-  // Hide menu and filters
+  // Hide filters and strategies
   strategyMenu.classList.add('hidden');
 
   // Show strategy builder UI
   strategyBuilderBoard.classList.remove('hidden');
 
+  //Here should be te predefined instruments of the strategy selected
   customInstruments = [];
   instrumentList.innerHTML = '';
 
@@ -314,6 +345,7 @@ exitBuilderBtn.addEventListener('click', () => {
 
 // Add instrument to list
 function addInstrument(type = 'long-call') {
+  //it only allows to add long-call options! 
   const instrumentId = `inst-${Date.now()}`;
   const instrument = {
     id: instrumentId,
@@ -334,9 +366,7 @@ function addInstrument(type = 'long-call') {
       <button data-remove="${instrumentId}" class="text-red-500 text-sm">Remove</button>
     </div>
     <label>Strike: <input type="number" class="strike-input border px-2" value="${instrument.strike}"></label>
-    <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>
-    ${type.includes('perp') ? `<label>Leverage: <input type="number" class="leverage-input border px-2" value="${instrument.leverage}"></label>` : ''}
-  `;
+    <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>`;
   instrumentList.appendChild(div);
 
   // Add event to remove
