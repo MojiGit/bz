@@ -303,7 +303,8 @@ const strategyMenu = document.getElementById('menu');
 const dashboardChart = document.getElementById('pnlChart');
 const exitBuilderBtn = document.getElementById('exit-builder');
 const instrumentList = document.getElementById('instrument-list');
-const addInstrumentBtn = document.getElementById('add-instrument');
+const addOptionBtn = document.getElementById('add-option');
+const addPerpBtn = document.getElementById('add-perp');
 
 let customInstruments = [];
 
@@ -334,12 +335,13 @@ exitBuilderBtn.addEventListener('click', () => {
 });
 
 // Add instrument to list
-function addInstrument(type = 'long-call') {
+function addOption() {
   //it only allows to add long-call options! 
   const instrumentId = `inst-${Date.now()}`;
   const instrument = {
     id: instrumentId,
-    type,
+    type: 'call',
+    position: 'long',
     strike: Math.round(currentPrice),
     size: 1,
     leverage: 1,
@@ -352,9 +354,10 @@ function addInstrument(type = 'long-call') {
   div.id = instrumentId;
   div.innerHTML = `
     <div class="flex justify-between">
-      <strong>${type.replace('-', ' ')}</strong>
       <button data-remove="${instrumentId}" class="text-red-500 text-sm">Remove</button>
     </div>
+    <label>Type: <input type="label" class="type-input border px-2" value="${instrument.type}"></label>
+    <label>Position: <input type="label" class="position-input border px-2" value="${instrument.position}"></label>
     <label>Strike: <input type="number" class="strike-input border px-2" value="${instrument.strike}"></label>
     <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>`;
   instrumentList.appendChild(div);
@@ -367,7 +370,15 @@ function addInstrument(type = 'long-call') {
   });
 
   // Listen to input changes
-  div.querySelector('.strike-input')?.addEventListener('input', e => {
+  div.querySelector('.type-input')?.addEventListener('input', e => {
+    instrument.strike = parseFloat(e.target.value);
+    updateBuilderChart();
+  });
+    div.querySelector('.position-input')?.addEventListener('input', e => {
+    instrument.strike = parseFloat(e.target.value);
+    updateBuilderChart();
+  });
+    div.querySelector('.strike-input')?.addEventListener('input', e => {
     instrument.strike = parseFloat(e.target.value);
     updateBuilderChart();
   });
@@ -384,9 +395,9 @@ function addInstrument(type = 'long-call') {
 }
 
 // Add new instrument
-addInstrumentBtn.addEventListener('click', () => {
+addOptionBtn.addEventListener('click', () => {
   // For now default to long call
-  addInstrument('long-call');
+  addOption();
 });
 
 // Render chart for current builder state
@@ -396,38 +407,16 @@ async function updateBuilderChart() {
 
   for (const inst of customInstruments) {
     const color = inst.color || '#D8DDEF';
-    const size = inst.size || 1;
-    const strike = inst.strike;
-    const leverage = inst.leverage || 1;
 
-    let data = [];
+    let data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position);
     let label = '';
-
-    if (inst.type === 'long-call') {
-      const premium = Strategies.generatePremium(strike, 'call');
-      data = Strategies.calculateOptionPNL('call', strike, premium, size, priceRange, 'long');
-      label = `Long Call`;
-      strikePrices.push(strike);
-    }
-
-    if (inst.type === 'long-put') {
-      const premium = Strategies.generatePremium(strike, 'put');
-      data = Strategies.calculateOptionPNL('put', strike, premium, size, priceRange, 'long');
-      label = `Long Put`;
-      strikePrices.push(strike);
-    }
-
-    if (inst.type === 'long-perp') {
-      data = Strategies.calculatePerpPNL(strike, size, leverage, priceRange, 'long');
-      label = `Long Perp`;
-      strikePrices.push(strike);
-    }
+    strikePrices.push(inst.strike)
 
     datasets.push({
       label,
       data,
       color,
-      bgColor: 'rgba(0,0,255,0.1)'
+      bgColor: 'rgba(183, 184, 183, 0.16)'
     });
   }
 
@@ -436,7 +425,7 @@ async function updateBuilderChart() {
     label: 'Compound',
     data: compound,
     color: 'blue',
-    bgColor: 'rgba(0,0,255,0.05)'
+    bgColor: 'rgba(0, 0, 255, 0.1)'
   });
 
   renderPNLChart(datasets, strikePrices);

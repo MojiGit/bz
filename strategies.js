@@ -5,7 +5,7 @@ These functions calculate PNL for different trading strategies, including spot, 
 import { currentPrice, selectedTokenSymbol, priceRange } from "./mvp.js";
 
 // Perpetual PNL
-export function calculatePerpPNL(entryPrice, quantity, leverage, position = 'long') {
+export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 'long') {
   return priceRange.map(currentPrice => {
     if(position === 'short'){
       const pnl = (entryPrice - currentPrice) * quantity * leverage;
