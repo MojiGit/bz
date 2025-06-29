@@ -69,6 +69,7 @@ button.addEventListener('click', () => {
     mobileMenu.classList.toggle('opacity-100', menuOpen);
 });
 
+export let priceRange = [];
 // Fetch current price from CoinGecko
 async function fetchCurrentPrice(tokenId) {
   const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`;
@@ -82,6 +83,8 @@ async function fetchCurrentPrice(tokenId) {
   if (currentPriceP) {
     currentPriceP.textContent = `US $ ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
   }
+
+  priceRange = Strategies.generateDynamicPriceRange();
 
   return data[tokenId]?.usd || null;
 }
@@ -388,7 +391,6 @@ addInstrumentBtn.addEventListener('click', () => {
 
 // Render chart for current builder state
 async function updateBuilderChart() {
-  const priceRange = Strategies.generateDynamicPriceRange();
   const datasets = [];
   const strikePrices = [];
 

@@ -2,10 +2,10 @@
 === PNL Calculation Functions ===
 These functions calculate PNL for different trading strategies, including spot, perpetual futures, and options.
 */
-import { currentPrice, selectedTokenSymbol } from "./mvp.js";
+import { currentPrice, selectedTokenSymbol, priceRange } from "./mvp.js";
 
 // Perpetual PNL
-export function calculatePerpPNL(entryPrice, quantity, leverage, priceRange, position = 'long') {
+export function calculatePerpPNL(entryPrice, quantity, leverage, position = 'long') {
   return priceRange.map(currentPrice => {
     if(position === 'short'){
       const pnl = (entryPrice - currentPrice) * quantity * leverage;
@@ -17,7 +17,7 @@ export function calculatePerpPNL(entryPrice, quantity, leverage, priceRange, pos
 }
 
 // Option PNL (Call or Put)
-export function calculateOptionPNL(optionType, strikePrice, quantity = 1, priceRange, position = 'long') {
+export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long') {
   return priceRange.map(currentPrice => {
     let intrinsicValue;
     if (optionType === 'call') {
@@ -128,7 +128,6 @@ export function generatePremium(strike, position) {
 
 // === Long Call ===
 export async function longCall(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
-  const priceRange = generateDynamicPriceRange();
 
   const pnlData = calculateOptionPNL('call', strike, size, priceRange, 'long');
   const breakeven = findBreakevenPoints(pnlData)
@@ -143,7 +142,6 @@ export async function longCall(strike = currentPrice, size = 1, lineColor = '#D8
 }
 // == Short Call ==
 export async function nakedCall(strike = currentPrice, size = 1, lineColor = '#D8DDEF') {
-  const priceRange = generateDynamicPriceRange();
 
   const pnlData = calculateOptionPNL('call',strike,size,priceRange,'short');
   const breakeven = findBreakevenPoints(pnlData);
@@ -159,7 +157,6 @@ export async function nakedCall(strike = currentPrice, size = 1, lineColor = '#D
 
 // == Long Put ==
 export async function longPut(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
-  const priceRange = generateDynamicPriceRange();
 
   const pnlData = calculateOptionPNL('put', strike, size, priceRange, 'long');
   const breakeven = findBreakevenPoints(pnlData)
@@ -175,7 +172,6 @@ export async function longPut(strike = currentPrice, size = 1, lineColor = '#D8D
 
 // == Short Put ==
 export async function nakedPut(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
-  const priceRange = generateDynamicPriceRange();
 
   const pnlData = calculateOptionPNL('put', strike, size, priceRange, 'short');
   const breakeven = findBreakevenPoints(pnlData)
@@ -191,7 +187,6 @@ export async function nakedPut(strike = currentPrice, size = 1, lineColor = '#D8
 
 // == long perp ==
 export async function longPerp(entryPrice = currentPrice, size = 1, leverage = 1,lineColor = '#D8DDEF'){
-  const priceRange = generateDynamicPriceRange();
   
   const pnlData = calculatePerpPNL(entryPrice,size,leverage,priceRange,);
   const breakeven = findBreakevenPoints(pnlData);
@@ -206,7 +201,6 @@ export async function longPerp(entryPrice = currentPrice, size = 1, leverage = 1
 
 // == Short perp ==
 export async function shortPerp(entryPrice = currentPrice, size = 1, leverage = 1,lineColor = '#D8DDEF'){
-  const priceRange = generateDynamicPriceRange();
   
   const pnlData = calculatePerpPNL(entryPrice,size,leverage,priceRange,'short');
   const breakeven = findBreakevenPoints(pnlData);
@@ -222,12 +216,11 @@ export async function shortPerp(entryPrice = currentPrice, size = 1, leverage = 
 // == covered call
 export async function coveredCall() {
 
-  const priceRange = generateDynamicPriceRange();
   const entryPrice = currentPrice;
   const strike = currentPrice * 1.1;
 
-  const perpPnl = calculatePerpPNL(entryPrice, 1, 1, priceRange, 'long');
-  const callPnl = calculateOptionPNL('call', strike, 1, priceRange, 'short');
+  const perpPnl = calculatePerpPNL(entryPrice, 1, 1, 'long');
+  const callPnl = calculateOptionPNL('call', strike, 1, 'short');
 
   const combinedPNL = combinePNLCurves([perpPnl, callPnl]);
   const breakeven = findBreakevenPoints(combinedPNL);
@@ -247,15 +240,13 @@ export async function coveredCall() {
 // Buy OTM Put + Buy OTM Call
 export async function createStrangle() {
 
-  const priceRange = generateDynamicPriceRange();
-
   const longPutStrike = currentPrice * 0.98;
   const longCallStrike = currentPrice * 1.02;
   const quantity = 1;
   
 
-  const putPNL = calculateOptionPNL('put', longPutStrike, quantity, priceRange);
-  const callPNL = calculateOptionPNL('call', longCallStrike, quantity, priceRange);
+  const putPNL = calculateOptionPNL('put', longPutStrike, quantity);
+  const callPNL = calculateOptionPNL('call', longCallStrike, quantity);
   const combinedPNL = combinePNLCurves([putPNL, callPNL]);
 
   const breakeven = findBreakevenPoints(combinedPNL);
@@ -275,14 +266,12 @@ export async function createStrangle() {
 // Buy OTM Put + sell OTM Put
 export async function createBullPutSpread() {
 
-  const priceRange = generateDynamicPriceRange();
-
   const longPutStrike = currentPrice * 0.90; // Long Put Strike
   const shortPutStrike = currentPrice * 1; // Short Put Strike
   const quantity = 1;
 
-  const Shortput = calculateOptionPNL('put', shortPutStrike, quantity, priceRange, 'short');
-  const Longput = calculateOptionPNL('put', longPutStrike, quantity, priceRange);
+  const Shortput = calculateOptionPNL('put', shortPutStrike, quantity, 'short');
+  const Longput = calculateOptionPNL('put', longPutStrike, quantity);
   const combinedPNL = combinePNLCurves([Shortput, Longput]);
 
   const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bull Put Spread
@@ -302,14 +291,13 @@ export async function createBullPutSpread() {
 // === Predefined Strategy: Bear Call Spread (bearish capital gain) ===
 // Buy OTM Call + sell OTM Call
 export async function createBearCallSpread() {
-  const priceRange = generateDynamicPriceRange();
 
   const longCallStrike = currentPrice * 1.1;
   const shortCallStrike = currentPrice * 1.02;
   const quantity = 1;
 
-  const ShortCall = calculateOptionPNL('call', shortCallStrike, quantity, priceRange, 'short');
-  const LongCall = calculateOptionPNL('call', longCallStrike, quantity, priceRange);
+  const ShortCall = calculateOptionPNL('call', shortCallStrike, quantity, 'short');
+  const LongCall = calculateOptionPNL('call', longCallStrike, quantity);
   const combinedPNL = combinePNLCurves([ShortCall, LongCall]);
 
   const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bear Call Spread
@@ -326,8 +314,6 @@ export async function createBearCallSpread() {
 }
 
 export async function createLongIronButterfly(){
-  
-  const priceRange = generateDynamicPriceRange();
 
   const longCallStrike = currentPrice * 1.1;
   const shortCallStrike = currentPrice * 1;
@@ -335,10 +321,10 @@ export async function createLongIronButterfly(){
   const longPutStrike = currentPrice * 0.9; // Long Put Strike
   const shortPutStrike = currentPrice * 1; // Short Put Strike
 
-  const ShortPut = calculateOptionPNL('put', shortPutStrike, quantity, priceRange, 'short');
-  const LongPut = calculateOptionPNL('put', longPutStrike, quantity, priceRange);
-  const ShortCall = calculateOptionPNL('call', shortCallStrike, quantity, priceRange, 'short');
-  const LongCall = calculateOptionPNL('call', longCallStrike, quantity, priceRange);
+  const ShortPut = calculateOptionPNL('put', shortPutStrike, quantity, 'short');
+  const LongPut = calculateOptionPNL('put', longPutStrike, quantity);
+  const ShortCall = calculateOptionPNL('call', shortCallStrike, quantity, 'short');
+  const LongCall = calculateOptionPNL('call', longCallStrike, quantity);
   const combinedPNL = combinePNLCurves([ShortCall, LongCall, LongPut, ShortPut]);
 
   const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bear Call Spread
@@ -358,18 +344,16 @@ export async function createLongIronButterfly(){
 
 export async function createLongIronCondor() {
 
-  const priceRange = generateDynamicPriceRange();
-
   const longCallStrike = currentPrice * 1.1;
   const shortCallStrike = currentPrice * 1.05;
   const quantity = 1;
   const longPutStrike = currentPrice * 0.9; // Long Put Strike
   const shortPutStrike = currentPrice * 0.95; // Short Put Strike
 
-  const ShortPut = calculateOptionPNL('put', shortPutStrike, quantity, priceRange, 'short');
-  const LongPut = calculateOptionPNL('put', longPutStrike, quantity, priceRange);
-  const ShortCall = calculateOptionPNL('call', shortCallStrike, quantity, priceRange, 'short');
-  const LongCall = calculateOptionPNL('call', longCallStrike, quantity, priceRange);
+  const ShortPut = calculateOptionPNL('put', shortPutStrike, quantity, 'short');
+  const LongPut = calculateOptionPNL('put', longPutStrike, quantity);
+  const ShortCall = calculateOptionPNL('call', shortCallStrike, quantity, 'short');
+  const LongCall = calculateOptionPNL('call', longCallStrike, quantity);
   const combinedPNL = combinePNLCurves([ShortCall, LongCall, LongPut, ShortPut]);
 
   const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bear Call Spread
@@ -390,12 +374,11 @@ export async function createLongIronCondor() {
 // == covered Put
 export async function createCoveredPut() {
 
-  const priceRange = generateDynamicPriceRange();
   const entryPrice = currentPrice;
   const strike = currentPrice * 0.95;
 
-  const perpPnl = calculatePerpPNL(entryPrice, 1, 1, priceRange, 'short');
-  const callPnl = calculateOptionPNL('put', strike, 1, priceRange, 'short');
+  const perpPnl = calculatePerpPNL(entryPrice, 1, 1, 'short');
+  const callPnl = calculateOptionPNL('put', strike, 1, 'short');
 
   const combinedPNL = combinePNLCurves([perpPnl, callPnl]);
   const breakeven = findBreakevenPoints(combinedPNL);
