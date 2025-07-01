@@ -371,11 +371,11 @@ function addOption() {
 
   // Listen to input changes
   div.querySelector('.type-input')?.addEventListener('input', e => {
-    instrument.strike = parseFloat(e.target.value);
+    instrument.type = e.target.value;
     updateBuilderChart();
   });
     div.querySelector('.position-input')?.addEventListener('input', e => {
-    instrument.strike = parseFloat(e.target.value);
+    instrument.position = e.target.value;
     updateBuilderChart();
   });
     div.querySelector('.strike-input')?.addEventListener('input', e => {
@@ -409,7 +409,7 @@ async function updateBuilderChart() {
     const color = inst.color || '#D8DDEF';
 
     let data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position);
-    let label = '';
+    let label = inst.position +' '+ inst.type;
     strikePrices.push(inst.strike)
 
     datasets.push({
