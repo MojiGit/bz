@@ -340,6 +340,7 @@ function addOption() {
   const instrumentId = `inst-${Date.now()}`;
   const instrument = {
     id: instrumentId,
+    asset: 'opt',
     type: 'call',
     position: 'long',
     strike: Math.round(currentPrice),
@@ -386,6 +387,58 @@ function addOption() {
     instrument.size = parseFloat(e.target.value);
     updateBuilderChart();
   });
+
+  updateBuilderChart();
+}
+
+// Add instrument to list
+function addPerp() {
+  //it only allows to add long-call options! 
+  const instrumentId = `inst-${Date.now()}`;
+  const instrument = {
+    id: instrumentId,
+    asset: 'perp',
+    position: 'long',
+    entry: Math.round(currentPrice),
+    size: 1,
+    leverage: 1,
+    color: '#D8DDEF',
+  };
+  customInstruments.push(instrument);
+
+  const div = document.createElement('div');
+  div.className = 'flex flex-col gap-2 p-2 border rounded bg-[#F9FAFB]';
+  div.id = instrumentId;
+  div.innerHTML = `
+    <div class="flex justify-between">
+      <button data-remove="${instrumentId}" class="text-red-500 text-sm">Remove</button>
+    </div>
+    <label>Position: <input type="label" class="position-input border px-2" value="${instrument.position}"></label>
+    <label>Entry Price: <input type="number" class="entry-input border px-2" value="${instrument.entry}"></label>
+    <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>
+    <label>leverage: <input type="number" class="leverage-input border px-2" value="${instrument.leverage}"></label>`;
+  instrumentList.appendChild(div);
+
+  // Add event to remove
+  div.querySelector(`[data-remove="${instrumentId}"]`).addEventListener('click', () => {
+    customInstruments = customInstruments.filter(inst => inst.id !== instrumentId);
+    document.getElementById(instrumentId).remove();
+    updateBuilderChart();
+  });
+
+  // Listen to input changes
+    div.querySelector('.position-input')?.addEventListener('input', e => {
+    instrument.position = e.target.value;
+    updateBuilderChart();
+  });
+    div.querySelector('.entry-input')?.addEventListener('input', e => {
+    instrument.entry = parseFloat(e.target.value);
+    updateBuilderChart();
+  });
+      div.querySelector('.size-input')?.addEventListener('input', e => {
+    instrument.size = parseFloat(e.target.value);
+    updateBuilderChart();
+  })
   div.querySelector('.leverage-input')?.addEventListener('input', e => {
     instrument.leverage = parseFloat(e.target.value);
     updateBuilderChart();
@@ -399,18 +452,31 @@ addOptionBtn.addEventListener('click', () => {
   // For now default to long call
   addOption();
 });
+addPerpBtn.addEventListener('click', () => {
+  // For now default to long call
+  addPerp();
+});
 
 // Render chart for current builder state
 async function updateBuilderChart() {
   const datasets = [];
   const strikePrices = [];
 
+
   for (const inst of customInstruments) {
     const color = inst.color || '#D8DDEF';
 
-    let data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position);
+    let data; 
+    if ( inst.asset === 'opt'){
+      data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position);
+      strikePrices.push(inst.strike)
+    }
+    if (inst.asset === 'perp'){
+      data = Strategies.calculatePerpPNL(inst.entry, inst.size, inst.leverage, inst.position);
+      strikePrices.push(inst.entry)
+    }
+    
     let label = inst.position +' '+ inst.type;
-    strikePrices.push(inst.strike)
 
     datasets.push({
       label,
@@ -422,7 +488,7 @@ async function updateBuilderChart() {
 
   const compound = Strategies.combinePNLCurves(datasets.map(d => d.data));
   datasets.push({
-    label: 'Compound',
+    label: 'PnL',
     data: compound,
     color: 'blue',
     bgColor: 'rgba(0, 0, 255, 0.1)'
