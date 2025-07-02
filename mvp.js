@@ -280,6 +280,12 @@ function generateStrategyCards(containerId) {
       selectedStrategyId = strategyId; //update global variable
 
       // Render chart
+      if(strategyId === 'custom'){
+        updateChartForToken();
+      }
+      const {datasets, strikePrices} = await Strategies.generateStrategy(selectedStrategyId);
+      renderPNLChart(datasets);
+      /*
       if (typeof info.fn === 'function') {
         try {
           const { datasets, strikePrices } = await info.fn(); // pass current token
@@ -287,7 +293,7 @@ function generateStrategyCards(containerId) {
         } catch (err) {
           console.error(`Error building strategy "${strategyId}":`, err);
         }
-      }
+      }*/
     });
 
     container.appendChild(card);
@@ -300,7 +306,6 @@ function generateStrategyCards(containerId) {
 // === BUILD MODE =================================================================================
 const strategyBuilderBoard = document.getElementById('strategy-builder-board');
 const strategyMenu = document.getElementById('menu');
-const dashboardChart = document.getElementById('pnlChart');
 const exitBuilderBtn = document.getElementById('exit-builder');
 const instrumentList = document.getElementById('instrument-list');
 const addOptionBtn = document.getElementById('add-option');
@@ -467,17 +472,18 @@ async function updateBuilderChart() {
     const color = inst.color || '#D8DDEF';
 
     let data; 
+    let label;
     if ( inst.asset === 'opt'){
       data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position);
       strikePrices.push(inst.strike)
+      label = inst.position +' '+ inst.type;
     }
     if (inst.asset === 'perp'){
       data = Strategies.calculatePerpPNL(inst.entry, inst.size, inst.leverage, inst.position);
       strikePrices.push(inst.entry)
+      label = inst.position +' '+ inst.asset;
     }
-    
-    let label = inst.position +' '+ inst.type;
-
+     
     datasets.push({
       label,
       data,

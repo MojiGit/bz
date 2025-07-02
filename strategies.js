@@ -431,6 +431,49 @@ export async function createCalendarCall(){
 */
 
 
+export async function generateStrategy(strategyId){
+  let strategy = {datasets: [], strikeprices: [], breakeven: null};
+  let combined = [];
+  let pnl;
+
+  for (const inst of strategiesIdMap[strategyId].components){
+    if (inst.asset === 'opt'){
+      pnl = calculateOptionPNL(inst.type, inst.strike * currentPrice, inst.size, inst.position);
+      strategy.strikeprices.push(inst.strike);
+    } else if (inst.asset === 'perp'){
+      pnl = calculatePerpPNL(inst.entry * currentPrice, inst.size, inst.leverage, inst.position);
+      strategy.strikeprices.push(inst.entry);
+    }
+
+    let data = {
+      label: inst.position +' '+ inst.type,
+      data: pnl,
+      color: '#D8DDEF',
+      bgColor: 'rgba(255, 107, 107, 0)',
+      borderDash: [5,5]
+    };
+
+    combined.push(pnl);
+    strategy.datasets.push(data);
+    
+  }
+
+  let combinedPnl = combinePNLCurves(combined);
+
+  let compoundPnl = {
+    label: 'PnL',
+    data: combinedPnl,
+    color: 'blue',
+    bgColor:'rgba(0, 0, 255, 0.1)'
+  };
+
+  strategy.datasets.push(compoundPnl);
+  strategy.breakeven = findBreakevenPoints(compoundPnl);
+
+  return strategy;
+
+}
+
 // Mapping from strategy ID to strategy functions
 export const strategiesIdMap = {
   'custom':{
@@ -446,7 +489,11 @@ export const strategiesIdMap = {
     maxLoss:'Uncapped',
     strategyType:'Income',
     sentiment:'bearish',
-    proficiency: 'Advance'
+    proficiency: 'Advance',
+    components: [
+      {asset: 'perp', entry: 1, size: 1, leverage: 1, position: 'short'},
+      {asset: 'opt', type: 'put', strike: 0.95, size: 1, position: 'short'}
+    ],
   },
   
   'longIronCondor':{
