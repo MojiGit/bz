@@ -310,50 +310,43 @@ let customInstruments = [];
 function enterBuildMode() {
   // Hide filters and strategies
   strategyMenu.classList.add('hidden');
-
   // Show strategy builder UI
   strategyBuilderBoard.classList.remove('hidden');
 
   if(strategyComponents){
     for (const inst of strategyComponents){
-      const instrumentId = `inst-${Date.now()}`;
-      const instrument = {
-        id: instrumentId,
-        asset: inst.asset,
-        type: inst.type,
-        position: inst.position,
-        strike: inst.strike,
-        entry: inst.entry,
-        size: inst.size,
-        leverage: inst.leverage
-      };
-      customInstruments.push(instrument);
+      if(inst.asset === 'opt'){
+        addOption(inst.type, inst.position, inst.strike, inst.size);
+      }
+      if(inst.asset === 'perp'){
+        addPerp(inst.position, inst.entry, inst.size, inst.leverage);
+      }
     }
   }
   console.log(customInstruments);
   updateBuilderChart();
 }
 
-
 // Exit build mode
 exitBuilderBtn.addEventListener('click', () => {
   strategyMenu.classList.remove('hidden');
   strategyBuilderBoard.classList.add('hidden');
   customInstruments = [];
+  instrumentList.innerHTML = '';
   updateChartForToken();
 });
 
 // Add instrument to list
-function addOption() {
+function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1) {
   //it only allows to add long-call options! 
   const instrumentId = `inst-${Date.now()}`;
   const instrument = {
     id: instrumentId,
     asset: 'opt',
-    type: 'call',
-    position: 'long',
-    strike: Math.round(currentPrice),
-    size: 1,
+    type: optType,
+    position: optPost,
+    strike: optStrike * currentPrice,
+    size: optSize,
     leverage: 1,
     color: '#D8DDEF',
   };
@@ -401,16 +394,16 @@ function addOption() {
 }
 
 // Add instrument to list
-function addPerp() {
+function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage = 1) {
   //it only allows to add long-call options! 
   const instrumentId = `inst-${Date.now()}`;
   const instrument = {
     id: instrumentId,
     asset: 'perp',
-    position: 'long',
-    entry: Math.round(currentPrice),
-    size: 1,
-    leverage: 1,
+    position: perpPositon,
+    entry: perpEntry * currentPrice,
+    size: perpSize,
+    leverage: perpLeverage,
     color: '#D8DDEF',
   };
   customInstruments.push(instrument);
@@ -478,12 +471,12 @@ async function updateBuilderChart() {
     let data; 
     let label;
     if ( inst.asset === 'opt'){
-      data = Strategies.calculateOptionPNL(inst.type, inst.strike * currentPrice, inst.size, inst.position);
+      data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position);
       strikePrices.push(inst.strike)
       label = inst.position +' '+ inst.type;
     }
     if (inst.asset === 'perp'){
-      data = Strategies.calculatePerpPNL(inst.entry * currentPrice, inst.size, inst.leverage, inst.position);
+      data = Strategies.calculatePerpPNL(inst.entry, inst.size, inst.leverage, inst.position);
       strikePrices.push(inst.entry)
       label = inst.position +' '+ inst.asset;
     }
