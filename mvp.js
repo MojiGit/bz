@@ -13,6 +13,7 @@ import * as Strategies from './strategies.js';
 
 Chart.register(window['chartjs-plugin-annotation']);
 const buttons = document.querySelectorAll('.token-btn');
+let builderMode = false;
 
 export let selectedTokenSymbol = null;
 export let currentPrice = null;
@@ -109,6 +110,12 @@ buttons.forEach((btn) => {
       await fetchCurrentPrice(tokenId); //update the current price
     }
     //if there is a strategy selected then deploy it, otherwise run a long call option
+    if (builderMode === true){
+      strategyMenu.classList.remove('hidden');
+      strategyBuilderBoard.classList.add('hidden');
+      customInstruments = [];
+      instrumentList.innerHTML = '';
+    } 
     if (selectedStrategyId) { 
       const { datasets, strikePrices } = await Strategies.generateStrategy(selectedStrategyId);
       renderPNLChart(datasets);
@@ -304,6 +311,7 @@ const instrumentList = document.getElementById('instrument-list');
 const addOptionBtn = document.getElementById('add-option');
 const addPerpBtn = document.getElementById('add-perp');
 
+
 let customInstruments = [];
 
 // Launch build mode
@@ -312,6 +320,7 @@ function enterBuildMode() {
   strategyMenu.classList.add('hidden');
   // Show strategy builder UI
   strategyBuilderBoard.classList.remove('hidden');
+  builderMode = true;
 
   if(strategyComponents){
     for (const inst of strategyComponents){
@@ -359,10 +368,12 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
     <div class="flex justify-between">
       <button data-remove="${instrumentId}" class="text-red-500 text-sm">Remove</button>
     </div>
-    <label>Type: <input type="label" class="type-input border px-2" value="${instrument.type}"></label>
-    <label>Position: <input type="label" class="position-input border px-2" value="${instrument.position}"></label>
-    <label>Strike: <input type="number" class="strike-input border px-2" value="${instrument.strike}"></label>
-    <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>`;
+    <div class = "flex flex-row gap-4"> 
+      <label><button type="button" class="type-btn border px-2 rounded bg-white hover:bg-gray-200">${instrument.type}</button></label>
+      <label><button type="button" class="position-btn border px-2 rounded bg-white hover:bg-gray-200">${instrument.position}</button></label>
+      <label>Strike: <input type="number" class="strike-input border px-2" value="${instrument.strike}"></label>
+      <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>
+    </div>`;
   instrumentList.appendChild(div);
 
   // Add event to remove
@@ -373,12 +384,16 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
   });
 
   // Listen to input changes
-  div.querySelector('.type-input')?.addEventListener('input', e => {
-    instrument.type = e.target.value;
+  const typeBtn = div.querySelector('.type-btn');
+  typeBtn?.addEventListener('click', () => {
+    instrument.type = instrument.type === 'call' ? 'put' : 'call';
+    typeBtn.textContent = instrument.type;
     updateBuilderChart();
   });
-    div.querySelector('.position-input')?.addEventListener('input', e => {
-    instrument.position = e.target.value;
+  const positionBtn = div.querySelector('.position-btn');
+  positionBtn?.addEventListener('click', () => {
+    instrument.position = instrument.position === 'long' ? 'short' : 'long';
+    positionBtn.textContent = instrument.position;
     updateBuilderChart();
   });
     div.querySelector('.strike-input')?.addEventListener('input', e => {
@@ -415,10 +430,12 @@ function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage
     <div class="flex justify-between">
       <button data-remove="${instrumentId}" class="text-red-500 text-sm">Remove</button>
     </div>
-    <label>Position: <input type="label" class="position-input border px-2" value="${instrument.position}"></label>
-    <label>Entry Price: <input type="number" class="entry-input border px-2" value="${instrument.entry}"></label>
-    <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>
-    <label>leverage: <input type="number" class="leverage-input border px-2" value="${instrument.leverage}"></label>`;
+    <div class = "flex flex-row gap-4">
+      <label><button type="button" class="position-btn border px-2 rounded bg-white hover:bg-gray-200">${instrument.position}</button></label>
+      <label>Entry Price: <input type="number" class="entry-input border px-2" value="${instrument.entry}"></label>
+      <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>
+      <label>leverage: <input type="number" class="leverage-input border px-2" value="${instrument.leverage}"></label>
+    </div>`;
   instrumentList.appendChild(div);
 
   // Add event to remove
@@ -429,8 +446,10 @@ function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage
   });
 
   // Listen to input changes
-    div.querySelector('.position-input')?.addEventListener('input', e => {
-    instrument.position = e.target.value;
+  const positionBtn = div.querySelector('.position-btn');
+  positionBtn?.addEventListener('click', () => {
+    instrument.position = instrument.position === 'long' ? 'short' : 'long';
+    positionBtn.textContent = instrument.position;
     updateBuilderChart();
   });
     div.querySelector('.entry-input')?.addEventListener('input', e => {
@@ -496,8 +515,6 @@ async function updateBuilderChart() {
     color: 'blue',
     bgColor: 'rgba(0, 0, 255, 0.1)'
   });
-
-  console.log(datasets);
 
   renderPNLChart(datasets, strikePrices);
 }
