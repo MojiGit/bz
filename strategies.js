@@ -126,8 +126,8 @@ export function generatePremium(strike, position) {
   }
 }
 
-// === Long Call ===
-export async function longCall(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
+// === default strategy ===
+export async function defaultStrategy(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
 
   const pnlData = calculateOptionPNL('call', strike, size, priceRange, 'long');
   const breakeven = findBreakevenPoints(pnlData)
@@ -137,259 +137,6 @@ export async function longCall(strike = currentPrice, size = 1, lineColor = '#D8
       {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'},
     ],
     strikePrices: [Math.round(strike)],
-    breakeven: breakeven,
-  };
-}
-// == Short Call ==
-export async function nakedCall(strike = currentPrice, size = 1, lineColor = '#D8DDEF') {
-
-  const pnlData = calculateOptionPNL('call',strike,size,priceRange,'short');
-  const breakeven = findBreakevenPoints(pnlData);
-
-  return {
-    datasets: [
-      {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'},
-    ],
-    strikePrice: [Math.round(strike)],
-    breakeven: breakeven,
-  };
-}
-
-// == Long Put ==
-export async function longPut(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
-
-  const pnlData = calculateOptionPNL('put', strike, size, priceRange, 'long');
-  const breakeven = findBreakevenPoints(pnlData)
-
-  return {
-    datasets: [
-      {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'}
-    ],
-    strikePrice: [Math.round(strike)],
-    breakeven: breakeven,
-  };
-}
-
-// == Short Put ==
-export async function nakedPut(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
-
-  const pnlData = calculateOptionPNL('put', strike, size, priceRange, 'short');
-  const breakeven = findBreakevenPoints(pnlData)
-
-  return {
-    datasets: [
-      {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'}
-    ],
-    strikePrice: [Math.round(strike)],
-    breakeven: breakeven,
-  };
-}
-
-// == long perp ==
-export async function longPerp(entryPrice = currentPrice, size = 1, leverage = 1,lineColor = '#D8DDEF'){
-  
-  const pnlData = calculatePerpPNL(entryPrice,size,leverage,priceRange,);
-  const breakeven = findBreakevenPoints(pnlData);
-  return {
-    datasets: [
-      {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'}
-    ],
-    strikePrice: ['N/A'],
-    breakeven: breakeven,
-  };
-}
-
-// == Short perp ==
-export async function shortPerp(entryPrice = currentPrice, size = 1, leverage = 1,lineColor = '#D8DDEF'){
-  
-  const pnlData = calculatePerpPNL(entryPrice,size,leverage,priceRange,'short');
-  const breakeven = findBreakevenPoints(pnlData);
-  return {
-    datasets: [
-      {data: pnlData, color: lineColor, bgColor: 'rgba(183, 184, 183, 0.16)'}
-    ],
-    strikePrice: ['N/A'],
-    breakeven: breakeven,
-  };
-}
-
-// == covered call
-export async function coveredCall() {
-
-  const entryPrice = currentPrice;
-  const strike = currentPrice * 1.1;
-
-  const perpPnl = calculatePerpPNL(entryPrice, 1, 1, 'long');
-  const callPnl = calculateOptionPNL('call', strike, 1, 'short');
-
-  const combinedPNL = combinePNLCurves([perpPnl, callPnl]);
-  const breakeven = findBreakevenPoints(combinedPNL);
-
-  return {
-    datasets: [
-      { label: `Long Call`, data: callPnl, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Long Perp`, data: perpPnl, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0)', borderDash: [5, 5] },
-      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)' },
-    ],
-    strikePrices: [Math.round(strike), Math.round(entryPrice)],
-    breakeven: breakeven,
-  };
-}
-
-// === Predefined Strategy: Long Strangle (Neutral Volatility Bet) ===
-// Buy OTM Put + Buy OTM Call
-export async function createStrangle() {
-
-  const longPutStrike = currentPrice * 0.98;
-  const longCallStrike = currentPrice * 1.02;
-  const quantity = 1;
-  
-
-  const putPNL = calculateOptionPNL('put', longPutStrike, quantity);
-  const callPNL = calculateOptionPNL('call', longCallStrike, quantity);
-  const combinedPNL = combinePNLCurves([putPNL, callPNL]);
-
-  const breakeven = findBreakevenPoints(combinedPNL);
-
-  return {
-    datasets: [
-      { label: `Long Put`, data: putPNL, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Long Call`, data: callPNL, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0)', borderDash: [5, 5] },
-      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)' },
-    ],
-    strikePrices: [Math.round(longPutStrike), Math.round(longCallStrike)],
-    breakeven: breakeven,
-  };
-}
-
-// === Predefined Strategy: Bull Put Spread (bullish capital gain) ===
-// Buy OTM Put + sell OTM Put
-export async function createBullPutSpread() {
-
-  const longPutStrike = currentPrice * 0.90; // Long Put Strike
-  const shortPutStrike = currentPrice * 1; // Short Put Strike
-  const quantity = 1;
-
-  const Shortput = calculateOptionPNL('put', shortPutStrike, quantity, 'short');
-  const Longput = calculateOptionPNL('put', longPutStrike, quantity);
-  const combinedPNL = combinePNLCurves([Shortput, Longput]);
-
-  const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bull Put Spread
-
-  return {
-    datasets: [
-      { label: `Short Put`, data: Shortput, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Long Put`, data: Longput, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)' },
-    ],
-    strikePrices: [Math.round(longPutStrike), Math.round(shortPutStrike)],
-    breakeven: breakeven,
-  };
-  
-}
-
-// === Predefined Strategy: Bear Call Spread (bearish capital gain) ===
-// Buy OTM Call + sell OTM Call
-export async function createBearCallSpread() {
-
-  const longCallStrike = currentPrice * 1.1;
-  const shortCallStrike = currentPrice * 1.02;
-  const quantity = 1;
-
-  const ShortCall = calculateOptionPNL('call', shortCallStrike, quantity, 'short');
-  const LongCall = calculateOptionPNL('call', longCallStrike, quantity);
-  const combinedPNL = combinePNLCurves([ShortCall, LongCall]);
-
-  const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bear Call Spread
-
-  return {
-    datasets: [
-      { label: `Short Call`, data: ShortCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Long Call`, data: LongCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)'},
-    ],
-    strikePrices: [Math.round(longCallStrike), Math.round(shortCallStrike)],
-    breakeven: breakeven,
-  };
-}
-
-export async function createLongIronButterfly(){
-
-  const longCallStrike = currentPrice * 1.1;
-  const shortCallStrike = currentPrice * 1;
-  const quantity = 1;
-  const longPutStrike = currentPrice * 0.9; // Long Put Strike
-  const shortPutStrike = currentPrice * 1; // Short Put Strike
-
-  const ShortPut = calculateOptionPNL('put', shortPutStrike, quantity, 'short');
-  const LongPut = calculateOptionPNL('put', longPutStrike, quantity);
-  const ShortCall = calculateOptionPNL('call', shortCallStrike, quantity, 'short');
-  const LongCall = calculateOptionPNL('call', longCallStrike, quantity);
-  const combinedPNL = combinePNLCurves([ShortCall, LongCall, LongPut, ShortPut]);
-
-  const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bear Call Spread
-
-  return {
-    datasets: [
-      { label: `Short Call`, data: ShortCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Long Call`, data: LongCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Long Put`, data: LongPut, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Short Put`, data: ShortPut, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)'},
-    ],
-    strikePrices: [Math.round(longCallStrike), Math.round(shortCallStrike), Math.round(longPutStrike), Math.round(shortPutStrike)],
-    breakeven: breakeven,
-  };
-}
-
-export async function createLongIronCondor() {
-
-  const longCallStrike = currentPrice * 1.1;
-  const shortCallStrike = currentPrice * 1.05;
-  const quantity = 1;
-  const longPutStrike = currentPrice * 0.9; // Long Put Strike
-  const shortPutStrike = currentPrice * 0.95; // Short Put Strike
-
-  const ShortPut = calculateOptionPNL('put', shortPutStrike, quantity, 'short');
-  const LongPut = calculateOptionPNL('put', longPutStrike, quantity);
-  const ShortCall = calculateOptionPNL('call', shortCallStrike, quantity, 'short');
-  const LongCall = calculateOptionPNL('call', longCallStrike, quantity);
-  const combinedPNL = combinePNLCurves([ShortCall, LongCall, LongPut, ShortPut]);
-
-  const breakeven = findBreakevenPoints(combinedPNL); // Breakeven for the Bear Call Spread
-
-  return {
-    datasets: [
-      { label: `Short Call`, data: ShortCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Long Call`, data: LongCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Long Put`, data: LongPut, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Short Put`, data: ShortPut, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)'},
-    ],
-    strikePrices: [Math.round(longCallStrike), Math.round(shortCallStrike), Math.round(longPutStrike), Math.round(shortPutStrike)],
-    breakeven: breakeven,
-  };
-}
-
-// == covered Put
-export async function createCoveredPut() {
-
-  const entryPrice = currentPrice;
-  const strike = currentPrice * 0.95;
-
-  const perpPnl = calculatePerpPNL(entryPrice, 1, 1, 'short');
-  const callPnl = calculateOptionPNL('put', strike, 1, 'short');
-
-  const combinedPNL = combinePNLCurves([perpPnl, callPnl]);
-  const breakeven = findBreakevenPoints(combinedPNL);
-
-  return {
-    datasets: [
-      { label: `Short Put`, data: callPnl, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5] },
-      { label: `Short Perp`, data: perpPnl, color: '#D8DDEF', bgColor: 'rgba(183, 184, 183, 0)', borderDash: [5, 5] },
-      { label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)' },
-    ],
-    strikePrices: [Math.round(strike), Math.round(entryPrice)],
     breakeven: breakeven,
   };
 }
@@ -482,7 +229,6 @@ export const strategiesIdMap = {
   },
 
   'coveredPut':{
-    fn: createCoveredPut,
     name: 'Covered Put',
     description:'The Covered Put is the opposite process to a Covered Call, and it achieves the oppo￾site risk profile. Whereas the Covered Call is bullish, the Covered Put is a bearish income strategy, where you receive a substantial net credit for shorting both the put and the stock simultaneously to create the spread. ',
     maxProfit:'Capped',
@@ -497,65 +243,91 @@ export const strategiesIdMap = {
   },
   
   'longIronCondor':{
-    fn: createLongIronCondor,
     name: 'Long Iron Condor',
     description: 'A variation of the Long Iron Butterfly, it is in fact the combi￾nation of a Bull Put Spread and a Bear Call Spread. The higher strike put is lower than the lower strike call in order to create the condor shape. The combination of two income strategies also makes this an income strategy',
     maxProfit:'Capped',
     maxLoss:'Capped',
     strategyType:'Income',
     sentiment:'neutral',
-    proficiency: 'Intermediate'
+    proficiency: 'Intermediate',
+    components: [
+      {asset: 'opt', type: 'put', strike: 0.95, size: 1, position: 'short'},
+      {asset: 'opt', type: 'put', strike: 0.9, size: 1},
+      {asset: 'opt', type: 'call', strike: 1.05, size: 1, position: 'short'},
+      {asset: 'opt', type: 'call', strike: 1.1, size: 1}
+    ],
   },
+
   'longIronButterfly':{
-    fn: createLongIronButterfly,
     name: 'Long Iron Butterfly',
     description: 'It is, in fact, the combination of a Bull Put Spread and a Bear Call Spread. The higher strike put shares the same strike as the lower strike call to create the butterfly shape. The combination of two income strategies also makes this an income strategy',
     maxProfit:'Capped',
     maxLoss:'Capped',
     strategyType:'Income',
     sentiment:'neutral',
-    proficiency:'Intermediate'
+    proficiency:'Intermediate',
+    components: [
+      {asset: 'opt', type: 'put', strike: 1, size: 1, position: 'short'},
+      {asset: 'opt', type: 'put', strike: 0.85, size: 1},
+      {asset: 'opt', type: 'call', strike: 1, size: 1, position: 'short'},
+      {asset: 'opt', type: 'call', strike: 1.15, size: 1}
+    ],
   },
+
   'strangle': {
-    fn: createStrangle,
     name: 'Strangle',
     description:'We simply buy lower strike puts and higher strike calls with the same expiration date so that we can profit from the stock soaring up or plummeting down.',
     maxProfit: 'Unlimited',
     maxLoss: 'Limited',
     strategyType: 'Capital Gain',
     sentiment: 'neutral',
-    proficiency: 'Intermediate'
+    proficiency: 'Intermediate',
+    components: [
+      {asset: 'opt', type: 'put', strike: 0.95, size: 1},
+      {asset: 'opt', type: 'call', strike: 1.05, size: 1}
+    ],
   },
+
   'bull-put-spread': {
-    fn: createBullPutSpread,
     name: 'Bull Put Spread',
     description:'Protect the downside of a Naked Put by buying a lower strike put to insure the one you sold. Both put strikes should be lower than the current market price so as to ensure a profit even if the stock doesn’t move at all.',
     maxProfit: 'Limited',
     maxLoss: 'Limited',
     strategyType: 'Income',
     sentiment: 'bullish',
-    proficiency: 'Intermediate'
+    proficiency: 'Intermediate',
+    components: [
+      {asset: 'opt', type: 'put', strike: 1, size: 1, position: 'short'},
+      {asset: 'opt', type: 'put', strike: 0.9, size: 1}
+    ],
   },
+
   'bear-call-spread': {
-    fn: createBearCallSpread,
     name: 'Bear Call Spread',
     description:'The concept is to protect the downside of a Naked Call by buying a higher strike call to insure the one you sold. Both call strikes should be higher than the current stock price so as to ensure a profit even if the stock doesn’t move at all. ',
     maxProfit: 'Limited',
     maxLoss: 'Limited',
     strategyType: 'Income',
     sentiment: 'bearish',
-    proficiency: 'Intermediate'
+    proficiency: 'Intermediate',
+    components: [
+      {asset: 'opt', type: 'call', strike: 1, size: 1, position: 'short'},
+      {asset: 'opt', type: 'call', strike: 1.1, size: 1}
+    ],
   },
 
   'covered-call': {
-    fn: coveredCall,
     name: 'Covered Call',
-    description: 'The concept is that in owning the stock, you then sell an Out of the Money call option on a monthly basis as a means of collecting rent (or a dividend) while you own the stock. If the stock rises above the call strike, you’ll be exercised, and the stock will be sold . . . but you make a profit anyway. (You’re covered because you own the stock in the first place.) If the stock remains static, then you’re better off because you col￾lected the call premium. If the stock falls, you have the cushion of the call premium you collected.',
+    description: 'The concept is that in owning the stock, you then sell an Out of the Money call option on a monthly basis as a means of collecting rent (or a dividend) while you own the stock. If the stock rises above the call strike, you’ll be exercised, and the stock will be sold . . . but you make a profit anyway. (You’re covered because you own the stock in the first place.) If the stock remains static, then you’re better off because you collected the call premium. If the stock falls, you have the cushion of the call premium you collected.',
     maxProfit: 'Limited',
     maxLoss: 'Unlimted',
     strategyType: 'Income',
     sentiment: 'bullish',
-    proficiency: 'Novice'
+    proficiency: 'Novice',
+    components: [
+      {asset: 'perp', entry: 1, size: 1, leverage: 1, position: 'long'},
+      {asset: 'opt', type: 'call', strike: 1.1, size: 1, position: 'short'}
+    ],
   },
   
   // Add more strategies

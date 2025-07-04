@@ -128,7 +128,7 @@ async function updateChartForToken() {
   if (!currentPrice) return;
 
   // deploying a long call option ATM as default
-  const { datasets } = await Strategies.longCall();
+  const { datasets } = await Strategies.defaultStrategy();
   return renderPNLChart(datasets);// i removed the strikePrices for now !!
 }
 
@@ -236,7 +236,7 @@ function generateStrategyCards(containerId) {
           </div>
           <div class="strategy-type-display flex flex-col">
             <h2 class="font-bold text-[14px]">Strategy Type</h2>
-            <p class="text-[14px]">${info.type}</p>
+            <p class="text-[14px]">${info.strategyType}</p>
           </div>
           <div class="max-profit-display flex flex-col">
             <h2 class="font-bold text-[14px]">Max Profit</h2>
