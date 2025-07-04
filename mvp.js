@@ -91,6 +91,7 @@ async function fetchCurrentPrice(tokenId) {
 
 //variable to store the current strategy dployed
 let selectedStrategyId;
+let strategyComponents;
 
 // token's buttons (ETH, WBTC, etc.), Dynamically update chart scale 
 buttons.forEach((btn) => {
@@ -278,6 +279,7 @@ function generateStrategyCards(containerId) {
       content.classList.add('opacity-100', 'max-h-96');
 
       selectedStrategyId = strategyId; //update global variable
+      strategyComponents = Strategies.strategiesIdMap[selectedStrategyId].components;
 
       // Render chart
       if(strategyId === 'custom'){
@@ -285,15 +287,6 @@ function generateStrategyCards(containerId) {
       }
       const {datasets, strikePrices} = await Strategies.generateStrategy(selectedStrategyId);
       renderPNLChart(datasets);
-      /*
-      if (typeof info.fn === 'function') {
-        try {
-          const { datasets, strikePrices } = await info.fn(); // pass current token
-          renderPNLChart(datasets);// i removed the strikePrices for now
-        } catch (err) {
-          console.error(`Error building strategy "${strategyId}":`, err);
-        }
-      }*/
     });
 
     container.appendChild(card);
@@ -314,29 +307,40 @@ const addPerpBtn = document.getElementById('add-perp');
 let customInstruments = [];
 
 // Launch build mode
-function enterBuildMode(initialInstrument = null) {
+function enterBuildMode() {
   // Hide filters and strategies
   strategyMenu.classList.add('hidden');
 
   // Show strategy builder UI
   strategyBuilderBoard.classList.remove('hidden');
 
-  //Here should be te predefined instruments of the strategy selected
-  customInstruments = [];
-  instrumentList.innerHTML = '';
-
-  if (initialInstrument) {
-    addInstrument(initialInstrument);
+  if(strategyComponents){
+    for (const inst of strategyComponents){
+      const instrumentId = `inst-${Date.now()}`;
+      const instrument = {
+        id: instrumentId,
+        asset: inst.asset,
+        type: inst.type,
+        position: inst.position,
+        strike: inst.strike,
+        entry: inst.entry,
+        size: inst.size,
+        leverage: inst.leverage
+      };
+      customInstruments.push(instrument);
+    }
   }
-
+  console.log(customInstruments);
   updateBuilderChart();
 }
+
 
 // Exit build mode
 exitBuilderBtn.addEventListener('click', () => {
   strategyMenu.classList.remove('hidden');
   strategyBuilderBoard.classList.add('hidden');
   customInstruments = [];
+  updateChartForToken();
 });
 
 // Add instrument to list
@@ -474,12 +478,12 @@ async function updateBuilderChart() {
     let data; 
     let label;
     if ( inst.asset === 'opt'){
-      data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position);
+      data = Strategies.calculateOptionPNL(inst.type, inst.strike * currentPrice, inst.size, inst.position);
       strikePrices.push(inst.strike)
       label = inst.position +' '+ inst.type;
     }
     if (inst.asset === 'perp'){
-      data = Strategies.calculatePerpPNL(inst.entry, inst.size, inst.leverage, inst.position);
+      data = Strategies.calculatePerpPNL(inst.entry * currentPrice, inst.size, inst.leverage, inst.position);
       strikePrices.push(inst.entry)
       label = inst.position +' '+ inst.asset;
     }
@@ -499,6 +503,8 @@ async function updateBuilderChart() {
     color: 'blue',
     bgColor: 'rgba(0, 0, 255, 0.1)'
   });
+
+  console.log(datasets);
 
   renderPNLChart(datasets, strikePrices);
 }
