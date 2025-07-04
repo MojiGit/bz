@@ -109,10 +109,10 @@ buttons.forEach((btn) => {
     }
     //if there is a strategy selected then deploy it, otherwise run a long call option
     if (selectedStrategyId) { 
-      const { datasets, strikePrices } = await Strategies.strategiesIdMap[selectedStrategyId].fn();
+      const { datasets, strikePrices } = await Strategies.generateStrategy(selectedStrategyId);
       renderPNLChart(datasets);
     } else {
-      const { datasets, strikePrices } = await Strategies.longCall();
+      const { datasets, strikePrices } = await Strategies.defaultStrategy();
       renderPNLChart(datasets);
     }   
    

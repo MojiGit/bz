@@ -141,43 +141,6 @@ export async function defaultStrategy(strike = currentPrice, size = 1, lineColor
   };
 }
 
-/* This strategy involved different times, which is not included so far
-export async function createCalendarCall(){
-  const priceRange = generateDynamicPriceRange();
-
-  const strike = currentPrice * 1.05;
-  const premium = generatePremium(strike,'call')
-  const quantity = 1;
-
-  const longCall = calculateOptionPNL('call', strike, premium, quantity, priceRange, 'long' );
-  const shortCall = calculateOptionPNL('call', strike, premium, quantity, priceRange, 'short' );
-  const combinedPNL = combinePNLCurves([longCall, shortCall]);
-
-  const breakeven = findBreakevenPoints(combinedPNL);
-
-  return {
-    datasets: [
-      {label: 'Long Call', data: longCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5]},
-      {label: 'Short Call', data: shortCall, color: '#D8DDEF', bgColor: 'rgba(255, 107, 107, 0)', borderDash: [5, 5]},
-      {label: `Compound`, data: combinedPNL, color: 'blue', bgColor: 'rgba(0, 0, 255, 0.1)'},
-    ],
-    strikePrices: [Math.round(strike)],
-    breakeven: breakeven,
-  };
-}
-'calendarCall':{
-    fn: createCalendarCall,
-    name: 'Calendar Call',
-    description: 'Calendar spreads are known as horizontal spreads, and the Calendar Call is a variation of a Covered Call, where you substitute the long stock with a long-term long call option instead. This has the effect of radically reducing the investment, thereby increasing the initial yield. ',
-    maxProfit:'Capped',
-    maxLoss: 'capped',
-    strategyType: 'Income',
-    sentiment: 'Neutral',
-    proficiency: 'Intermediate'
-  },  
-*/
-
-
 export async function generateStrategy(strategyId){
   let strategy = {datasets: [], strikeprices: [], breakeven: null};
   let combined = [];
