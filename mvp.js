@@ -328,6 +328,8 @@ async function connectWallet() {
     alert("Please install and use MetaMask only. Other wallets like Rabby are not supported in this version.");
   }
 
+  document.getElementById('wallet-address').textContent = `Connected: ${userAddress}`;
+  document.getElementById('my-strategies-btn')?.classList.remove('hidden');
   showSavedStrategiesList();
 
 }
@@ -378,6 +380,66 @@ function showSavedStrategiesList() {
   console.log("Saved strategies:", list);
   // You can now render them in a dropdown or section
 }
+
+function renderSavedStrategies() {
+  const listEl = document.getElementById('saved-strategy-list');
+  listEl.innerHTML = '';
+
+  const strategies = loadSavedStrategies();
+
+  if (Object.keys(strategies).length === 0) {
+    listEl.innerHTML = `<li class="text-gray-400">No saved strategies</li>`;
+    return;
+  }
+
+  Object.entries(strategies).forEach(([name, { instruments }]) => {
+    const li = document.createElement('li');
+    li.className = 'flex justify-between items-center border-b pb-1';
+
+    li.innerHTML = `
+      <span>${name}</span>
+      <div class="flex gap-2">
+        <button data-load="${name}" class="text-blue-600 hover:underline">Load</button>
+        <button data-delete="${name}" class="text-red-500 hover:underline">Delete</button>
+      </div>
+    `;
+
+    listEl.appendChild(li);
+
+    // Load strategy
+    li.querySelector(`[data-load="${name}"]`).addEventListener('click', () => {
+      loadStrategyIntoBuilder(name, instruments);
+    });
+
+    // Delete strategy
+    li.querySelector(`[data-delete="${name}"]`).addEventListener('click', () => {
+      if (confirm(`Delete strategy "${name}"?`)) {
+        deleteStrategy(name);
+        renderSavedStrategies();
+      }
+    });
+  });
+}
+
+function deleteStrategy(name) {
+  const key = getStorageKey(userAddress);
+  const stored = loadSavedStrategies();
+  delete stored[name];
+  localStorage.setItem(key, JSON.stringify(stored));
+}
+
+function loadStrategyIntoBuilder(name, instruments) {
+  builder.enterBuildMode();
+  builder.rebuildBuilderUI(instruments);
+}
+
+
+
+document.getElementById('my-strategies-btn').addEventListener('click', () => {
+  const panel = document.getElementById('saved-strategies-panel');
+  panel.classList.toggle('hidden');
+  renderSavedStrategies();
+});
 
 
 

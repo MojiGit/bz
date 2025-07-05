@@ -182,3 +182,27 @@ addPerpBtn.addEventListener('click', () => {
   // For now default to long call
   addPerp();
 });
+
+export function rebuildBuilderUI(instruments = []) {
+  instrumentList.innerHTML = '';
+  customInstruments.length = 0;
+
+  for (const inst of instruments) {
+    const id = `inst-${Date.now()}`;
+    const newInst = { ...inst, id };
+    customInstruments.push(newInst);
+
+    if (inst.asset === 'opt') {
+      addOption(newInst.type, newInst.position, 1, newInst.size);
+      const added = instrumentList.lastChild;
+      added.querySelector('.strike-input').value = newInst.strike;
+    } else if (inst.asset === 'perp') {
+      addPerp(newInst.position, 1, newInst.size, newInst.leverage);
+      const added = instrumentList.lastChild;
+      added.querySelector('.entry-input').value = newInst.entry;
+    }
+  }
+
+  charts.updateBuilderChart();
+}
+

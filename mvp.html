@@ -52,7 +52,10 @@
 
             <!-- Desktop Links -->
             <ul class="space-x-6 text-black text-[18px] hidden md:flex items-center">
-                <li><a href="#" class="hover:text-[#00E083] transition font-bold">My strategies</a></li>
+                <li>
+                    <button id="my-strategies-btn" class="mt-2 px-4 py-2 bg-[#D8DDEF] rounded text-black hover:bg-[#52FFB8] hidden">
+                    My Strategies
+                    </button>
                 <li>
                     <button id="connect-wallet" class="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
                     Connect Wallet
@@ -127,6 +130,12 @@
         <div class="w-full max-w-4xl mx-auto p-2">
             <canvas id="pnlChart" class="w-full min-h-[400px]"></canvas>           
         </div>
+
+        <div id="saved-strategies-panel" class="hidden mt-4 p-4 border border-[#D8DDEF] rounded-xl shadow-md bg-white">
+            <h3 class="text-[16px] font-bold mb-2">Saved Strategies</h3>
+            <ul id="saved-strategy-list" class="flex flex-col gap-2 text-sm text-gray-800"></ul>
+        </div>
+
         
         <!--menu options-->
         <div id="menu" class="max-w-xl"> 
