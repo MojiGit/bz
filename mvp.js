@@ -10,10 +10,11 @@ It includes the following functionalities:
 */
 
 import * as Strategies from './strategies.js';
+import * as charts from './charts.js';
+import * as builder from './builder.js';
 
 Chart.register(window['chartjs-plugin-annotation']);
 const buttons = document.querySelectorAll('.token-btn');
-let builderMode = false;
 
 export let selectedTokenSymbol = null;
 export let currentPrice = null;
@@ -92,7 +93,7 @@ async function fetchCurrentPrice(tokenId) {
 
 //variable to store the current strategy dployed
 let selectedStrategyId;
-let strategyComponents;
+export let strategyComponents;
 
 // token's buttons (ETH, WBTC, etc.), Dynamically update chart scale 
 buttons.forEach((btn) => {
@@ -110,18 +111,16 @@ buttons.forEach((btn) => {
       await fetchCurrentPrice(tokenId); //update the current price
     }
     //if there is a strategy selected then deploy it, otherwise run a long call option
-    if (builderMode === true){
-      strategyMenu.classList.remove('hidden');
-      strategyBuilderBoard.classList.add('hidden');
-      customInstruments = [];
-      instrumentList.innerHTML = '';
+    if (builder.builderMode === true){
+      builder.exitBuilder()
     } 
+
     if (selectedStrategyId) { 
       const { datasets, strikePrices } = await Strategies.generateStrategy(selectedStrategyId);
-      renderPNLChart(datasets);
+      charts.renderPNLChart(datasets);
     } else {
       const { datasets, strikePrices } = await Strategies.defaultStrategy();
-      renderPNLChart(datasets);
+      charts.renderPNLChart(datasets);
     }   
    
   });
@@ -129,15 +128,20 @@ buttons.forEach((btn) => {
 
 
 // Generate default chart - long call option ATM
-async function updateChartForToken() {
+export async function updateChartForToken() {
   const tokenId = tokenIdMap[selectedTokenSymbol];
   if (!tokenId) return;
   const currentPrice = await fetchCurrentPrice(tokenId);
   if (!currentPrice) return;
 
-  // deploying a long call option ATM as default
-  const { datasets } = await Strategies.defaultStrategy();
-  return renderPNLChart(datasets);// i removed the strikePrices for now !!
+  if (selectedStrategyId) { 
+    const { datasets, strikePrices } = await Strategies.generateStrategy(selectedStrategyId);
+    charts.renderPNLChart(datasets);
+  } else {
+    const { datasets, strikePrices } = await Strategies.defaultStrategy();
+    charts.renderPNLChart(datasets);
+  }   
+
 }
 
 // Select WBTC by default on page load and render its chart
@@ -265,7 +269,7 @@ function generateStrategyCards(containerId) {
     const buildBtn = card.querySelector('button');
     buildBtn.addEventListener('click', (e) => {
       e.stopPropagation(); // Prevent collapsing behavior
-      enterBuildMode(); // You can pass initial instrument if needed
+      builder.enterBuildMode(); // You can pass initial instrument if needed
     });
 
     // Chart trigger on card click
@@ -293,7 +297,7 @@ function generateStrategyCards(containerId) {
         updateChartForToken();
       }
       const {datasets, strikePrices} = await Strategies.generateStrategy(selectedStrategyId);
-      renderPNLChart(datasets);
+      charts.renderPNLChart(datasets);
     });
 
     container.appendChild(card);
@@ -303,365 +307,9 @@ function generateStrategyCards(containerId) {
 
 };
 
-// === BUILD MODE =================================================================================
-const strategyBuilderBoard = document.getElementById('strategy-builder-board');
-const strategyMenu = document.getElementById('menu');
-const exitBuilderBtn = document.getElementById('exit-builder');
-const instrumentList = document.getElementById('instrument-list');
-const addOptionBtn = document.getElementById('add-option');
-const addPerpBtn = document.getElementById('add-perp');
 
 
-let customInstruments = [];
-
-// Launch build mode
-function enterBuildMode() {
-  // Hide filters and strategies
-  strategyMenu.classList.add('hidden');
-  // Show strategy builder UI
-  strategyBuilderBoard.classList.remove('hidden');
-  builderMode = true;
-
-  if(strategyComponents){
-    for (const inst of strategyComponents){
-      if(inst.asset === 'opt'){
-        addOption(inst.type, inst.position, inst.strike, inst.size);
-      }
-      if(inst.asset === 'perp'){
-        addPerp(inst.position, inst.entry, inst.size, inst.leverage);
-      }
-    }
-  }
-  console.log(customInstruments);
-  updateBuilderChart();
-}
-
-// Exit build mode
-exitBuilderBtn.addEventListener('click', () => {
-  strategyMenu.classList.remove('hidden');
-  strategyBuilderBoard.classList.add('hidden');
-  customInstruments = [];
-  instrumentList.innerHTML = '';
-  updateChartForToken();
-});
-
-// Add instrument to list
-function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1) {
-  //it only allows to add long-call options! 
-  const instrumentId = `inst-${Date.now()}`;
-  const instrument = {
-    id: instrumentId,
-    asset: 'opt',
-    type: optType,
-    position: optPost,
-    strike: optStrike * currentPrice,
-    size: optSize,
-    leverage: 1,
-    color: '#D8DDEF',
-  };
-  customInstruments.push(instrument);
-
-  const div = document.createElement('div');
-  div.className = 'flex flex-col gap-2 p-2 border rounded bg-[#F9FAFB]';
-  div.id = instrumentId;
-  div.innerHTML = `
-    <div class="flex justify-between">
-      <button data-remove="${instrumentId}" class="text-red-500 text-sm">Remove</button>
-    </div>
-    <div class = "flex flex-row gap-4"> 
-      <label><button type="button" class="type-btn border px-2 rounded bg-white hover:bg-gray-200">${instrument.type}</button></label>
-      <label><button type="button" class="position-btn border px-2 rounded bg-white hover:bg-gray-200">${instrument.position}</button></label>
-      <label>Strike: <input type="number" class="strike-input border px-2" value="${instrument.strike}"></label>
-      <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>
-    </div>`;
-  instrumentList.appendChild(div);
-
-  // Add event to remove
-  div.querySelector(`[data-remove="${instrumentId}"]`).addEventListener('click', () => {
-    customInstruments = customInstruments.filter(inst => inst.id !== instrumentId);
-    document.getElementById(instrumentId).remove();
-    updateBuilderChart();
-  });
-
-  // Listen to input changes
-  const typeBtn = div.querySelector('.type-btn');
-  typeBtn?.addEventListener('click', () => {
-    instrument.type = instrument.type === 'call' ? 'put' : 'call';
-    typeBtn.textContent = instrument.type;
-    updateBuilderChart();
-  });
-  const positionBtn = div.querySelector('.position-btn');
-  positionBtn?.addEventListener('click', () => {
-    instrument.position = instrument.position === 'long' ? 'short' : 'long';
-    positionBtn.textContent = instrument.position;
-    updateBuilderChart();
-  });
-    div.querySelector('.strike-input')?.addEventListener('input', e => {
-    instrument.strike = parseFloat(e.target.value);
-    updateBuilderChart();
-  });
-  div.querySelector('.size-input')?.addEventListener('input', e => {
-    instrument.size = parseFloat(e.target.value);
-    updateBuilderChart();
-  });
-
-  updateBuilderChart();
-}
-
-// Add instrument to list
-function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage = 1) {
-  //it only allows to add long-call options! 
-  const instrumentId = `inst-${Date.now()}`;
-  const instrument = {
-    id: instrumentId,
-    asset: 'perp',
-    position: perpPositon,
-    entry: perpEntry * currentPrice,
-    size: perpSize,
-    leverage: perpLeverage,
-    color: '#D8DDEF',
-  };
-  customInstruments.push(instrument);
-
-  const div = document.createElement('div');
-  div.className = 'flex flex-col gap-2 p-2 border rounded bg-[#F9FAFB]';
-  div.id = instrumentId;
-  div.innerHTML = `
-    <div class="flex justify-between">
-      <button data-remove="${instrumentId}" class="text-red-500 text-sm">Remove</button>
-    </div>
-    <div class = "flex flex-row gap-4">
-      <label><button type="button" class="position-btn border px-2 rounded bg-white hover:bg-gray-200">${instrument.position}</button></label>
-      <label>Entry Price: <input type="number" class="entry-input border px-2" value="${instrument.entry}"></label>
-      <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>
-      <label>leverage: <input type="number" class="leverage-input border px-2" value="${instrument.leverage}"></label>
-    </div>`;
-  instrumentList.appendChild(div);
-
-  // Add event to remove
-  div.querySelector(`[data-remove="${instrumentId}"]`).addEventListener('click', () => {
-    customInstruments = customInstruments.filter(inst => inst.id !== instrumentId);
-    document.getElementById(instrumentId).remove();
-    updateBuilderChart();
-  });
-
-  // Listen to input changes
-  const positionBtn = div.querySelector('.position-btn');
-  positionBtn?.addEventListener('click', () => {
-    instrument.position = instrument.position === 'long' ? 'short' : 'long';
-    positionBtn.textContent = instrument.position;
-    updateBuilderChart();
-  });
-    div.querySelector('.entry-input')?.addEventListener('input', e => {
-    instrument.entry = parseFloat(e.target.value);
-    updateBuilderChart();
-  });
-      div.querySelector('.size-input')?.addEventListener('input', e => {
-    instrument.size = parseFloat(e.target.value);
-    updateBuilderChart();
-  })
-  div.querySelector('.leverage-input')?.addEventListener('input', e => {
-    instrument.leverage = parseFloat(e.target.value);
-    updateBuilderChart();
-  });
-
-  updateBuilderChart();
-}
-
-// Add new instrument
-addOptionBtn.addEventListener('click', () => {
-  // For now default to long call
-  addOption();
-});
-addPerpBtn.addEventListener('click', () => {
-  // For now default to long call
-  addPerp();
-});
-
-// Render chart for current builder state
-async function updateBuilderChart() {
-  const datasets = [];
-  const strikePrices = [];
 
 
-  for (const inst of customInstruments) {
-    const color = inst.color || '#D8DDEF';
 
-    let data; 
-    let label;
-    if ( inst.asset === 'opt'){
-      data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position);
-      strikePrices.push(inst.strike)
-      label = inst.position +' '+ inst.type;
-    }
-    if (inst.asset === 'perp'){
-      data = Strategies.calculatePerpPNL(inst.entry, inst.size, inst.leverage, inst.position);
-      strikePrices.push(inst.entry)
-      label = inst.position +' '+ inst.asset;
-    }
-     
-    datasets.push({
-      label,
-      data,
-      color,
-      bgColor: 'rgba(183, 184, 183, 0.16)'
-    });
-  }
-
-  const compound = Strategies.combinePNLCurves(datasets.map(d => d.data));
-  datasets.push({
-    label: 'PnL',
-    data: compound,
-    color: 'blue',
-    bgColor: 'rgba(0, 0, 255, 0.1)'
-  });
-
-  renderPNLChart(datasets, strikePrices);
-}
-
-
-// ==================================================================================== //
-
-// Chart.js instance for rendering the PNL chart
-let chartInstance = null;
-
-function renderPNLChart(datasets, strikePrices = []) {
-  if (!Array.isArray(datasets) || datasets.length === 0) {
-    console.warn("Empty or invalid datasets.");
-    return;
-  }
-
-  const ctx = document.getElementById('pnlChart')?.getContext('2d');
-  if (!ctx) {
-    console.error("Chart canvas not found.");
-    return;
-  }
-
-  // create datasets for Chart.js
-  const allDatasets = datasets.map(ds => ({
-    label: ds.label || '',
-    data: ds.data?.map(point => ({ x: point.price, y: point.pnl })) || [],
-    borderColor: ds.color || 'blue',
-    backgroundColor: ds.bgColor || 'rgba(0, 0, 255, 0.1)',
-    borderWidth: 2,
-    pointRadius: 0,
-    fill: true,
-    type: 'line',
-    borderDash: ds.borderDash || [],
-    tension: 0,
-  }));
-
-  const allPNL = allDatasets.flatMap(ds => ds.data.map(point => point.y));
-
-  // Prepare annotations for strike prices
-  const annotations = {};
-  if (strikePrices.length > 0) {
-      (strikePrices || []).forEach((price, index) => {
-      annotations[`strikeLine${index}`] = {
-        type: 'line',
-        xMin: price,
-        xMax: price,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderDash: [],
-        label: {
-          display: true,
-          content: `Strike ${price}`,
-          position: 'start',
-          color: 'gray',
-          backgroundColor: 'transparent',
-          font: {
-            size: 10
-          }
-        },
-        z: 0
-      };
-    }); 
-  }
-  
-
-  // Add current price line if available
-  if (typeof currentPrice === 'number' && !isNaN(currentPrice)) {
-    annotations.currentPriceLine = {
-      type: 'line',
-      xMin: Math.round(currentPrice),
-      xMax: Math.round(currentPrice),
-      borderColor: '#00E083',
-      borderWidth: 1,
-      borderDash: [5,5],
-      label: {
-        display: true,
-        content: `Current $${Math.round(currentPrice)}`,
-        position: 'end',
-        color: '#00E083',
-        backgroundColor: 'transparent',
-        font: { size: 12, weight: 'bold' }
-      },
-      z: 1
-    };
-  }
-
-  annotations.breakEvenLine = {
-    type: 'line',
-    yMin: 0,
-    yMax: 0,
-    borderColor: 'black',
-    borderWidth: 1,
-    borderDash: [5,5],
-    label: {
-      display: true,
-      content: 'Break-even',
-      position: 'start',
-      color: 'black',
-      backgroundColor: 'transparent',
-      font: {
-        size: 10,
-        weight: 'bold',
-      }
-    },
-    z: 1
-  };
-
-  if (chartInstance) chartInstance.destroy();
-
-  chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      datasets: allDatasets,
-    },
-    options: {
-      parsing: false,
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: {
-          type: 'linear',
-          title: {
-            display: true,
-            text: `${selectedTokenSymbol} Price`,
-          },
-        },
-        y: {
-          title: {
-            display: false,
-            text: 'PnL',
-          },
-          beginAtZero: false,
-        }
-      },
-      plugins: {
-        tooltip: {
-          mode: 'index',
-          intersect: false,
-        },
-        legend: {
-          display: true,
-        },
-        annotation: {
-          annotations
-        }
-      }
-    }
-  });
-}
 
