@@ -309,6 +309,29 @@ function generateStrategyCards(containerId) {
 
 
 
+// =======================================================CONNECT WALLET================================================
+
+let userAddress = null;
+
+async function connectWallet() {
+  if (window.ethereum && window.ethereum.isMetaMask) {
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const accounts = await provider.send("eth_requestAccounts", []);
+      userAddress = ethers.getAddress(accounts[0]);
+      document.getElementById('wallet-address').textContent = `Connected: ${userAddress}`;
+    } catch (err) {
+      console.error("MetaMask connection failed:", err);
+      alert("MetaMask connection failed.");
+    }
+  } else {
+    alert("Please install and use MetaMask only. Other wallets like Rabby are not supported in this version.");
+  }
+}
+
+
+// Register the event handler for your Connect Wallet button
+document.getElementById("connect-wallet").addEventListener("click", connectWallet);
 
 
 

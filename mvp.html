@@ -31,6 +31,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+
 
 </head>
 
@@ -51,11 +53,11 @@
             <!-- Desktop Links -->
             <ul class="space-x-6 text-black text-[18px] hidden md:flex items-center">
                 <li><a href="#" class="hover:text-[#00E083] transition font-bold">My strategies</a></li>
-                <li><a href="#" target="_blank" rel="noopener noreferrer" class="transition">
-                    <button class="text-[16px] font-bold text-black bg-[#00E083] px-4 py-2 rounded-full hover:bg-[#52FFB8]">
-                        Connect Wallet
-                    </button>   
-                    </a>
+                <li>
+                    <button id="connect-wallet" class="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
+                    Connect Wallet
+                    </button>
+                    <p id="wallet-address" class="mt-2 text-sm text-gray-600"></p>
                 </li>
             </ul>
 
