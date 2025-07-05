@@ -18,6 +18,8 @@ export function enterBuildMode() {
   // Show strategy builder UI
   strategyBuilderBoard.classList.remove('hidden');
   builderMode = true;
+  document.getElementById('save-strategy-section')?.classList.remove('hidden');
+
 
   if(mvp.strategyComponents){
     for (const inst of mvp.strategyComponents){
@@ -29,6 +31,7 @@ export function enterBuildMode() {
       }
     }
   }
+
   charts.updateBuilderChart();
 }
 
@@ -39,6 +42,7 @@ export function exitBuilder(){
     customInstruments = [];
     instrumentList.innerHTML = '';
     builderMode = false;
+    document.getElementById('save-strategy-section')?.classList.add('hidden');
 }
 
 exitBuilderBtn.addEventListener('click', () => {

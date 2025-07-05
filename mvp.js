@@ -327,12 +327,57 @@ async function connectWallet() {
   } else {
     alert("Please install and use MetaMask only. Other wallets like Rabby are not supported in this version.");
   }
+
+  showSavedStrategiesList();
+
 }
 
 
 // Register the event handler for your Connect Wallet button
 document.getElementById("connect-wallet").addEventListener("click", connectWallet);
 
+function getStorageKey(address) {
+  return `strategies-${address.toLowerCase()}`;
+}
+
+function saveStrategy(name, instruments) {
+  if (!userAddress) return alert("Connect your wallet first.");
+  if (!name.trim()) return alert("Please enter a strategy name.");
+  if (builder.customInstruments.length === 0) {
+  return alert("You must add at least one instrument to save a strategy.");
+  }
+
+
+  const key = getStorageKey(userAddress);
+  const stored = JSON.parse(localStorage.getItem(key) || '{}');
+  stored[name] = { instruments };
+  localStorage.setItem(key, JSON.stringify(stored));
+  alert(`Strategy "${name}" saved.`);
+}
+
+function loadSavedStrategies() {
+  if (!userAddress) return {};
+  const key = getStorageKey(userAddress);
+  return JSON.parse(localStorage.getItem(key) || '{}');
+}
+
+
+const saveBtn = document.getElementById('save-strategy-btn');
+const nameInput = document.getElementById('strategy-name-input');
+
+saveBtn.addEventListener('click', () => {
+  const strategyName = nameInput.value.trim();
+  saveStrategy(strategyName, builder.customInstruments);
+  nameInput.value = '';
+});
+
+
+function showSavedStrategiesList() {
+  const strategies = loadSavedStrategies();
+  const list = Object.keys(strategies);
+  console.log("Saved strategies:", list);
+  // You can now render them in a dropdown or section
+}
 
 
 
