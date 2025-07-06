@@ -67,17 +67,30 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
   customInstruments.push(instrument);
 
   const div = document.createElement('div');
-  div.className = 'flex flex-col gap-2 p-2 border rounded bg-[#F9FAFB]';
+  div.className = 'flex flex-col gap-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-xl';
   div.id = instrumentId;
   div.innerHTML = `
-    <div class="flex justify-between">
-      <button data-remove="${instrumentId}" class="text-red-500 text-sm">Remove</button>
+    <div class="flex flex-row justify-between items-center">
+      <span class="text-black text-[16px] font-semibold">Option</span>
+      <button data-remove="${instrumentId}" class="text-black text-[16px]">X</button>
     </div>
-    <div class = "flex flex-row gap-4"> 
-      <label><button type="button" class="type-btn border px-2 rounded bg-white hover:bg-gray-200">${instrument.type}</button></label>
-      <label><button type="button" class="position-btn border px-2 rounded bg-white hover:bg-gray-200">${instrument.position}</button></label>
-      <label>Strike: <input type="number" class="strike-input border px-2" value="${instrument.strike}"></label>
-      <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>
+    <div class = "flex flex-row justify-between gap-2"> 
+      <div class="flex flex-col items-center gap-2">
+        <label class= "text-[12px]">Type</label>
+        <label><button type="button" class="type-btn text-[16px] border px-2 rounded bg-white hover:bg-gray-200">${instrument.type}</button></label>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <label class= "text-[12px]">Position</label>
+      <label><button type="button" class="position-btn text-[16px] border px-2 rounded bg-white hover:bg-gray-200">${instrument.position}</button></label>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <label class= "text-[12px]">Strike</label>
+      <label><input type="number" class="strike-input text-[16px] max-w-[100px] border px-2" value="${instrument.strike}"></label>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <label class= "text-[12px]">Size</label>
+      <label><input type="number" class="size-input text-[16px] max-w-[100px] border px-2" value="${instrument.size}"></label>
+      </div>
     </div>`;
   instrumentList.appendChild(div);
 
@@ -129,17 +142,30 @@ function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage
   customInstruments.push(instrument);
 
   const div = document.createElement('div');
-  div.className = 'flex flex-col gap-2 p-2 border rounded bg-[#F9FAFB]';
+  div.className = 'flex flex-col gap-2 p-2 border border-2 border-[#D8DDEF] shadow-md rounded-xl';
   div.id = instrumentId;
   div.innerHTML = `
-    <div class="flex justify-between">
-      <button data-remove="${instrumentId}" class="text-red-500 text-sm">Remove</button>
+    <div class="flex flex-row justify-between items-center">
+      <span class="text-black text-[16px] font-semibold">Perpetual</span>
+      <button data-remove="${instrumentId}" class="text-black text-[16px]">X</button>
     </div>
-    <div class = "flex flex-row gap-4">
-      <label><button type="button" class="position-btn border px-2 rounded bg-white hover:bg-gray-200">${instrument.position}</button></label>
-      <label>Entry Price: <input type="number" class="entry-input border px-2" value="${instrument.entry}"></label>
-      <label>Size: <input type="number" class="size-input border px-2" value="${instrument.size}"></label>
-      <label>leverage: <input type="number" class="leverage-input border px-2" value="${instrument.leverage}"></label>
+    <div class= "flex flex-row justify-between gap-2">
+      <div class="flex flex-col items-center gap-2">
+        <label class= "text-[12px]">Position</label>
+        <label><button type="button" class="position-btn text-[16px] border px-2 rounded bg-white hover:bg-gray-200">${instrument.position}</button></label>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <label class= "text-[12px]">Entry</label>
+        <label><input type="number" class="entry-input text-[16px]  max-w-[100px] border px-2" value="${instrument.entry}"></label>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <label class= "text-[12px]">Size</label>
+        <label><input type="number" class="size-input text-[16px] max-w-[100px] border px-2" value="${instrument.size}"></label>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <label class= "text-[12px]">Leverage</label>
+        <label><input type="number" class="leverage-input text-[16px] max-w-[100px] border px-2" value="${instrument.leverage}"></label>
+      </div>
     </div>`;
   instrumentList.appendChild(div);
 
