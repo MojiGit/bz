@@ -22,8 +22,8 @@ export function renderPNLChart(datasets, strikePrices = []) {
   const allDatasets = datasets.map(ds => ({
     label: ds.label || '',
     data: ds.data?.map(point => ({ x: point.price, y: point.pnl })) || [],
-    borderColor: ds.color || 'blue',
-    backgroundColor: ds.bgColor || 'rgba(0, 0, 255, 0.1)',
+    borderColor: ds.color,
+    backgroundColor: ds.bgColor || 'rgba(255, 255, 255, 0)',
     borderWidth: 2,
     pointRadius: 0,
     fill: true,
@@ -42,7 +42,7 @@ export function renderPNLChart(datasets, strikePrices = []) {
         xMax: price,
         borderColor: 'gray',
         borderWidth: 1,
-        borderDash: [],
+        borderDash: [5,5],
         label: {
           display: true,
           content: `Strike ${price}`,
@@ -60,17 +60,17 @@ export function renderPNLChart(datasets, strikePrices = []) {
   
 
   // Add current price line if available
-  if (typeof currentPrice === 'number' && !isNaN(currentPrice)) {
+  if (typeof mvp.currentPrice === 'number' && !isNaN(mvp.currentPrice)) {
     annotations.currentPriceLine = {
       type: 'line',
-      xMin: Math.round(currentPrice),
-      xMax: Math.round(currentPrice),
+      xMin: Math.round(mvp.currentPrice),
+      xMax: Math.round(mvp.currentPrice),
       borderColor: '#00E083',
       borderWidth: 1,
       borderDash: [5,5],
       label: {
         display: true,
-        content: `Current $${Math.round(currentPrice)}`,
+        content: `Current $${Math.round(mvp.currentPrice)}`,
         position: 'end',
         color: '#00E083',
         backgroundColor: 'transparent',
@@ -86,7 +86,6 @@ export function renderPNLChart(datasets, strikePrices = []) {
     yMax: 0,
     borderColor: 'black',
     borderWidth: 1,
-    borderDash: [5,5],
     label: {
       display: true,
       content: 'Break-even',
@@ -115,12 +114,14 @@ export function renderPNLChart(datasets, strikePrices = []) {
       scales: {
         x: {
           type: 'linear',
+          grid: { color: '#f0f0f0'},
           title: {
             display: true,
             text: `${mvp.selectedTokenSymbol} Price`,
           },
         },
         y: {
+          grid: { color: '#f0f0f0'},
           title: {
             display: false,
             text: 'PnL',
@@ -135,6 +136,7 @@ export function renderPNLChart(datasets, strikePrices = []) {
         },
         legend: {
           display: true,
+          position: 'bottom',
         },
         annotation: {
           annotations
@@ -169,8 +171,7 @@ export async function updateBuilderChart() {
     datasets.push({
       label,
       data,
-      color,
-      bgColor: 'rgba(183, 184, 183, 0.16)'
+      color
     });
   }
 
