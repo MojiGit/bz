@@ -207,7 +207,7 @@ function generateStrategyCards(containerId) {
 
     //for each strategy in IdMap creates a div with the atributes, sentiment and strategyid
     const card = document.createElement('div');
-    card.className = 'strategy-block grid grid-cols-1 divide-y-2 px-2 pt-2 gap-2 w-full border border-2 border-[#D8DDEF] shadow-md rounded-xl transition-all duration-300 cursor-pointer overflow-hidden';
+    card.className = 'strategy-block grid grid-cols-1 divide-y-2 px-2 pt-2 gap-2 border border-2 border-[#D8DDEF] rounded-xl transition-all duration-300 cursor-pointer overflow-hidden';
     card.setAttribute('data-strategy', strategyId);
     card.setAttribute('data-sentiment', info.sentiment);
 
@@ -433,11 +433,11 @@ function loadStrategyIntoBuilder(name, instruments) {
   builder.rebuildBuilderUI(instruments);
 }
 
-
-
 document.getElementById('my-strategies-btn').addEventListener('click', () => {
   const panel = document.getElementById('saved-strategies-panel');
+  const strategies = document.getElementById('strategy-container');
   panel.classList.toggle('hidden');
+  strategies.classList.toggle('hidden');
   renderSavedStrategies();
 });
 

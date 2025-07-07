@@ -95,10 +95,10 @@
     </div>
 
     <!-- Dashboard -->
-    <section id="dashboard" class="flex flex-col md:flex-row gap-8 px-4">
+    <section id="dashboard" class="flex flex-col justify-between md:flex-row gap-8 px-4">
 
         <!--menu options-->
-        <div id="menu" class="max-w-xl"> 
+        <div id="menu" class="w-full"> 
             <!-- Sentiment Filters Section -->
             <div id="sentiment-filters" class="flex flex-row justify-between w-full gap-8 mb-4 overflow-hidden" >
                 <div class="flex flex-row gap-2 overflow-x-auto no-scrollbar whitespace-nowrap text-[16px] text-black font-semibold">
@@ -125,10 +125,19 @@
             <!--Strategies-->
             <div id="strategy-container" class="grid gap-4"></div>
 
+            <!-- Saved Strategies Panel -->
+            <div id="saved-strategies-panel" class="hidden mt-4 p-4 border border-[#D8DDEF] rounded-xl shadow-md bg-white">
+                <div class="flex flex-row justify-between items-center mb-4">
+                    <h2 class="text-[16px] font-bold mb-2">My Strategies</h2>
+                    <button id="exit-saved-strategies" class="text-[16px] px-1 hover:bg-gray-200 rounded font-semibold text-black"> Exit</button>
+                </div>
+                <ul id="saved-strategy-list" class="flex flex-col gap-2 text-sm text-gray-800"></ul>
+            </div>
+
         </div>
         
         <!-- Strategy Builder UI -->
-        <div id="strategy-builder-board" class="hidden max-w-xl">
+        <div id="strategy-builder-board" class="hidden w-full">
             <div class="flex flex-row justify-between items-center mb-4">
                 <div id="save-strategy-section" class="flex flex-row gap-2 items-center">
                     <input id="strategy-name-input" type="text" placeholder="Strategy Name" class="w-full max-w-[150px] px-2 border border-[#D8DDEF] rounded-xl" />
@@ -153,17 +162,10 @@
             <!-- Instruments List -->
             <div id="instrument-list" class="grid gap-4"></div>
 
-            
-        </div>
-
-        <!-- Saved Strategies Panel -->
-        <div id="saved-strategies-panel" class="hidden mt-4 p-4 border border-[#D8DDEF] rounded-xl shadow-md bg-white">
-            <h3 class="text-[16px] font-bold mb-2">Saved Strategies</h3>
-            <ul id="saved-strategy-list" class="flex flex-col gap-2 text-sm text-gray-800"></ul>
         </div>
 
         <!--Chart-->
-        <div class="w-full px-4">
+        <div class="w-full max-w-[850px] px-4">
             <!-- Token selection -->
             <div id="token-buttons" class="flex flex-row gap-2 text-black justify-between">
                 <div>

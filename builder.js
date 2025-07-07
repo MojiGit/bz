@@ -1,6 +1,7 @@
 export const strategyBuilderBoard = document.getElementById('strategy-builder-board');
 export const strategyMenu = document.getElementById('menu');
 export const exitBuilderBtn = document.getElementById('exit-builder');
+export const exitSavedStrategiesBtn = document.getElementById('exit-saved-strategies');
 export const instrumentList = document.getElementById('instrument-list');
 export const addOptionBtn = document.getElementById('add-option');
 export const addPerpBtn = document.getElementById('add-perp');
@@ -47,6 +48,19 @@ export function exitBuilder(){
 
 exitBuilderBtn.addEventListener('click', () => {
   exitBuilder()
+  mvp.updateChartForToken();
+});
+
+export function exitSavedStrategies() {
+  const panel = document.getElementById('saved-strategies-panel');
+  const strategies = document.getElementById('strategy-container');
+  panel.classList.toggle('hidden');
+  strategies.classList.toggle('hidden');
+  strategyMenu.classList.remove('hidden');
+}
+
+exitSavedStrategiesBtn.addEventListener('click', () => {
+  exitSavedStrategies();
   mvp.updateChartForToken();
 });
 
