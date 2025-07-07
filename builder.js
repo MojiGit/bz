@@ -54,8 +54,10 @@ exitBuilderBtn.addEventListener('click', () => {
 export function exitSavedStrategies() {
   const panel = document.getElementById('saved-strategies-panel');
   const strategies = document.getElementById('strategy-container');
+  const filters = document.getElementById('sentiment-filters');
   panel.classList.toggle('hidden');
   strategies.classList.toggle('hidden');
+  filters.classList.toggle('hidden');
   strategyMenu.classList.remove('hidden');
 }
 

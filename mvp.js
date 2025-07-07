@@ -31,7 +31,7 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// Navbar Visibility on Scroll
+/* Navbar Visibility on Scroll
 let lastScrollTop = 0;
 const navbar = document.querySelector('nav');
 const mobileMenu = document.getElementById('mobile-menu');
@@ -58,7 +58,7 @@ window.addEventListener('scroll', () => {
   }
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
-});
+}); */
 
 const button = document.getElementById('mobile-menu-button');
 let menuOpen = false;
@@ -436,8 +436,10 @@ function loadStrategyIntoBuilder(name, instruments) {
 document.getElementById('my-strategies-btn').addEventListener('click', () => {
   const panel = document.getElementById('saved-strategies-panel');
   const strategies = document.getElementById('strategy-container');
+  const filters = document.getElementById('sentiment-filters');
   panel.classList.toggle('hidden');
   strategies.classList.toggle('hidden');
+  filters.classList.toggle('hidden');
   renderSavedStrategies();
 });
 
