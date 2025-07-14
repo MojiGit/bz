@@ -67,7 +67,7 @@ exitSavedStrategiesBtn.addEventListener('click', () => {
 });
 
 // Add instrument to list
-function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1) {
+function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1, optDate = null) {
   //it only allows to add long-call options! 
   const instrumentId = `inst-${Date.now()}`;
   const instrument = {
@@ -78,6 +78,7 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
     strike: optStrike * mvp.currentPrice,
     size: optSize,
     leverage: 1,
+    date: optDate,
     color: '#D8DDEF',
   };
   customInstruments.push(instrument);
@@ -102,6 +103,10 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
       <div class="flex flex-col items-center gap-2">
         <label class= "text-[12px]">Strike</label>
       <label><input type="number" class="strike-input text-[16px] max-w-[100px] border px-2" value="${instrument.strike}"></label>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <label class="text-[12px]">Date</label>
+        <label><input type="date" class="date-input text-[16px] max-w-[140px] border px-2" value="${optDate ? optDate : ''}"></label>
       </div>
       <div class="flex flex-col items-center gap-2">
         <label class= "text-[12px]">Size</label>
@@ -136,6 +141,10 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
   });
   div.querySelector('.size-input')?.addEventListener('input', e => {
     instrument.size = parseFloat(e.target.value);
+    charts.updateBuilderChart();
+  });
+  div.querySelector('.date-input')?.addEventListener('input', e => {
+    instrument.date = e.target.value;
     charts.updateBuilderChart();
   });
 
