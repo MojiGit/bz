@@ -104,7 +104,9 @@ async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optS
       </div>
       <div class="flex flex-col items-center gap-2">
         <label class= "text-[12px]">Strike</label>
-      <label><input type="number" class="strike-input text-[16px] max-w-[100px] border px-2" value="${instrument.strike}"></label>
+      <label>
+        <select class="strike-select text-[16px] max-w-[100px] border px-2">${instrument.strike}</select>
+      </label>
       </div>
       <div class="flex flex-col items-center gap-2">
         <label class="text-[12px]">Date</label>
@@ -118,19 +120,42 @@ async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optS
       </div>
     </div>`;
   instrumentList.appendChild(div);
-  
-  const dateSelect = div.querySelector('.date-select'); 
-  const result = await deriveApi.fetchDatesAndStrikesByType();
-  const availableDates = Object.keys(result[instrument.type === 'call' ? 'C' : 'P']);
 
-  availableDates.forEach(date => {
-    const option = document.createElement('option');
-    option.value = date;
-    option.textContent = `${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}`;
-    dateSelect.appendChild(option);
-  });
+  const dateSelect = div.querySelector('.date-select');
+  const strikeSelect = div.querySelector('.strike-select');
 
-  dateSelect.value = instrument.date || availableDates[0];
+  // Helper to update date dropdown based on type
+  async function updateDateOptions() {
+    const result = await deriveApi.fetchDatesAndStrikesByType();
+    const availableDates = Object.keys(result[instrument.type === 'call' ? 'C' : 'P']);
+    dateSelect.innerHTML = '';
+    availableDates.forEach(date => {
+      const option = document.createElement('option');
+      option.value = date;
+      option.textContent = `${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}`;
+      dateSelect.appendChild(option);
+    });
+    // Set selected date
+    dateSelect.value = instrument.date || availableDates[0];
+    instrument.date = dateSelect.value;
+  }
+
+  // Helper to update strike dropdown based on type and date
+  async function updateStrikeOptions() {
+    const result = await deriveApi.fetchDatesAndStrikesByType();
+    const typeKey = instrument.type === 'call' ? 'C' : 'P';
+    const strikes = result[typeKey][instrument.date] || [];
+    strikeSelect.innerHTML = '';
+    strikes.forEach(strike => {
+      const option = document.createElement('option');
+      option.value = strike;
+      option.textContent = strike;
+      strikeSelect.appendChild(option);
+    });
+    // Set selected strike
+    strikeSelect.value = instrument.strike || strikes[0];
+    instrument.strike = parseFloat(strikeSelect.value);
+  }
 
   // Add event to remove
   div.querySelector(`[data-remove="${instrumentId}"]`).addEventListener('click', () => {
@@ -141,18 +166,22 @@ async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optS
 
   // Listen to input changes
   const typeBtn = div.querySelector('.type-btn');
-  typeBtn?.addEventListener('click', () => {
+  typeBtn?.addEventListener('click', async () => {
     instrument.type = instrument.type === 'call' ? 'put' : 'call';
     typeBtn.textContent = instrument.type;
+    await updateDateOptions();
+    await updateStrikeOptions();
     charts.updateBuilderChart();
   });
+
   const positionBtn = div.querySelector('.position-btn');
   positionBtn?.addEventListener('click', () => {
     instrument.position = instrument.position === 'long' ? 'short' : 'long';
     positionBtn.textContent = instrument.position;
     charts.updateBuilderChart();
   });
-  div.querySelector('.strike-input')?.addEventListener('input', e => {
+
+  strikeSelect.addEventListener('change', e => {
     instrument.strike = parseFloat(e.target.value);
     charts.updateBuilderChart();
   });
@@ -160,10 +189,14 @@ async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optS
     instrument.size = parseFloat(e.target.value);
     charts.updateBuilderChart();
   });
-  dateSelect.addEventListener('change', e => {
+  dateSelect.addEventListener('change', async e => {
     instrument.date = e.target.value;
+    await updateStrikeOptions();
     charts.updateBuilderChart();
   });
+
+  await updateDateOptions();
+  await updateStrikeOptions();
 
   charts.updateBuilderChart();
 }

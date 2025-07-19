@@ -148,6 +148,7 @@ export function renderPNLChart(datasets, strikePrices = []) {
 
 // Render chart for current builder state
 export async function updateBuilderChart() {
+  console.log(builder.customInstruments)
   const datasets = [];
   const strikePrices = [];
 
