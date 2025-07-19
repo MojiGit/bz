@@ -1,36 +1,18 @@
-import fetch from "node-fetch";
-import { ethers } from "ethers";
-
-const API_URL = "https://api-demo.lyra.finance/public/get_all_instruments";
+const LOCAL_JSON_URL = 'lyra_instruments.json'; // Adjust path if needed
 let instruments = [];
 
-const options = {
-  method: 'POST',
-  headers: {accept: 'application/json', 'content-type': 'application/json'},
-  body: JSON.stringify({
-    currency: 'ETH',
-    expired: false,
-    instrument_type: 'option',
-    page: 1,
-    page_size: 100
-  })
-};
-
 export const getInstruments = () => {
-  return new Promise((resolve, reject) => {
-    fetch(API_URL, options)
-      .then(res => res.json())
-      .then(res => {
-        // Access the instruments array
-        if (res.result && Array.isArray(res.result.instruments)) {
-          instruments = res.result.instruments;
-          resolve(instruments);
-        } else {
-          reject(new Error("Invalid response format"));
-        }
-      })
-      .catch(err => reject(err));
-  });
+  return fetch(LOCAL_JSON_URL)
+    .then(res => res.json())
+    .then(res => {
+      // Access the instruments array
+      if (res.result && Array.isArray(res.result.instruments)) {
+        instruments = res.result.instruments;
+        return instruments;
+      } else {
+        throw new Error("Invalid response format");
+      }
+    });
 };
 
 export const getInstrumentsByType = (type) => {
@@ -73,9 +55,3 @@ export async function fetchDatesAndStrikesByType() {
 
   return result;
 }
-
-// Example usage:
-fetchDatesAndStrikesByType().then(res => {
-  console.log('Calls:', res.C); // { '20250725': [strike1, strike2, ...], ... }
-  console.log('Puts:', res.P);  // { '20250725': [strike1, strike2, ...], ... }
-});

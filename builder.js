@@ -8,6 +8,8 @@ export const addPerpBtn = document.getElementById('add-perp');
 
 import * as charts from './charts.js';
 import * as mvp from './mvp.js';
+import * as deriveApi from './derive_api.js';
+
 
 export let customInstruments = [];
 export let builderMode = false;
@@ -67,7 +69,7 @@ exitSavedStrategiesBtn.addEventListener('click', () => {
 });
 
 // Add instrument to list
-function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1, optDate = null) {
+async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1, optDate = null) {
   //it only allows to add long-call options! 
   const instrumentId = `inst-${Date.now()}`;
   const instrument = {
@@ -106,7 +108,9 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
       </div>
       <div class="flex flex-col items-center gap-2">
         <label class="text-[12px]">Date</label>
-        <label><input type="date" class="date-input text-[16px] max-w-[140px] border px-2" value="${optDate ? optDate : ''}"></label>
+        <label>
+          <select class="date-select text-[16px] max-w-[140px] border px-2">${instrument.date}</select>
+        </label>
       </div>
       <div class="flex flex-col items-center gap-2">
         <label class= "text-[12px]">Size</label>
@@ -114,6 +118,19 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
       </div>
     </div>`;
   instrumentList.appendChild(div);
+  
+  const dateSelect = div.querySelector('.date-select'); 
+  const result = await deriveApi.fetchDatesAndStrikesByType();
+  const availableDates = Object.keys(result[instrument.type === 'call' ? 'C' : 'P']);
+
+  availableDates.forEach(date => {
+    const option = document.createElement('option');
+    option.value = date;
+    option.textContent = `${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}`;
+    dateSelect.appendChild(option);
+  });
+
+  dateSelect.value = instrument.date || availableDates[0];
 
   // Add event to remove
   div.querySelector(`[data-remove="${instrumentId}"]`).addEventListener('click', () => {
@@ -143,7 +160,7 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
     instrument.size = parseFloat(e.target.value);
     charts.updateBuilderChart();
   });
-  div.querySelector('.date-input')?.addEventListener('input', e => {
+  dateSelect.addEventListener('change', e => {
     instrument.date = e.target.value;
     charts.updateBuilderChart();
   });

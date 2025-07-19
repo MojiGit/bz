@@ -13,6 +13,7 @@ import * as Strategies from './strategies.js';
 import * as charts from './charts.js';
 import * as builder from './builder.js';
 
+
 Chart.register(window['chartjs-plugin-annotation']);
 const buttons = document.querySelectorAll('.token-btn');
 
@@ -30,35 +31,6 @@ const tokenIdMap = {
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
-
-/* Navbar Visibility on Scroll
-let lastScrollTop = 0;
-const navbar = document.querySelector('nav');
-const mobileMenu = document.getElementById('mobile-menu');
-
-// listener to hide the navbar each time the user scrolls down, and show it again when scrolling up
-window.addEventListener('scroll', () => {
-  const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-
-  if (currentScroll > lastScrollTop) {
-    // Scroll Down — hide navbar and dropdown (if open)
-    navbar.classList.add('opacity-0', 'pointer-events-none');
-    navbar.classList.remove('opacity-100');
-
-    if (!mobileMenu.classList.contains('hidden')) {
-      mobileMenu.classList.add('opacity-0', 'pointer-events-none');
-      mobileMenu.classList.remove('opacity-100');
-    }
-  } else {
-    // Scroll Up — show navbar ONLY
-    navbar.classList.remove('opacity-0', 'pointer-events-none');
-    navbar.classList.add('opacity-100');
-
-    // Do NOT show the dropdown here — leave it hidden unless manually triggered
-  }
-
-  lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
-}); */
 
 const button = document.getElementById('mobile-menu-button');
 let menuOpen = false;
