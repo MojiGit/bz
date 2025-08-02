@@ -67,7 +67,7 @@ exitSavedStrategiesBtn.addEventListener('click', () => {
 });
 
 // Add instrument to list
-function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1) {
+function addOption(optType = 'C', optPost = 'B', optStrike = 1, optSize = 1) {
   //it only allows to add long-call options! 
   const instrumentId = `inst-${Date.now()}`;
   const instrument = {
@@ -120,13 +120,13 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
   // Listen to input changes
   const typeBtn = div.querySelector('.type-btn');
   typeBtn?.addEventListener('click', () => {
-    instrument.type = instrument.type === 'call' ? 'put' : 'call';
+    instrument.type = instrument.type === 'C' ? 'P' : 'C';
     typeBtn.textContent = instrument.type;
     charts.updateBuilderChart();
   });
   const positionBtn = div.querySelector('.position-btn');
   positionBtn?.addEventListener('click', () => {
-    instrument.position = instrument.position === 'long' ? 'short' : 'long';
+    instrument.position = instrument.position === 'B' ? 'S' : 'B';
     positionBtn.textContent = instrument.position;
     charts.updateBuilderChart();
   });
@@ -143,13 +143,13 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
 }
 
 // Add instrument to list
-function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage = 1) {
+function addPerp(perpPosition = 'B', perpEntry = 1, perpSize = 1, perpLeverage = 1) {
   //it only allows to add long-call options! 
   const instrumentId = `inst-${Date.now()}`;
   const instrument = {
     id: instrumentId,
     asset: 'perp',
-    position: perpPositon,
+    position: perpPosition,
     entry: perpEntry * mvp.currentPrice,
     size: perpSize,
     leverage: perpLeverage,
@@ -195,7 +195,7 @@ function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage
   // Listen to input changes
   const positionBtn = div.querySelector('.position-btn');
   positionBtn?.addEventListener('click', () => {
-    instrument.position = instrument.position === 'long' ? 'short' : 'long';
+    instrument.position = instrument.position === 'B' ? 'S' : 'B';
     positionBtn.textContent = instrument.position;
     charts.updateBuilderChart();
   });

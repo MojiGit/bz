@@ -5,9 +5,9 @@ These functions calculate PNL for different trading strategies, including spot, 
 import { currentPrice, selectedTokenSymbol, priceRange } from "./mvp.js";
 
 // Perpetual PNL
-export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 'long') {
+export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 'B') {
   return priceRange.map(currentPrice => {
-    if(position === 'short'){
+    if(position === 'S'){
       const pnl = (entryPrice - currentPrice) * quantity * leverage;
       return { price: currentPrice, pnl};
     }
@@ -17,19 +17,19 @@ export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 
 }
 
 // Option PNL (Call or Put)
-export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long') {
+export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'B') {
   return priceRange.map(currentPrice => {
     let intrinsicValue;
-    if (optionType === 'call') {
+    if (optionType === 'C') {
       intrinsicValue = Math.max(currentPrice - strikePrice, 0);
-    } else if (optionType === 'put') {
+    } else if (optionType === 'P') {
       intrinsicValue = Math.max(strikePrice - currentPrice, 0);
     } else {
       throw new Error("Invalid option type");
     }
 
     const totalPNL = (intrinsicValue - generatePremium(strikePrice, optionType)) * quantity;
-    if (position === 'short') {
+    if (position === 'S') {
       // If the position is short, we invert the PNL
       return { price: currentPrice, pnl: -totalPNL };
     }
@@ -105,7 +105,7 @@ export function generatePremium(strike, position) {
   const midRate = 0.04;
   const farRate = 0.02;
 
-  if (position === 'call') {
+  if (position === 'C') {
     if (strike <= currentPrice * 0.9 || strike >= currentPrice * 1.1) {
       return Math.max(currentPrice - strike, 0) + strike * farRate;
     }
@@ -113,7 +113,7 @@ export function generatePremium(strike, position) {
       return Math.max(currentPrice - strike, 0) + strike * midRate;
     }
     return strike * nearRate;
-  } else if (position === 'put') {
+  } else if (position === 'P') {
     if (strike <= currentPrice * 0.9 || strike >= currentPrice * 1.1) {
       return Math.max(strike - currentPrice, 0) + strike * farRate;
     }
@@ -129,7 +129,7 @@ export function generatePremium(strike, position) {
 // === default strategy ===
 export async function defaultStrategy(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
 
-  const pnlData = calculateOptionPNL('call', strike, size, priceRange, 'long');
+  const pnlData = calculateOptionPNL('C', strike, size, priceRange, 'B');
   const breakeven = findBreakevenPoints(pnlData)
 
   return {
@@ -200,8 +200,8 @@ export const strategiesIdMap = {
     sentiment:'bearish',
     proficiency: 'Advance',
     components: [
-      {asset: 'perp', entry: 1, size: 1, leverage: 1, position: 'short'},
-      {asset: 'opt', type: 'put', strike: 0.95, size: 1, position: 'short'}
+      {asset: 'perp', entry: 1, size: 1, leverage: 1, position: 'S'},
+      {asset: 'opt', type: 'P', strike: 0.95, size: 1, position: 'S'}
     ],
   },
   
@@ -214,10 +214,10 @@ export const strategiesIdMap = {
     sentiment:'neutral',
     proficiency: 'Intermediate',
     components: [
-      {asset: 'opt', type: 'put', strike: 0.95, size: 1, position: 'short'},
-      {asset: 'opt', type: 'put', strike: 0.9, size: 1},
-      {asset: 'opt', type: 'call', strike: 1.05, size: 1, position: 'short'},
-      {asset: 'opt', type: 'call', strike: 1.1, size: 1}
+      {asset: 'opt', type: 'P', strike: 0.95, size: 1, position: 'S'},
+      {asset: 'opt', type: 'P', strike: 0.9, size: 1},
+      {asset: 'opt', type: 'C', strike: 1.05, size: 1, position: 'S'},
+      {asset: 'opt', type: 'C', strike: 1.1, size: 1}
     ],
   },
 
@@ -230,10 +230,10 @@ export const strategiesIdMap = {
     sentiment:'neutral',
     proficiency:'Intermediate',
     components: [
-      {asset: 'opt', type: 'put', strike: 1, size: 1, position: 'short'},
-      {asset: 'opt', type: 'put', strike: 0.85, size: 1},
-      {asset: 'opt', type: 'call', strike: 1, size: 1, position: 'short'},
-      {asset: 'opt', type: 'call', strike: 1.15, size: 1}
+      {asset: 'opt', type: 'P', strike: 1, size: 1, position: 'S'},
+      {asset: 'opt', type: 'P', strike: 0.85, size: 1},
+      {asset: 'opt', type: 'C', strike: 1, size: 1, position: 'S'},
+      {asset: 'opt', type: 'C', strike: 1.15, size: 1}
     ],
   },
 
@@ -246,8 +246,8 @@ export const strategiesIdMap = {
     sentiment: 'neutral',
     proficiency: 'Intermediate',
     components: [
-      {asset: 'opt', type: 'put', strike: 0.95, size: 1},
-      {asset: 'opt', type: 'call', strike: 1.05, size: 1}
+      {asset: 'opt', type: 'P', strike: 0.95, size: 1},
+      {asset: 'opt', type: 'C', strike: 1.05, size: 1}
     ],
   },
 
@@ -260,8 +260,8 @@ export const strategiesIdMap = {
     sentiment: 'bullish',
     proficiency: 'Intermediate',
     components: [
-      {asset: 'opt', type: 'put', strike: 1, size: 1, position: 'short'},
-      {asset: 'opt', type: 'put', strike: 0.9, size: 1}
+      {asset: 'opt', type: 'P', strike: 1, size: 1, position: 'S'},
+      {asset: 'opt', type: 'P', strike: 0.9, size: 1}
     ],
   },
 
@@ -274,8 +274,8 @@ export const strategiesIdMap = {
     sentiment: 'bearish',
     proficiency: 'Intermediate',
     components: [
-      {asset: 'opt', type: 'call', strike: 1, size: 1, position: 'short'},
-      {asset: 'opt', type: 'call', strike: 1.1, size: 1}
+      {asset: 'opt', type: 'C', strike: 1, size: 1, position: 'S'},
+      {asset: 'opt', type: 'C', strike: 1.1, size: 1}
     ],
   },
 
@@ -288,8 +288,8 @@ export const strategiesIdMap = {
     sentiment: 'bullish',
     proficiency: 'Novice',
     components: [
-      {asset: 'perp', entry: 1, size: 1, leverage: 1, position: 'long'},
-      {asset: 'opt', type: 'call', strike: 1.1, size: 1, position: 'short'}
+      {asset: 'perp', entry: 1, size: 1, leverage: 1, position: 'B'},
+      {asset: 'opt', type: 'C', strike: 1.1, size: 1, position: 'S'}
     ],
   },
   

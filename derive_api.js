@@ -4,7 +4,9 @@ import { ethers } from "ethers";
 const API_URL = "https://api-demo.lyra.finance/public/get_all_instruments";
 let instruments = [];
 
-const options = {
+
+
+let options = {
   method: 'POST',
   headers: {accept: 'application/json', 'content-type': 'application/json'},
   body: JSON.stringify({
