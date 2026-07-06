@@ -31,8 +31,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
-
 
 </head>
 
@@ -50,13 +48,6 @@
 
             <div class="flex-1"></div>
 
-            <!-- Desktop Links -->
-            <ul class="space-x-6 text-black text-[16px] hidden md:flex items-center">
-                    <button id="connect-wallet" class="px-4 font-bold py-2 rounded-full bg-[#00E083] rounded hover:bg-[#52FFB8]">
-                    Connect
-                    </button>
-            </ul>
-
             <!--Menu button -->
             <div class="md:hidden flex items-center p-2">
                 <button id="mobile-menu-button" class="text-black focus:outline-none">
@@ -70,14 +61,7 @@
         <div id="mobile-menu"
             class="fixed top-[72px] left-0 right-0 mx-5 p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-black font-semibold opacity-0 pointer-events-none transition-all duration-300 ease-in-out z-40">
             <ul class="space-y-4 text-[18px]">
-            <li><a href="#" class="px-1">My Strategies</a></li>
             <li><a target="_blank" rel="noopener noreferrer" href="https://m-mojica-mateuss-organization.gitbook.io/betazero-1/" class="px-1">Docs</a></li>
-            <li><a href="#" target="_blank" rel="noopener noreferrer" class="hover:text-[#00E083] transition">
-                    <button class="text-[16px] font-bold text-black bg-[#00E083] p-1 rounded-md hover:bg-[#52FFB8]">
-                        Connect Wallet
-                    </button>   
-                    </a>
-                </li>
             </ul>
         </div>
     </div>
@@ -106,9 +90,6 @@
                     <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="bullish"> Bullish </button>
                     <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="bearish"> Bearish </button>
                     <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="neutral"> Neutral </button>
-                    <button id="my-strategies-btn" class=" text-[16px] px-1 bg-gray-200 rounded font-semibold text-black hidden">
-                    My Strategies
-                    </button>
                 </div>
                  
                 <div>
@@ -125,28 +106,12 @@
             <!--Strategies-->
             <div id="strategy-container" class="grid gap-4"></div>
 
-            <!-- Saved Strategies Panel -->
-            <div id="saved-strategies-panel" class="hidden mt-4 p-4 border border-[#D8DDEF] rounded-xl shadow-md bg-white">
-                <div class="flex flex-row justify-between items-center mb-4">
-                    <h2 class="text-[16px] font-bold mb-2">My Strategies</h2>
-                    <button id="exit-saved-strategies" class="text-[16px] px-1 hover:bg-gray-200 rounded font-semibold text-black"> Templates</button>
-                </div>
-                <ul id="saved-strategy-list" class="flex flex-col gap-2 text-sm text-gray-800"></ul>
-            </div>
-
         </div>
         
         <!-- Strategy Builder UI -->
         <div id="strategy-builder-board" class="hidden w-full">
-            <div class="flex flex-row justify-between items-center mb-4">
-                <div id="save-strategy-section" class="flex flex-row gap-2 items-center">
-                    <input id="strategy-name-input" type="text" placeholder="Strategy Name" class="w-full max-w-[150px] px-2 border border-[#D8DDEF] rounded-xl" />
-                </div>
-                <div class="flex flex-row gap-2 items-center">                    
-                    <button id="save-strategy-btn" class=" text-[16px] px-1 hover:bg-gray-200 rounded font-semibold text-black"> Save </button>
-                    <label>|</label>
-                    <button id="exit-builder" class="text-[16px] px-1 hover:bg-gray-200 rounded font-semibold text-black"> Exit</button>
-                </div>
+            <div class="flex flex-row justify-end items-center mb-4">
+                <button id="exit-builder" class="text-[16px] px-1 hover:bg-gray-200 rounded font-semibold text-black"> Exit</button>
             </div>
 
             <!-- Instrument buttons -->
@@ -199,16 +164,11 @@
 
     </section>
 
-    <!-- pre-designed strategies cards-->
-    <div id="strategy-container" class="grid gap-4"></div>
-
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script>
 <script type="module" src="./mvp.js"></script>
 <script type="module" src="./strategies.js"></script>
 <script type="module" src="./builder.js"></script>
 <script type="module" src="./charts.js"></script>
-<script type="module" src="./derive_api.js"></script>
 </body>
 </html>

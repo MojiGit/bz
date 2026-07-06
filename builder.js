@@ -1,14 +1,12 @@
 export const strategyBuilderBoard = document.getElementById('strategy-builder-board');
 export const strategyMenu = document.getElementById('menu');
 export const exitBuilderBtn = document.getElementById('exit-builder');
-export const exitSavedStrategiesBtn = document.getElementById('exit-saved-strategies');
 export const instrumentList = document.getElementById('instrument-list');
 export const addOptionBtn = document.getElementById('add-option');
 export const addPerpBtn = document.getElementById('add-perp');
 
 import * as charts from './charts.js';
 import * as mvp from './mvp.js';
-import * as deriveApi from './derive_api.js';
 
 
 export let customInstruments = [];
@@ -21,8 +19,6 @@ export function enterBuildMode() {
   // Show strategy builder UI
   strategyBuilderBoard.classList.remove('hidden');
   builderMode = true;
-  document.getElementById('save-strategy-section')?.classList.remove('hidden');
-
 
   if(mvp.strategyComponents){
     for (const inst of mvp.strategyComponents){
@@ -45,7 +41,6 @@ export function exitBuilder(){
     customInstruments = [];
     instrumentList.innerHTML = '';
     builderMode = false;
-    document.getElementById('save-strategy-section')?.classList.add('hidden');
 }
 
 exitBuilderBtn.addEventListener('click', () => {
@@ -53,24 +48,12 @@ exitBuilderBtn.addEventListener('click', () => {
   mvp.updateChartForToken();
 });
 
-export function exitSavedStrategies() {
-  const panel = document.getElementById('saved-strategies-panel');
-  const strategies = document.getElementById('strategy-container');
-  const filters = document.getElementById('sentiment-filters');
-  panel.classList.toggle('hidden');
-  strategies.classList.toggle('hidden');
-  filters.classList.toggle('hidden');
-  strategyMenu.classList.remove('hidden');
-}
-
-exitSavedStrategiesBtn.addEventListener('click', () => {
-  exitSavedStrategies();
-  mvp.updateChartForToken();
-});
+// Strike choices as multiples of the current price, from 0.8x to 1.2x in 0.05 steps
+const STRIKE_MULTIPLIERS = [0.8, 0.85, 0.9, 0.95, 1, 1.05, 1.1, 1.15, 1.2];
 
 // Add instrument to list
-async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1, optDate = null) {
-  //it only allows to add long-call options! 
+function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1) {
+  //it only allows to add long-call options!
   const instrumentId = `inst-${Date.now()}`;
   const instrument = {
     id: instrumentId,
@@ -80,7 +63,6 @@ async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optS
     strike: optStrike * mvp.currentPrice,
     size: optSize,
     leverage: 1,
-    date: optDate,
     color: '#D8DDEF',
   };
   customInstruments.push(instrument);
@@ -93,7 +75,7 @@ async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optS
       <span class="text-black text-[16px] font-semibold">Option</span>
       <button data-remove="${instrumentId}" class="text-black text-[16px]">X</button>
     </div>
-    <div class = "flex flex-row justify-between gap-2"> 
+    <div class = "flex flex-row justify-between gap-2">
       <div class="flex flex-col items-center gap-2">
         <label class= "text-[12px]">Type</label>
         <label><button type="button" class="type-btn text-[16px] border px-2 rounded bg-white hover:bg-gray-200">${instrument.type}</button></label>
@@ -105,14 +87,8 @@ async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optS
       <div class="flex flex-col items-center gap-2">
         <label class= "text-[12px]">Strike</label>
       <label>
-        <select class="strike-select text-[16px] max-w-[100px] border px-2">${instrument.strike}</select>
+        <select class="strike-select text-[16px] max-w-[100px] border px-2"></select>
       </label>
-      </div>
-      <div class="flex flex-col items-center gap-2">
-        <label class="text-[12px]">Date</label>
-        <label>
-          <select class="date-select text-[16px] max-w-[140px] border px-2">${instrument.date}</select>
-        </label>
       </div>
       <div class="flex flex-col items-center gap-2">
         <label class= "text-[12px]">Size</label>
@@ -121,39 +97,19 @@ async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optS
     </div>`;
   instrumentList.appendChild(div);
 
-  const dateSelect = div.querySelector('.date-select');
   const strikeSelect = div.querySelector('.strike-select');
 
-  // Helper to update date dropdown based on type
-  async function updateDateOptions() {
-    const result = await deriveApi.fetchDatesAndStrikesByType();
-    const availableDates = Object.keys(result[instrument.type === 'call' ? 'C' : 'P']);
-    dateSelect.innerHTML = '';
-    availableDates.forEach(date => {
-      const option = document.createElement('option');
-      option.value = date;
-      option.textContent = `${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}`;
-      dateSelect.appendChild(option);
-    });
-    // Set selected date
-    dateSelect.value = instrument.date || availableDates[0];
-    instrument.date = dateSelect.value;
-  }
-
-  // Helper to update strike dropdown based on type and date
-  async function updateStrikeOptions() {
-    const result = await deriveApi.fetchDatesAndStrikesByType();
-    const typeKey = instrument.type === 'call' ? 'C' : 'P';
-    const strikes = result[typeKey][instrument.date] || [];
+  // Populate strike dropdown with values around the current price
+  function populateStrikeOptions() {
     strikeSelect.innerHTML = '';
-    strikes.forEach(strike => {
+    STRIKE_MULTIPLIERS.forEach(mult => {
+      const strikeValue = Math.round(mvp.currentPrice * mult);
       const option = document.createElement('option');
-      option.value = strike;
-      option.textContent = strike;
+      option.value = strikeValue;
+      option.textContent = strikeValue;
       strikeSelect.appendChild(option);
     });
-    // Set selected strike
-    strikeSelect.value = instrument.strike || strikes[0];
+    strikeSelect.value = Math.round(instrument.strike);
     instrument.strike = parseFloat(strikeSelect.value);
   }
 
@@ -166,11 +122,9 @@ async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optS
 
   // Listen to input changes
   const typeBtn = div.querySelector('.type-btn');
-  typeBtn?.addEventListener('click', async () => {
+  typeBtn?.addEventListener('click', () => {
     instrument.type = instrument.type === 'call' ? 'put' : 'call';
     typeBtn.textContent = instrument.type;
-    await updateDateOptions();
-    await updateStrikeOptions();
     charts.updateBuilderChart();
   });
 
@@ -189,14 +143,8 @@ async function addOption(optType = 'call', optPost = 'long', optStrike = 1, optS
     instrument.size = parseFloat(e.target.value);
     charts.updateBuilderChart();
   });
-  dateSelect.addEventListener('change', async e => {
-    instrument.date = e.target.value;
-    await updateStrikeOptions();
-    charts.updateBuilderChart();
-  });
 
-  await updateDateOptions();
-  await updateStrikeOptions();
+  populateStrikeOptions();
 
   charts.updateBuilderChart();
 }
@@ -283,27 +231,4 @@ addPerpBtn.addEventListener('click', () => {
   // For now default to long call
   addPerp();
 });
-
-export function rebuildBuilderUI(instruments = []) {
-  instrumentList.innerHTML = '';
-  customInstruments.length = 0;
-
-  for (const inst of instruments) {
-    const id = `inst-${Date.now()}`;
-    const newInst = { ...inst, id };
-    customInstruments.push(newInst);
-
-    if (inst.asset === 'opt') {
-      addOption(newInst.type, newInst.position, 1, newInst.size);
-      const added = instrumentList.lastChild;
-      added.querySelector('.strike-input').value = newInst.strike;
-    } else if (inst.asset === 'perp') {
-      addPerp(newInst.position, 1, newInst.size, newInst.leverage);
-      const added = instrumentList.lastChild;
-      added.querySelector('.entry-input').value = newInst.entry;
-    }
-  }
-
-  charts.updateBuilderChart();
-}
 
