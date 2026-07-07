@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Claude Code local settings (personal, not shared)
+.claude
+
+#Project Documentation
+docs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# npm logs
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
