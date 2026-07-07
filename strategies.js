@@ -142,17 +142,17 @@ export async function defaultStrategy(strike = currentPrice, size = 1, lineColor
 }
 
 export async function generateStrategy(strategyId){
-  let strategy = {datasets: [], strikeprices: [], breakeven: null};
+  let strategy = {datasets: [], strikePrices: [], breakeven: null};
   let combined = [];
   let pnl;
 
   for (const inst of strategiesIdMap[strategyId].components){
     if (inst.asset === 'opt'){
       pnl = calculateOptionPNL(inst.type, inst.strike * currentPrice, inst.size, inst.position);
-      strategy.strikeprices.push(inst.strike);
+      strategy.strikePrices.push(inst.strike);
     } else if (inst.asset === 'perp'){
       pnl = calculatePerpPNL(inst.entry * currentPrice, inst.size, inst.leverage, inst.position);
-      strategy.strikeprices.push(inst.entry);
+      strategy.strikePrices.push(inst.entry);
     }
 
     let data = {
@@ -178,7 +178,7 @@ export async function generateStrategy(strategyId){
   };
 
   strategy.datasets.push(compoundPnl);
-  strategy.breakeven = findBreakevenPoints(compoundPnl);
+  strategy.breakeven = findBreakevenPoints(combinedPnl);
 
   return strategy;
 
@@ -189,6 +189,8 @@ export const strategiesIdMap = {
   'custom':{
     name: 'Custom',
     description: 'Design your strategy from scratch by adding assets and defining their parameters.',
+    components: [],
+    sentiment: 'neutral',
   },
 
   'coveredPut':{

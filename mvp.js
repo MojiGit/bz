@@ -46,21 +46,30 @@ button.addEventListener('click', () => {
 export let priceRange = [];
 // Fetch current price from CoinGecko
 async function fetchCurrentPrice(tokenId) {
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`;
-  const res = await fetch(url);
-  const data = await res.json();
-  //update the gobal variable
-  currentPrice = data[tokenId]?.usd;
+  try {
+    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`;
+    const res = await fetch(url);
+    const data = await res.json();
+    //update the gobal variable
+    currentPrice = data[tokenId]?.usd;
 
-  const currentPriceDisplay = document.querySelector('.current-price-display');
-  const currentPriceP = currentPriceDisplay.querySelector('p');
-  if (currentPriceP) {
-    currentPriceP.textContent = `US $ ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    const currentPriceDisplay = document.querySelector('.current-price-display');
+    const currentPriceP = currentPriceDisplay.querySelector('p');
+    if (currentPriceP) {
+      currentPriceP.textContent = `US $ ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+
+    priceRange = Strategies.generateDynamicPriceRange();
+
+    return data[tokenId]?.usd || null;
+  } catch (err) {
+    console.error('Failed to fetch current price:', err);
+    const currentPriceP = document.querySelector('.current-price-display')?.querySelector('p');
+    if (currentPriceP) {
+      currentPriceP.textContent = 'Price unavailable';
+    }
+    return null;
   }
-
-  priceRange = Strategies.generateDynamicPriceRange();
-
-  return data[tokenId]?.usd || null;
 }
 
 //variable to store the current strategy dployed
@@ -89,10 +98,10 @@ buttons.forEach((btn) => {
 
     if (selectedStrategyId) { 
       const { datasets, strikePrices } = await Strategies.generateStrategy(selectedStrategyId);
-      charts.renderPNLChart(datasets);
+      charts.renderPNLChart(datasets, strikePrices);
     } else {
       const { datasets, strikePrices } = await Strategies.defaultStrategy();
-      charts.renderPNLChart(datasets);
+      charts.renderPNLChart(datasets, strikePrices);
     }   
    
   });
@@ -108,10 +117,10 @@ export async function updateChartForToken() {
 
   if (selectedStrategyId) { 
     const { datasets, strikePrices } = await Strategies.generateStrategy(selectedStrategyId);
-    charts.renderPNLChart(datasets);
+    charts.renderPNLChart(datasets, strikePrices);
   } else {
     const { datasets, strikePrices } = await Strategies.defaultStrategy();
-    charts.renderPNLChart(datasets);
+    charts.renderPNLChart(datasets, strikePrices);
   }   
 
 }
@@ -265,11 +274,17 @@ function generateStrategyCards(containerId) {
       strategyComponents = Strategies.strategiesIdMap[selectedStrategyId].components;
 
       // Render chart
-      if(strategyId === 'custom'){
-        updateChartForToken();
+      try {
+        if(strategyId === 'custom'){
+          updateChartForToken();
+        }
+        const {datasets, strikePrices} = await Strategies.generateStrategy(selectedStrategyId);
+        charts.renderPNLChart(datasets, strikePrices);
+      } catch (err) {
+        console.error('Failed to render strategy chart:', err);
+        content.querySelector('.strategy-error')?.remove();
+        content.insertAdjacentHTML('beforeend', `<p class="strategy-error text-red-500 text-[14px]">Unable to load this strategy's chart.</p>`);
       }
-      const {datasets, strikePrices} = await Strategies.generateStrategy(selectedStrategyId);
-      charts.renderPNLChart(datasets);
     });
 
     container.appendChild(card);
