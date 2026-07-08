@@ -73,10 +73,10 @@ export function findBreakevenPoints(pnlArray) {
     }
     // También puedes agregar el caso exacto de PNL = 0
     if (curr.pnl === 0) {
-      breakevens.push(curr.price);
+      breakevens.push(Math.round(curr.price));
     }
   }
-  return breakevens;
+  return [...new Set(breakevens)];
 }
 
 // Generate price range based on current price
