@@ -5,8 +5,8 @@ These functions calculate PNL for different trading strategies, including spot, 
 import { currentPrice, selectedTokenSymbol, priceRange } from "./mvp.js";
 
 // Perpetual PNL
-export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 'long') {
-  return priceRange.map(currentPrice => {
+export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 'long', prices = priceRange) {
+  return prices.map(currentPrice => {
     if(position === 'short'){
       const pnl = (entryPrice - currentPrice) * quantity * leverage;
       return { price: currentPrice, pnl};
@@ -17,8 +17,8 @@ export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 
 }
 
 // Option PNL (Call or Put)
-export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long') {
-  return priceRange.map(currentPrice => {
+export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long', prices = priceRange) {
+  return prices.map(currentPrice => {
     let intrinsicValue;
     if (optionType === 'call') {
       intrinsicValue = Math.max(currentPrice - strikePrice, 0);
@@ -77,6 +77,39 @@ export function findBreakevenPoints(pnlArray) {
     }
   }
   return [...new Set(breakevens)];
+}
+
+// Detect whether a strategy's combined PnL is still sloping (uncapped) or has flattened
+// (capped) at price extremes far beyond the normal ± 20% chart window, using the same
+// per-leg PnL functions the rest of this file uses — evaluated at synthetic extreme prices
+// instead of the usual priceRange.
+export function detectCapped(components, spotPrice) {
+  const lowFar = spotPrice * 0.0001;
+  const lowNear = spotPrice * 0.001;
+  const highNear = spotPrice * 50;
+  const highFar = spotPrice * 100;
+  const testPrices = [lowFar, lowNear, highNear, highFar];
+
+  const totals = [0, 0, 0, 0];
+
+  for (const inst of components) {
+    let legPnls;
+    if (inst.asset === 'opt') {
+      legPnls = calculateOptionPNL(inst.type, inst.strike * spotPrice, inst.size, inst.position, testPrices);
+    } else if (inst.asset === 'perp') {
+      legPnls = calculatePerpPNL(inst.entry * spotPrice, inst.size, inst.leverage, inst.position, testPrices);
+    } else {
+      continue;
+    }
+    legPnls.forEach((point, i) => { totals[i] += point.pnl; });
+  }
+
+  const [pnlLowFar, pnlLowNear, pnlHighNear, pnlHighFar] = totals;
+
+  return {
+    profitUncapped: pnlHighFar > pnlHighNear,
+    lossUncapped: pnlLowFar < pnlLowNear,
+  };
 }
 
 // Generate price range based on current price
@@ -149,7 +182,7 @@ export function normalizeLeg(component, spotPrice) {
 // === default strategy ===
 export async function defaultStrategy(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
 
-  const pnlData = calculateOptionPNL('call', strike, size, priceRange, 'long');
+  const pnlData = calculateOptionPNL('call', strike, size, 'long');
   const breakeven = findBreakevenPoints(pnlData)
 
   return {
