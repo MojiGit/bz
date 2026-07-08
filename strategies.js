@@ -126,6 +126,26 @@ export function generatePremium(strike, position) {
   }
 }
 
+// Normalize a leg/component from either schema into one common absolute-value shape.
+// strategiesIdMap components (this file) store strike/entry as a ratio of spot, converted
+// at point of use. builder.js instruments store strike/entry as absolute dollars already,
+// and are distinguishable by having an `id` field (assigned at creation for DOM binding),
+// which strategiesIdMap components never have.
+export function normalizeLeg(component, spotPrice) {
+  const assetType = component.asset;
+  const isAbsolute = component.id !== undefined;
+  const rawStrikeOrEntry = assetType === 'opt' ? component.strike : component.entry;
+
+  return {
+    assetType,
+    strikeOrEntryAbsolute: isAbsolute ? rawStrikeOrEntry : rawStrikeOrEntry * spotPrice,
+    size: component.size,
+    leverage: assetType === 'perp' ? component.leverage : 1,
+    position: component.position === 'short' ? 'short' : 'long',
+    optionType: assetType === 'opt' ? component.type : null,
+  };
+}
+
 // === default strategy ===
 export async function defaultStrategy(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
 
