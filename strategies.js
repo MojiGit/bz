@@ -179,6 +179,38 @@ export function normalizeLeg(component, spotPrice) {
   };
 }
 
+// Decompose a set of normalized legs (see normalizeLeg) into their structural PnL
+// contribution at a given price, excluding any premium/cost term. Perp legs have no
+// premium term, so their full PnL applies; option legs contribute intrinsic value only.
+export function decomposeStructuralAtPrice(normalizedLegs, price) {
+  let structuralValue = 0;
+  let hasPremiumLegs = false;
+
+  for (const leg of normalizedLegs) {
+    if (leg.assetType === 'perp') {
+      structuralValue += calculatePerpPNL(leg.strikeOrEntryAbsolute, leg.size, leg.leverage, leg.position, [price])[0].pnl;
+    } else if (leg.assetType === 'opt') {
+      hasPremiumLegs = true;
+      let intrinsicValue;
+      if (leg.optionType === 'call') {
+        intrinsicValue = Math.max(price - leg.strikeOrEntryAbsolute, 0);
+      } else if (leg.optionType === 'put') {
+        intrinsicValue = Math.max(leg.strikeOrEntryAbsolute - price, 0);
+      } else {
+        throw new Error("Invalid option type");
+      }
+
+      let value = intrinsicValue * leg.size;
+      if (leg.position === 'short') {
+        value = -value;
+      }
+      structuralValue += value;
+    }
+  }
+
+  return { structuralValue, hasPremiumLegs };
+}
+
 // === default strategy ===
 export async function defaultStrategy(strike = currentPrice, size = 1, lineColor = '#D8DDEF'){
 
