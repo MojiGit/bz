@@ -76,17 +76,17 @@
         <div>
 
             <!--menu options-->
-            <div id="menu" class="w-full border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden">
+            <div id="menu" class="w-full border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[calc(100vh_-_104px)] flex flex-col">
 
-                <!-- Header -->
+                <!-- Header (fixed, does not scroll) -->
                 <div class="flex flex-row items-center justify-between py-[13px] px-4 border-b border-[#D8DDEF]">
                     <h1 class="text-[24px] md:text-[32px] font-bold text-black">
-                        Option Strategy Builder
+                        Strategy Templates
                     </h1>
                 </div>
 
-                <div class="p-4">
-                    <!-- Sentiment Filters Section -->
+                <div class="p-4 flex flex-col flex-1 min-h-0">
+                    <!-- Sentiment Filters Section (fixed, does not scroll) -->
                     <div id="sentiment-filters" class="flex flex-row justify-between w-full gap-8 mb-4 overflow-hidden" >
                         <div class="flex flex-row gap-2 overflow-x-auto no-scrollbar whitespace-nowrap text-[16px] text-black font-semibold">
                             <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="all"> All </button>
@@ -106,8 +106,8 @@
 
                     </div>
 
-                    <!--Strategies-->
-                    <div id="strategy-container" class="grid gap-4"></div>
+                    <!--Strategies (only this part scrolls) -->
+                    <div id="strategy-container" class="flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto"></div>
                 </div>
 
             </div>

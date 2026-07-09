@@ -216,7 +216,7 @@ function generateStrategyCards(containerId) {
 
     //for each strategy in IdMap creates a div with the atributes, sentiment and strategyid
     const card = document.createElement('div');
-    card.className = 'strategy-block grid grid-cols-1 divide-y-2 px-2 pt-2 gap-2 border border-2 border-[#D8DDEF] rounded-xl transition-all duration-300 cursor-pointer overflow-hidden';
+    card.className = 'strategy-block shrink-0 grid grid-cols-1 divide-y-2 px-2 pt-2 gap-2 border border-2 border-[#D8DDEF] rounded-xl transition-all duration-300 cursor-pointer overflow-hidden';
     card.setAttribute('data-strategy', strategyId);
     card.setAttribute('data-sentiment', info.sentiment);
 
@@ -228,7 +228,7 @@ function generateStrategyCards(containerId) {
           <h1 class="text-[18px] font-bold text-[#191308]">${info.name}</h1>
         </div>
       </div>
-      <div class="strategy-content opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+      <div class="strategy-content opacity-0 overflow-hidden transition-all duration-500 ease-in-out" style="max-height: 0px;">
         <div class="description-display py-2">
           <p class="text-[16px] text-gray-400">${info.description}</p>
         </div>
@@ -246,7 +246,7 @@ function generateStrategyCards(containerId) {
           <span class="text-[16px] text-gray-400">${capitalize(info.sentiment)}</span>
         </div>
       </div>
-      <div class="strategy-content opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+      <div class="strategy-content opacity-0 overflow-hidden transition-all duration-500 ease-in-out" style="max-height: 0px;">
         <div class="description-display py-2">
           <p class="text-[16px] text-gray-400">${info.description}</p>
         </div>
@@ -288,15 +288,23 @@ function generateStrategyCards(containerId) {
       document.querySelectorAll('.strategy-block').forEach(other => {
         const content = other.querySelector('.strategy-content');
         other.classList.remove('bg-[#F4FFF9]', 'border-[#52FFB8]');
-        content.classList.remove('opacity-100', 'max-h-96');
-        content.classList.add('opacity-0', 'max-h-0');
+        content.classList.remove('opacity-100');
+        content.classList.add('opacity-0');
+        content.style.maxHeight = '0px';
       });
 
-      // Expand current card
+      // Expand current card (max-height matches its actual content, not a fixed guess)
       const content = card.querySelector('.strategy-content');
       card.classList.add('bg-[#F4FFF9]', 'border-[#52FFB8]');
-      content.classList.remove('opacity-0', 'max-h-0');
-      content.classList.add('opacity-100', 'max-h-96');
+      content.classList.remove('opacity-0');
+      content.classList.add('opacity-100');
+      content.style.maxHeight = content.scrollHeight + 'px';
+
+      // Scroll the expanded card into view within its scrollable list once it has
+      // finished growing (matches .strategy-content's own transition-duration-500)
+      setTimeout(() => {
+        card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }, 500);
 
       selectedStrategyId = strategyId; //update global variable
       strategyComponents = Strategies.strategiesIdMap[selectedStrategyId].components;
