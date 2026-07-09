@@ -5,8 +5,8 @@ These functions calculate PNL for different trading strategies, including spot, 
 import { currentPrice, selectedTokenSymbol, priceRange } from "./mvp.js";
 
 // Perpetual PNL
-export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 'long', prices = priceRange) {
-  return prices.map(currentPrice => {
+export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 'long') {
+  return priceRange.map(currentPrice => {
     if(position === 'short'){
       const pnl = (entryPrice - currentPrice) * quantity * leverage;
       return { price: currentPrice, pnl};
@@ -17,8 +17,8 @@ export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 
 }
 
 // Option PNL (Call or Put)
-export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long', prices = priceRange) {
-  return prices.map(currentPrice => {
+export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long') {
+  return priceRange.map(currentPrice => {
     let intrinsicValue;
     if (optionType === 'call') {
       intrinsicValue = Math.max(currentPrice - strikePrice, 0);
@@ -77,39 +77,6 @@ export function findBreakevenPoints(pnlArray) {
     }
   }
   return [...new Set(breakevens)];
-}
-
-// Detect whether a strategy's combined PnL is still sloping (uncapped) or has flattened
-// (capped) at price extremes far beyond the normal ± 20% chart window, using the same
-// per-leg PnL functions the rest of this file uses — evaluated at synthetic extreme prices
-// instead of the usual priceRange.
-export function detectCapped(components, spotPrice) {
-  const lowFar = spotPrice * 0.0001;
-  const lowNear = spotPrice * 0.001;
-  const highNear = spotPrice * 50;
-  const highFar = spotPrice * 100;
-  const testPrices = [lowFar, lowNear, highNear, highFar];
-
-  const totals = [0, 0, 0, 0];
-
-  for (const inst of components) {
-    let legPnls;
-    if (inst.asset === 'opt') {
-      legPnls = calculateOptionPNL(inst.type, inst.strike * spotPrice, inst.size, inst.position, testPrices);
-    } else if (inst.asset === 'perp') {
-      legPnls = calculatePerpPNL(inst.entry * spotPrice, inst.size, inst.leverage, inst.position, testPrices);
-    } else {
-      continue;
-    }
-    legPnls.forEach((point, i) => { totals[i] += point.pnl; });
-  }
-
-  const [pnlLowFar, pnlLowNear, pnlHighNear, pnlHighFar] = totals;
-
-  return {
-    profitUncapped: pnlHighFar > pnlHighNear,
-    lossUncapped: pnlLowFar < pnlLowNear,
-  };
 }
 
 // Generate price range based on current price
@@ -177,38 +144,6 @@ export function normalizeLeg(component, spotPrice) {
     position: component.position === 'short' ? 'short' : 'long',
     optionType: assetType === 'opt' ? component.type : null,
   };
-}
-
-// Decompose a set of normalized legs (see normalizeLeg) into their structural PnL
-// contribution at a given price, excluding any premium/cost term. Perp legs have no
-// premium term, so their full PnL applies; option legs contribute intrinsic value only.
-export function decomposeStructuralAtPrice(normalizedLegs, price) {
-  let structuralValue = 0;
-  let hasPremiumLegs = false;
-
-  for (const leg of normalizedLegs) {
-    if (leg.assetType === 'perp') {
-      structuralValue += calculatePerpPNL(leg.strikeOrEntryAbsolute, leg.size, leg.leverage, leg.position, [price])[0].pnl;
-    } else if (leg.assetType === 'opt') {
-      hasPremiumLegs = true;
-      let intrinsicValue;
-      if (leg.optionType === 'call') {
-        intrinsicValue = Math.max(price - leg.strikeOrEntryAbsolute, 0);
-      } else if (leg.optionType === 'put') {
-        intrinsicValue = Math.max(leg.strikeOrEntryAbsolute - price, 0);
-      } else {
-        throw new Error("Invalid option type");
-      }
-
-      let value = intrinsicValue * leg.size;
-      if (leg.position === 'short') {
-        value = -value;
-      }
-      structuralValue += value;
-    }
-  }
-
-  return { structuralValue, hasPremiumLegs };
 }
 
 // === default strategy ===
