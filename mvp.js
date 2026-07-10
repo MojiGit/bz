@@ -188,7 +188,7 @@ function generateStrategyCards(containerId) {
 
     //for each strategy in IdMap creates a div with the atributes, sentiment and strategyid
     const card = document.createElement('div');
-    card.className = 'strategy-block mx-1 shrink-0 grid grid-cols-1 divide-y-2 px-2 pt-2 gap-2 border border-2 border-[#D8DDEF] rounded-xl transition-all duration-300 cursor-pointer overflow-hidden';
+    card.className = 'strategy-block mx-1 shrink-0 grid grid-cols-1 divide-y-2 p-1 border border-2 border-[#D8DDEF] rounded-xl transition-all duration-300 cursor-pointer overflow-hidden';
     card.setAttribute('data-strategy', strategyId);
     card.setAttribute('data-sentiment', info.sentiment);
 
@@ -214,7 +214,7 @@ function generateStrategyCards(containerId) {
       <div class="flex flex-row strategy-header justify-between">
         <div class="flex flex-row gap-2 items-center">
           <h1 class="text-[14px] font-bold text-[#191308]">${info.name}</h1>
-          <label class="text-gray-400">|</label>
+          <label class="text-[10px] text-gray-400">|</label>
           <span class="text-[14px] text-gray-400">${capitalize(info.sentiment)}</span>
         </div>
       </div>

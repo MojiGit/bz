@@ -40,7 +40,7 @@
     <!-- Navbar -->
     <div class="relative">        
         <nav id="main-navbar"
-            class="static top-4 left-2 right-2 mt-2 px-4 bg-white border border-[#D8DDEF] rounded-full flex items-center justify-between">
+            class="static top-4 left-2 right-2 mt-2 mx-2 px-4 bg-white border border-[#D8DDEF] rounded-full flex items-center justify-between">
             <!-- Logo -->
             <a href="./index.html">
             <img src="./images/svgs/logo__black.svg" alt="Beta" class="w-16 h-12 lg:w-24 lg:h-16">
@@ -82,22 +82,22 @@
                     </h1>
                 </div>
 
-                <div class="p-2 flex flex-col">
+                <div class="p-2 flex ">
                     <!-- Sentiment Filters Section (fixed, does not scroll) -->
-                    <div id="sentiment-filters" class="flex flex-row w-full gap-4 overflow-hidden" >
-                        <div class="flex flex-row p-2 gap-2 overflow-x-auto no-scrollbar whitespace-nowrap text-[12px] text-gray-400 font-semibold">
-                            <button class="sentiment-filter max-h-[24px] px-1 rounded hover:bg-gray-200" data-sentiment="all"> All </button>
-                            <button class="sentiment-filter max-h-[24px] px-1 rounded hover:bg-gray-200" data-sentiment="bullish"> Bullish </button>
-                            <button class="sentiment-filter max-h-[24px] px-1 rounded hover:bg-gray-200" data-sentiment="bearish"> Bearish </button>
-                            <button class="sentiment-filter max-h-[24px] px-1 rounded hover:bg-gray-200" data-sentiment="neutral"> Neutral </button>
+                    <div id="sentiment-filters" class="flex flex-row w-full gap-2 overflow-hidden" >
+                        <div class="flex flex-row gap-2 overflow-x-auto no-scrollbar whitespace-nowrap text-[12px] text-gray-400 font-semibold">
+                            <button class="sentiment-filter max-h-[24px] p-1 rounded hover:bg-gray-200" data-sentiment="all"> All </button>
+                            <button class="sentiment-filter max-h-[24px] p-1 rounded hover:bg-gray-200" data-sentiment="bullish"> Bullish </button>
+                            <button class="sentiment-filter max-h-[24px] p-1 rounded hover:bg-gray-200" data-sentiment="bearish"> Bearish </button>
+                            <button class="sentiment-filter max-h-[24px] p-1 rounded hover:bg-gray-200" data-sentiment="neutral"> Neutral </button>
                         </div>
 
-                        <div class="items-left max-w-[75px]">
+                        <div class="items-right p-1 max-w-[110px]">
                             <input
                                 id="strategy-name-filter"
                                 type="text"
                                 placeholder="Search"
-                                class="w-full m-2 px-2 border border-[#D8DDEF] rounded-xl text-[12px] text-black focus:outline-none focus:ring-2 focus:ring-[#00E083] focus:border-transparent"
+                                class="flex flex-row w-full px-2 border border-[#D8DDEF] rounded-xl text-[12px] text-black focus:outline-none focus:ring-2 focus:ring-[#00E083] focus:border-transparent"
                             />
                         </div>
 
@@ -106,7 +106,7 @@
                 </div>
 
                 <!--Strategies (only this part scrolls) -->
-                <div id="strategy-container" class="flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto no-scrollbar"></div>
+                <div id="strategy-container" class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto no-scrollbar"></div>
 
             </div>
 
@@ -134,28 +134,36 @@
         </div>
 
         <!--Chart-->
-        <div class="w-full p-2 border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[calc(100vh_-_104px)]">
+        <div class="w-full px-2 border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[calc(100vh_-_104px)]">
+            
+                             <!-- Header (fixed, does not scroll) -->
+            <div class="flex flex-row items-center justify-between p-2 border-b border-[#D8DDEF]">
+                <h1 class="text-[22px] md:text-[18px] font-bold text-black">
+                    Payoff
+                </h1>
+            </div>
+
             <!-- Token selection -->
-            <div id="token-buttons" class="flex flex-row gap-2 text-black justify-between">
+            <div id="token-buttons" class="flex text-[12px] p-2 flex-row gap-2 text-black">
                 <div>
                     <button
                         data-token="WBTC"
-                        class="token-btn text-[16px] px-1 rounded hover:bg-gray-200 transition-colors font-semibold duration-300"
+                        class="token-btn p-1 rounded hover:bg-gray-200 transition-colors font-semibold duration-300"
                     >
                         WBTC
                     </button>
                     <label>|</label>
                     <button
                         data-token="ETH"
-                        class="token-btn text-[16px] px-1 rounded hover:bg-gray-200 transition-colors font-semibold duration-300"
+                        class="token-btn p-1 rounded hover:bg-gray-200 transition-colors font-semibold duration-300"
                     >
                         ETH
                     </button>
                 </div>
                 <!-- Current price display-->
                 <div class="current-price-display flex flex-row items-center">
-                    <h2 class=" font-semibold px-1 text-[16px] text-black">Underlaying Price :</h2>
-                    <p class="text-black text-[16px]">#</p>
+                    <h2 class=" font-semibold p-1 text-black">Price :</h2>
+                    <p class="text-black">#</p>
                 </div>
             </div>
 
