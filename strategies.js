@@ -215,7 +215,7 @@ export const strategiesIdMap = {
 
   'coveredPut':{
     name: 'Covered Put',
-    description:'The Covered Put is the opposite process to a Covered Call, and it achieves the oppo￾site risk profile. Whereas the Covered Call is bullish, the Covered Put is a bearish income strategy, where you receive a substantial net credit for shorting both the put and the stock simultaneously to create the spread. ',
+    description:'Is a bearish income strategy, where you receive a substantial net credit for shorting both the put and the stock simultaneously to create the spread. ',
     maxProfit:'Capped',
     maxLoss:'Uncapped',
     strategyType:'Income',
@@ -229,7 +229,7 @@ export const strategiesIdMap = {
   
   'longIronCondor':{
     name: 'Long Iron Condor',
-    description: 'A variation of the Long Iron Butterfly, it is in fact the combi￾nation of a Bull Put Spread and a Bear Call Spread. The higher strike put is lower than the lower strike call in order to create the condor shape. The combination of two income strategies also makes this an income strategy',
+    description: 'It is the combination of a Bull Put Spread and a Bear Call Spread. The higher strike put is lower than the lower strike call in order to create the condor shape',
     maxProfit:'Capped',
     maxLoss:'Capped',
     strategyType:'Income',
@@ -245,7 +245,7 @@ export const strategiesIdMap = {
 
   'longIronButterfly':{
     name: 'Long Iron Butterfly',
-    description: 'It is, in fact, the combination of a Bull Put Spread and a Bear Call Spread. The higher strike put shares the same strike as the lower strike call to create the butterfly shape. The combination of two income strategies also makes this an income strategy',
+    description: 'The combination of a Bull Put Spread and a Bear Call Spread. The higher strike put shares the same strike as the lower strike call to create the butterfly shape',
     maxProfit:'Capped',
     maxLoss:'Capped',
     strategyType:'Income',
@@ -262,8 +262,8 @@ export const strategiesIdMap = {
   'strangle': {
     name: 'Strangle',
     description:'We simply buy lower strike puts and higher strike calls with the same expiration date so that we can profit from the stock soaring up or plummeting down.',
-    maxProfit: 'Unlimited',
-    maxLoss: 'Limited',
+    maxProfit: 'Uncapped',
+    maxLoss: 'Capped',
     strategyType: 'Capital Gain',
     sentiment: 'neutral',
     proficiency: 'Intermediate',
@@ -275,9 +275,9 @@ export const strategiesIdMap = {
 
   'bull-put-spread': {
     name: 'Bull Put Spread',
-    description:'Protect the downside of a Naked Put by buying a lower strike put to insure the one you sold. Both put strikes should be lower than the current market price so as to ensure a profit even if the stock doesn’t move at all.',
-    maxProfit: 'Limited',
-    maxLoss: 'Limited',
+    description:'Protect the downside of a Naked Put by buying a lower strike put to insure the one you sold',
+    maxProfit: 'Capped',
+    maxLoss: 'Capped',
     strategyType: 'Income',
     sentiment: 'bullish',
     proficiency: 'Intermediate',
@@ -289,9 +289,9 @@ export const strategiesIdMap = {
 
   'bear-call-spread': {
     name: 'Bear Call Spread',
-    description:'The concept is to protect the downside of a Naked Call by buying a higher strike call to insure the one you sold. Both call strikes should be higher than the current stock price so as to ensure a profit even if the stock doesn’t move at all. ',
-    maxProfit: 'Limited',
-    maxLoss: 'Limited',
+    description:'The concept is to protect the downside of a Naked Call by buying a higher strike call to insure the one you sold.',
+    maxProfit: 'Capped',
+    maxLoss: 'Capped',
     strategyType: 'Income',
     sentiment: 'bearish',
     proficiency: 'Intermediate',
@@ -303,9 +303,9 @@ export const strategiesIdMap = {
 
   'covered-call': {
     name: 'Covered Call',
-    description: 'The concept is that in owning the stock, you then sell an Out of the Money call option on a monthly basis as a means of collecting rent (or a dividend) while you own the stock. If the stock rises above the call strike, you’ll be exercised, and the stock will be sold . . . but you make a profit anyway. (You’re covered because you own the stock in the first place.) If the stock remains static, then you’re better off because you collected the call premium. If the stock falls, you have the cushion of the call premium you collected.',
-    maxProfit: 'Limited',
-    maxLoss: 'Unlimted',
+    description: 'The concept is that in owning the stock, you then sell an Out of the Money call option on a monthly basis as a means of collecting rent while you own the stock',
+    maxProfit: 'Capped',
+    maxLoss: 'Uncapped',
     strategyType: 'Income',
     sentiment: 'bullish',
     proficiency: 'Novice',

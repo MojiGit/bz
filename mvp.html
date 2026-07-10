@@ -34,13 +34,13 @@
 
 </head>
 
-<body class="bg-white text-black text-[18px]">
+<body class="bg-gray-100 text-black text-[18px]">
 
 
     <!-- Navbar -->
-    <div class="relative z-50">        
+    <div class="relative">        
         <nav id="main-navbar"
-            class="fixed top-4 left-2 right-2 z-50 px-4 backdrop-blur-3xl bg-white/10 border border-[#D8DDEF] rounded-full flex items-center justify-between transition-opacity duration-500 ease-in-out opacity-100">
+            class="static top-4 left-2 right-2 m-2 px-4 bg-white border border-[#D8DDEF] rounded-full flex items-center justify-between">
             <!-- Logo -->
             <a href="./index.html">
             <img src="./images/svgs/logo__black.svg" alt="Beta" class="w-16 h-12 lg:w-24 lg:h-16">
@@ -59,15 +59,12 @@
         </nav>
         <!-- mobile menu -->
         <div id="mobile-menu"
-            class="fixed top-[72px] left-0 right-0 mx-5 p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-black font-semibold opacity-0 pointer-events-none transition-all duration-300 ease-in-out z-40">
+            class="fixed top-[72px] left-0 right-0 mx-5 p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-black font-semibold opacity-0 pointer-events-none z-40">
             <ul class="space-y-4 text-[18px]">
             <li><a target="_blank" rel="noopener noreferrer" href="https://m-mojica-mateuss-organization.gitbook.io/betazero-1/" class="px-1">Docs</a></li>
             </ul>
         </div>
     </div>
-
-    <!--section to avoid overlaping-->
-    <div class="h-[80px]"></div>
     
     <!-- Dashboard -->
     <section id="dashboard" class="grid grid-cols-[340px_minmax(0,1fr)] gap-3 p-3">
@@ -80,27 +77,27 @@
 
                 <!-- Header (fixed, does not scroll) -->
                 <div class="flex flex-row items-center justify-between py-[13px] px-4 border-b border-[#D8DDEF]">
-                    <h1 class="text-[24px] md:text-[32px] font-bold text-black">
+                    <h1 class="text-[22px] md:text-[18px] font-bold text-black">
                         Strategy Templates
                     </h1>
                 </div>
 
-                <div class="p-4 flex flex-col flex-1 min-h-0">
+                <div class="p-4 flex flex-col flex-1">
                     <!-- Sentiment Filters Section (fixed, does not scroll) -->
-                    <div id="sentiment-filters" class="flex flex-row justify-between w-full gap-8 mb-4 overflow-hidden" >
-                        <div class="flex flex-row gap-2 overflow-x-auto no-scrollbar whitespace-nowrap text-[16px] text-black font-semibold">
-                            <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="all"> All </button>
-                            <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="bullish"> Bullish </button>
-                            <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="bearish"> Bearish </button>
-                            <button class="sentiment-filter px-1 rounded hover:bg-gray-200" data-sentiment="neutral"> Neutral </button>
+                    <div id="sentiment-filters" class="flex flex-row w-full gap-4 mb-4 overflow-hidden" >
+                        <div class="flex flex-row p-2 gap-2 overflow-x-auto no-scrollbar whitespace-nowrap text-[12px] text-gray-400 font-semibold">
+                            <button class="sentiment-filter max-h-[24px] px-1 rounded hover:bg-gray-200" data-sentiment="all"> All </button>
+                            <button class="sentiment-filter max-h-[24px] px-1 rounded hover:bg-gray-200" data-sentiment="bullish"> Bullish </button>
+                            <button class="sentiment-filter max-h-[24px] px-1 rounded hover:bg-gray-200" data-sentiment="bearish"> Bearish </button>
+                            <button class="sentiment-filter max-h-[24px] px-1 rounded hover:bg-gray-200" data-sentiment="neutral"> Neutral </button>
                         </div>
 
-                        <div>
+                        <div class="items-left max-w-[75px]">
                             <input
                                 id="strategy-name-filter"
                                 type="text"
                                 placeholder="Search"
-                                class="w-full max-w-[150px] px-2 border border-[#D8DDEF] rounded-xl"
+                                class="w-full m-2 px-2 border border-[#D8DDEF] rounded-xl text-[12px] text-black focus:outline-none focus:ring-2 focus:ring-[#00E083] focus:border-transparent"
                             />
                         </div>
 
@@ -113,7 +110,7 @@
             </div>
 
             <!-- Strategy Builder UI -->
-            <div id="strategy-builder-board" class="hidden w-full">
+            <div id="strategy-builder-board" class="hidden w-full ">
                 <div class="flex flex-row justify-end items-center mb-4">
                     <button id="exit-builder" class="text-[16px] px-1 hover:bg-gray-200 rounded font-semibold text-black"> Exit</button>
                 </div>
@@ -136,7 +133,7 @@
         </div>
 
         <!--Chart-->
-        <div class="w-full px-4 min-h-[460px]">
+        <div class="w-full p-2 border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[calc(100vh_-_104px)]">
             <!-- Token selection -->
             <div id="token-buttons" class="flex flex-row gap-2 text-black justify-between">
                 <div>
@@ -162,7 +159,7 @@
             </div>
 
             <div class="w-full p-2">
-                <canvas id="pnlChart" class="h-[600px] w-[400px]"></canvas>
+                <canvas id="pnlChart" class="h-[500px]"></canvas>
             </div>
 
         </div>

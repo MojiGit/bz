@@ -1,12 +1,11 @@
 /*
 This section of code is responsible for the dynamic behavior of the MVP page.
 It includes the following functionalities:
-  1. **Navbar Visibility**: The navbar hides when scrolling down and shows when scrolling up.
-  2. **Strategy Block Toggle**: Clicking on a strategy block expands it and loads the corresponding PNL chart.
-  3. **Dynamic Price Range**: Fetches current token prices from CoinGecko and generates a dynamic price range for the PNL chart.
-  4. **Token Selection**: Allows users to select different tokens, updating the PNL chart accordingly.
-  5. **Default Token Selection**: Automatically selects WBTC on page load.
-  6. **Chart Rendering**: Utilizes Chart.js to render the PNL chart based on selected strategies and tokens.
+  1. **Strategy Block Toggle**: Clicking on a strategy block expands it and loads the corresponding PNL chart.
+  2. **Dynamic Price Range**: Fetches current token prices from CoinGecko and generates a dynamic price range for the PNL chart.
+  3. **Token Selection**: Allows users to select different tokens, updating the PNL chart accordingly.
+  4. **Default Token Selection**: Automatically selects WBTC on page load.
+  5. **Chart Rendering**: Utilizes Chart.js to render the PNL chart based on selected strategies and tokens.
 */
 
 import * as Strategies from './strategies.js';
@@ -42,33 +41,6 @@ button.addEventListener('click', () => {
     mobileMenu.classList.toggle('opacity-0', !menuOpen);
     mobileMenu.classList.toggle('pointer-events-none', !menuOpen);
     mobileMenu.classList.toggle('opacity-100', menuOpen);
-});
-
-// Hide navbar on scroll down, show on scroll up
-let lastScrollTop = 0;
-const navbar = document.querySelector('nav');
-
-window.addEventListener('scroll', () => {
-  const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-
-  if (currentScroll > lastScrollTop) {
-    // Scroll Down — hide navbar and dropdown (if open)
-    navbar.classList.add('opacity-0', 'pointer-events-none');
-    navbar.classList.remove('opacity-100');
-
-    if (!mobileMenu.classList.contains('hidden')) {
-      mobileMenu.classList.add('opacity-0', 'pointer-events-none');
-      mobileMenu.classList.remove('opacity-100');
-    }
-  } else {
-    // Scroll Up — show navbar ONLY
-    navbar.classList.remove('opacity-0', 'pointer-events-none');
-    navbar.classList.add('opacity-100');
-
-    // Do NOT show the dropdown here — leave it hidden unless manually triggered
-  }
-
-  lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
 export let priceRange = [];
