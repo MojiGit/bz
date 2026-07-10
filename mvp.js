@@ -188,7 +188,7 @@ function generateStrategyCards(containerId) {
 
     //for each strategy in IdMap creates a div with the atributes, sentiment and strategyid
     const card = document.createElement('div');
-    card.className = 'strategy-block shrink-0 grid grid-cols-1 divide-y-2 px-2 pt-2 gap-2 border border-2 border-[#D8DDEF] rounded-xl transition-all duration-300 cursor-pointer overflow-hidden';
+    card.className = 'strategy-block mx-1 shrink-0 grid grid-cols-1 divide-y-2 px-2 pt-2 gap-2 border border-2 border-[#D8DDEF] rounded-xl transition-all duration-300 cursor-pointer overflow-hidden';
     card.setAttribute('data-strategy', strategyId);
     card.setAttribute('data-sentiment', info.sentiment);
 
@@ -197,14 +197,14 @@ function generateStrategyCards(containerId) {
       card.innerHTML = `
       <div class="flex flex-row strategy-header justify-between">
         <div class="flex flex-row gap-2 items-center">
-          <h1 class="text-[18px] font-bold text-[#191308]">${info.name}</h1>
+          <h1 class="text-[14px] font-bold text-[#191308]">${info.name}</h1>
         </div>
       </div>
       <div class="strategy-content opacity-0 overflow-hidden transition-all duration-500 ease-in-out" style="max-height: 0px;">
         <div class="description-display py-2">
-          <p class="text-[16px] text-gray-400">${info.description}</p>
+          <p class="text-[12px] text-gray-400">${info.description}</p>
         </div>
-        <button class="text-[16px] bg-[#D8DDEF] font-semibold text-black px-2 mb-2 rounded-md hover:bg-[#52FFB8] transition-colors duration-300">
+        <button class="text-[14px] bg-[#D8DDEF] font-semibold text-black px-2 mb-2 rounded-md hover:bg-[#52FFB8] transition-colors duration-300">
           Build
         </button>
       </div>
@@ -213,34 +213,34 @@ function generateStrategyCards(containerId) {
     card.innerHTML = `
       <div class="flex flex-row strategy-header justify-between">
         <div class="flex flex-row gap-2 items-center">
-          <h1 class="text-[18px] font-bold text-[#191308]">${info.name}</h1>
+          <h1 class="text-[14px] font-bold text-[#191308]">${info.name}</h1>
           <label class="text-gray-400">|</label>
-          <span class="text-[16px] text-gray-400">${capitalize(info.sentiment)}</span>
+          <span class="text-[14px] text-gray-400">${capitalize(info.sentiment)}</span>
         </div>
       </div>
       <div class="strategy-content opacity-0 overflow-hidden transition-all duration-500 ease-in-out" style="max-height: 0px;">
         <div class="description-display py-2">
-          <p class="text-[16px] text-gray-400">${info.description}</p>
+          <p class="text-[12px] text-gray-400">${info.description}</p>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 py-2 justify-between gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-2 py-2 p justify-between gap-2">
           <div class="proficiency-display flex flex-col">
-            <h2 class="font-bold text-[14px]">Proficiency</h2>
-            <p class="text-[14px]">${info.proficiency}</p>
+            <h2 class="font-bold text-[12px]">Proficiency</h2>
+            <p class="text-[11px]">${info.proficiency}</p>
           </div>
           <div class="strategy-type-display flex flex-col">
-            <h2 class="font-bold text-[14px]">Strategy Type</h2>
-            <p class="text-[14px]">${info.strategyType}</p>
+            <h2 class="font-bold text-[12px]">Strategy Type</h2>
+            <p class="text-[11px]">${info.strategyType}</p>
           </div>
           <div class="max-profit-display flex flex-col">
-            <h2 class="font-bold text-[14px]">Max Profit</h2>
-            <p class="text-[14px]">${info.maxProfit}</p>
+            <h2 class="font-bold text-[12px]">Max Profit</h2>
+            <p class="text-[11px]">${info.maxProfit}</p>
           </div>
           <div class="max-loss-display flex flex-col">
-            <h2 class="font-bold text-[14px]">Max Loss</h2>
-            <p class="text-[14px]">${info.maxLoss}</p>
+            <h2 class="font-bold text-[12px]">Max Loss</h2>
+            <p class="text-[11px]">${info.maxLoss}</p>
           </div>
         </div>
-        <button class="text-[16px] bg-[#D8DDEF] font-semibold text-black px-2 mb-2 rounded-md hover:bg-[#52FFB8] transition-colors duration-300">
+        <button class="text-[14px] bg-[#D8DDEF] font-semibold text-black px-2 mb-2 rounded-md hover:bg-[#52FFB8] transition-colors duration-300">
           Build
         </button>
       </div>

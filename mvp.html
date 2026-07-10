@@ -40,7 +40,7 @@
     <!-- Navbar -->
     <div class="relative">        
         <nav id="main-navbar"
-            class="static top-4 left-2 right-2 m-2 px-4 bg-white border border-[#D8DDEF] rounded-full flex items-center justify-between">
+            class="static top-4 left-2 right-2 mt-2 px-4 bg-white border border-[#D8DDEF] rounded-full flex items-center justify-between">
             <!-- Logo -->
             <a href="./index.html">
             <img src="./images/svgs/logo__black.svg" alt="Beta" class="w-16 h-12 lg:w-24 lg:h-16">
@@ -76,15 +76,15 @@
             <div id="menu" class="w-full border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[calc(100vh_-_104px)] flex flex-col">
 
                 <!-- Header (fixed, does not scroll) -->
-                <div class="flex flex-row items-center justify-between py-[13px] px-4 border-b border-[#D8DDEF]">
+                <div class="flex flex-row items-center justify-between p-2 border-b border-[#D8DDEF]">
                     <h1 class="text-[22px] md:text-[18px] font-bold text-black">
                         Strategy Templates
                     </h1>
                 </div>
 
-                <div class="p-4 flex flex-col flex-1">
+                <div class="p-2 flex flex-col">
                     <!-- Sentiment Filters Section (fixed, does not scroll) -->
-                    <div id="sentiment-filters" class="flex flex-row w-full gap-4 mb-4 overflow-hidden" >
+                    <div id="sentiment-filters" class="flex flex-row w-full gap-4 overflow-hidden" >
                         <div class="flex flex-row p-2 gap-2 overflow-x-auto no-scrollbar whitespace-nowrap text-[12px] text-gray-400 font-semibold">
                             <button class="sentiment-filter max-h-[24px] px-1 rounded hover:bg-gray-200" data-sentiment="all"> All </button>
                             <button class="sentiment-filter max-h-[24px] px-1 rounded hover:bg-gray-200" data-sentiment="bullish"> Bullish </button>
@@ -103,9 +103,10 @@
 
                     </div>
 
-                    <!--Strategies (only this part scrolls) -->
-                    <div id="strategy-container" class="flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto"></div>
                 </div>
+
+                <!--Strategies (only this part scrolls) -->
+                <div id="strategy-container" class="flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto no-scrollbar"></div>
 
             </div>
 
