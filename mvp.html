@@ -134,7 +134,7 @@
         </div>
 
         <!--Chart-->
-        <div class="w-full px-2 border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[calc(100vh_-_104px)]">
+        <div class="w-full px-2 border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[calc(100vh_-_104px)] flex flex-col">
             
                              <!-- Header (fixed, does not scroll) -->
             <div class="flex flex-row items-center justify-between p-2 border-b border-[#D8DDEF]">
@@ -167,15 +167,20 @@
                 </div>
             </div>
 
-            <div class="w-full p-2">
-                <canvas id="pnlChart" class="h-[500px]"></canvas>
-            </div>
-            
-            <div id="strategy-legend" class="flex flex-row gap-4 p-2 text-[12px] text-black">
-                <p id="premium-disclaimer" class="text-[11px] text-gray-400 mt-1">
-                    Payoff curves use estimated reference premiums for illustration only — not live market
-                    prices. Actual costs and breakevens will differ. Request a quote for real pricing.
-                </p>
+            <!-- Fills leftover vertical space; only the canvas grows/shrinks, legend + disclaimer stay natural height -->
+            <div class="flex-1 flex flex-col min-h-0">
+
+                <div class="flex-1 min-h-0 relative p-2">
+                    <canvas id="pnlChart"></canvas>
+                </div>
+
+                <div id="strategy-legend" class="flex-none flex flex-row gap-4 p-2 text-[12px] text-black">
+                    <p id="premium-disclaimer" class="text-[11px] text-gray-400 mt-1">
+                        Payoff curves use estimated reference premiums for illustration only — not live market
+                        prices. Actual costs and breakevens will differ. Request a quote for real pricing.
+                    </p>
+                </div>
+
             </div>
 
         </div>

@@ -119,6 +119,10 @@ export function renderPNLChart(datasets, strikePrices = []) {
             display: true,
             text: `${mvp.selectedTokenSymbol} Price`,
           },
+          ...(typeof mvp.currentPrice === 'number' && !isNaN(mvp.currentPrice) ? {
+            min: mvp.currentPrice * 0.8,
+            max: mvp.currentPrice * 1.2,
+          } : {}),
         },
         y: {
           grid: { color: '#f0f0f0'},
