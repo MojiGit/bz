@@ -161,26 +161,48 @@ export async function defaultStrategy(strike = currentPrice, size = 1, lineColor
   };
 }
 
+// Visual styling for one leg line, shared by the template render (generateStrategy) and the
+// builder render (charts.updateBuilderChart). Following the reference prototype, every
+// individual leg is a uniform light-gray dotted line regardless of type/position — color
+// is reserved exclusively for the consolidated PnL curve. Strike/entry is conveyed via the
+// legend label (legLabel), not the line style. Args kept for call-site compatibility.
+export function legLineStyle(assetType, optionType, position) {
+  return { color: '#D8DDEF', borderDash: [2, 2] };
+}
+
+// Legend label for one leg, including its absolute strike (options) or entry (perps).
+// e.g. "Short Put 64,000", "Long Call 68,000", "Long Perp 65,000".
+export function legLabel(assetType, optionType, position, strikeOrEntry) {
+  const pos = position === 'short' ? 'Short' : 'Long';
+  const kind = assetType === 'perp' ? 'Perp' : (optionType === 'call' ? 'Call' : 'Put');
+  const price = Math.round(strikeOrEntry).toLocaleString('en-US');
+  return `${pos} ${kind} ${price}`;
+}
+
 export async function generateStrategy(strategyId){
   let strategy = {datasets: [], strikePrices: [], breakeven: null};
   let combined = [];
   let pnl;
 
   for (const inst of strategiesIdMap[strategyId].components){
+    let strikeOrEntryAbsolute;
     if (inst.asset === 'opt'){
-      pnl = calculateOptionPNL(inst.type, inst.strike * currentPrice, inst.size, inst.position);
-      strategy.strikePrices.push(inst.strike);
+      strikeOrEntryAbsolute = inst.strike * currentPrice;
+      pnl = calculateOptionPNL(inst.type, strikeOrEntryAbsolute, inst.size, inst.position);
+      strategy.strikePrices.push(strikeOrEntryAbsolute);
     } else if (inst.asset === 'perp'){
-      pnl = calculatePerpPNL(inst.entry * currentPrice, inst.size, inst.leverage, inst.position);
-      strategy.strikePrices.push(inst.entry);
+      strikeOrEntryAbsolute = inst.entry * currentPrice;
+      pnl = calculatePerpPNL(strikeOrEntryAbsolute, inst.size, inst.leverage, inst.position);
+      strategy.strikePrices.push(strikeOrEntryAbsolute);
     }
 
+    const style = legLineStyle(inst.asset, inst.type, inst.position);
     let data = {
-      label: (inst.position || 'long') + ' ' + (inst.asset === 'opt' ? inst.type : inst.asset),
+      label: legLabel(inst.asset, inst.type, inst.position, strikeOrEntryAbsolute),
       data: pnl,
-      color: '#D8DDEF',
+      color: style.color,
       bgColor: 'rgba(255, 107, 107, 0)',
-      borderDash: [5,5]
+      borderDash: style.borderDash
     };
 
     combined.push(pnl);

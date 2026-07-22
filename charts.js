@@ -57,22 +57,16 @@ export function renderPNLChart(datasets, strikePrices = []) {
   const annotations = {};
   if (strikePrices.length > 0) {
       (strikePrices || []).forEach((price, index) => {
+      // Secondary reference marks: thin, low-opacity gray, no label (strike is in the legend).
       annotations[`strikeLine${index}`] = {
         type: 'line',
         xMin: price,
         xMax: price,
-        borderColor: 'gray',
+        borderColor: 'rgba(156, 163, 175, 0.35)',
         borderWidth: 1,
-        borderDash: [5,5],
+        borderDash: [2, 2],
         label: {
-          display: true,
-          content: `Strike ${price}`,
-          position: 'start',
-          color: 'gray',
-          backgroundColor: 'transparent',
-          font: {
-            size: 10
-          }
+          display: false,
         },
         z: 0
       };
@@ -86,15 +80,16 @@ export function renderPNLChart(datasets, strikePrices = []) {
       type: 'line',
       xMin: Math.round(mvp.currentPrice),
       xMax: Math.round(mvp.currentPrice),
-      borderColor: '#00E083',
-      borderWidth: 1,
+      borderColor: '#475569',
+      borderWidth: 2,
       borderDash: [5,5],
       label: {
-        display: true,
-        content: `Current $${Math.round(mvp.currentPrice)}`,
-        position: 'end',
-        color: '#00E083',
-        backgroundColor: 'transparent',
+        enabled: true, // annotation plugin v1.4.0 uses `enabled`, not `display`
+        content: 'SPOT',
+        position: 'end', // v1.4.0: 'end' anchors a vertical line's label at the bottom
+        yAdjust: -24, // lift off the x-axis tick row into clear lower-plot space (below most payoff curves)
+        color: '#ffffff',
+        backgroundColor: '#475569', // solid slate pill: legible over the PnL curve at any spot
         font: { size: 12, weight: 'bold' }
       },
       z: 1
@@ -179,25 +174,28 @@ export async function updateBuilderChart() {
 
 
   for (const inst of builder.customInstruments) {
-    const color = inst.color || '#D8DDEF';
-
-    let data; 
+    let data;
     let label;
+    let strikeOrEntry;
     if ( inst.asset === 'opt'){
       data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position);
       strikePrices.push(inst.strike)
-      label = inst.position +' '+ inst.type;
+      strikeOrEntry = inst.strike;
     }
     if (inst.asset === 'perp'){
       data = Strategies.calculatePerpPNL(inst.entry, inst.size, inst.leverage, inst.position);
       strikePrices.push(inst.entry)
-      label = inst.position +' '+ inst.asset;
+      strikeOrEntry = inst.entry;
     }
-     
+
+    const style = Strategies.legLineStyle(inst.asset, inst.type, inst.position);
+    label = Strategies.legLabel(inst.asset, inst.type, inst.position, strikeOrEntry);
+
     datasets.push({
       label,
       data,
-      color
+      color: style.color,
+      borderDash: style.borderDash
     });
   }
 
