@@ -2,6 +2,12 @@
 
 // Chart.js instance for rendering the PNL chart
 let chartInstance = null;
+
+// Sign-based colors for the combined "PnL" line: green above y=0 (profit), red below (loss)
+const PNL_PROFIT_LINE = '#22c55e';
+const PNL_LOSS_LINE = '#ef4444';
+const PNL_PROFIT_FILL = 'rgba(34, 197, 94, 0.15)';
+const PNL_LOSS_FILL = 'rgba(239, 68, 68, 0.15)';
 import * as Strategies from './strategies.js';
 import * as mvp from './mvp.js';
 import * as builder from './builder.js';
@@ -19,18 +25,33 @@ export function renderPNLChart(datasets, strikePrices = []) {
   }
 
   // create datasets for Chart.js
-  const allDatasets = datasets.map(ds => ({
-    label: ds.label || '',
-    data: ds.data?.map(point => ({ x: point.price, y: point.pnl })) || [],
-    borderColor: ds.color,
-    backgroundColor: ds.bgColor || 'rgba(255, 255, 255, 0)',
-    borderWidth: 2,
-    pointRadius: 0,
-    fill: true,
-    type: 'line',
-    borderDash: ds.borderDash || [],
-    tension: 0,
-  }));
+  const allDatasets = datasets.map(ds => {
+    const dataset = {
+      label: ds.label || '',
+      data: ds.data?.map(point => ({ x: point.price, y: point.pnl })) || [],
+      borderColor: ds.color,
+      backgroundColor: ds.bgColor || 'rgba(255, 255, 255, 0)',
+      borderWidth: 2,
+      pointRadius: 0,
+      fill: true,
+      type: 'line',
+      borderDash: ds.borderDash || [],
+      tension: 0,
+    };
+
+    // Only the combined PnL curve is colored by sign, split at y=0. Individual leg
+    // datasets keep their own (dashed) styling untouched.
+    if (ds.label === 'PnL') {
+      dataset.segment = {
+        borderColor: ctx =>
+          (ctx.p0.parsed.y + ctx.p1.parsed.y) / 2 >= 0 ? PNL_PROFIT_LINE : PNL_LOSS_LINE,
+        backgroundColor: ctx =>
+          (ctx.p0.parsed.y + ctx.p1.parsed.y) / 2 >= 0 ? PNL_PROFIT_FILL : PNL_LOSS_FILL,
+      };
+    }
+
+    return dataset;
+  });
 
   // Prepare annotations for strike prices
   const annotations = {};

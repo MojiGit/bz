@@ -176,7 +176,7 @@ export async function generateStrategy(strategyId){
     }
 
     let data = {
-      label: inst.position +' '+ inst.type,
+      label: (inst.position || 'long') + ' ' + (inst.asset === 'opt' ? inst.type : inst.asset),
       data: pnl,
       color: '#D8DDEF',
       bgColor: 'rgba(255, 107, 107, 0)',
