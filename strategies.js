@@ -100,24 +100,36 @@ export function generateDynamicPriceRange() {
   return prices;
 }
 
+// Tier boundaries are compared on the strike/spot RATIO, not on absolute dollars. Template
+// strikes are authored as exact multiples of spot and so land exactly on a boundary, while
+// the builder rounds its strikes to whole dollars (populateStrikeOptions) — comparing
+// absolutes made that sub-dollar difference flip the tier, and the tiers are 2x apart, so
+// the same leg silently priced at double or half. TIER_EPSILON is far wider than dollar
+// rounding noise at realistic spot prices and far narrower than one strike-ladder step.
+const TIER_EPSILON = 0.001;
+
 export function generatePremium(strike, position) {
   const nearRate = 0.08;
   const midRate = 0.04;
   const farRate = 0.02;
 
+  const ratio = strike / currentPrice;
+  const isFar = ratio <= 0.9 + TIER_EPSILON || ratio >= 1.1 - TIER_EPSILON;
+  const isMid = ratio <= 0.95 + TIER_EPSILON || ratio >= 1.05 - TIER_EPSILON;
+
   if (position === 'call') {
-    if (strike <= currentPrice * 0.9 || strike >= currentPrice * 1.1) {
+    if (isFar) {
       return Math.max(currentPrice - strike, 0) + strike * farRate;
     }
-    if (strike <= currentPrice * 0.95 || strike >= currentPrice * 1.05) {
+    if (isMid) {
       return Math.max(currentPrice - strike, 0) + strike * midRate;
     }
     return strike * nearRate;
   } else if (position === 'put') {
-    if (strike <= currentPrice * 0.9 || strike >= currentPrice * 1.1) {
+    if (isFar) {
       return Math.max(strike - currentPrice, 0) + strike * farRate;
     }
-    if (strike <= currentPrice * 0.95 || strike >= currentPrice * 1.05) {
+    if (isMid) {
       return Math.max(strike - currentPrice, 0) + strike * midRate;
     }
     return strike * nearRate;
