@@ -75,24 +75,24 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
       <span class="text-black text-[16px] font-semibold">Option</span>
       <button data-remove="${instrumentId}" class="text-black text-[16px]">X</button>
     </div>
-    <div class = "flex flex-row justify-between gap-2">
-      <div class="flex flex-col items-center gap-2">
+    <div class="grid grid-cols-2 gap-2">
+      <div class="flex flex-col items-center gap-2 min-w-0">
         <label class= "text-[12px]">Type</label>
         <label><button type="button" class="type-btn text-[16px] border px-2 rounded bg-white hover:bg-gray-200">${instrument.type}</button></label>
       </div>
-      <div class="flex flex-col items-center gap-2">
+      <div class="flex flex-col items-center gap-2 min-w-0">
         <label class= "text-[12px]">Position</label>
       <label><button type="button" class="position-btn text-[16px] border px-2 rounded bg-white hover:bg-gray-200">${instrument.position}</button></label>
       </div>
-      <div class="flex flex-col items-center gap-2">
+      <div class="flex flex-col items-center gap-2 min-w-0">
         <label class= "text-[12px]">Strike</label>
-      <label>
-        <select class="strike-select text-[16px] max-w-[100px] border px-2"></select>
+      <label class="w-full">
+        <select class="strike-select w-full text-[16px] border px-2"></select>
       </label>
       </div>
-      <div class="flex flex-col items-center gap-2">
+      <div class="flex flex-col items-center gap-2 min-w-0">
         <label class= "text-[12px]">Size</label>
-      <label><input type="number" class="size-input text-[16px] max-w-[100px] border px-2" value="${instrument.size}"></label>
+      <label class="w-full"><input type="number" class="size-input w-full text-[16px] border px-2" value="${instrument.size}"></label>
       </div>
     </div>`;
   instrumentList.appendChild(div);
@@ -172,22 +172,22 @@ function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage
       <span class="text-black text-[16px] font-semibold">Perpetual</span>
       <button data-remove="${instrumentId}" class="text-black text-[16px]">X</button>
     </div>
-    <div class= "flex flex-row justify-between gap-2">
-      <div class="flex flex-col items-center gap-2">
+    <div class= "grid grid-cols-2 gap-2">
+      <div class="flex flex-col items-center gap-2 min-w-0">
         <label class= "text-[12px]">Position</label>
         <label><button type="button" class="position-btn text-[16px] border px-2 rounded bg-white hover:bg-gray-200">${instrument.position}</button></label>
       </div>
-      <div class="flex flex-col items-center gap-2">
+      <div class="flex flex-col items-center gap-2 min-w-0">
         <label class= "text-[12px]">Entry</label>
-        <label><input type="number" class="entry-input text-[16px]  max-w-[100px] border px-2" value="${instrument.entry}"></label>
+        <label class="w-full"><input type="number" class="entry-input w-full text-[16px] border px-2" value="${instrument.entry}"></label>
       </div>
-      <div class="flex flex-col items-center gap-2">
+      <div class="flex flex-col items-center gap-2 min-w-0">
         <label class= "text-[12px]">Size</label>
-        <label><input type="number" class="size-input text-[16px] max-w-[100px] border px-2" value="${instrument.size}"></label>
+        <label class="w-full"><input type="number" class="size-input w-full text-[16px] border px-2" value="${instrument.size}"></label>
       </div>
-      <div class="flex flex-col items-center gap-2">
+      <div class="flex flex-col items-center gap-2 min-w-0">
         <label class= "text-[12px]">Leverage</label>
-        <label><input type="number" class="leverage-input text-[16px] max-w-[100px] border px-2" value="${instrument.leverage}"></label>
+        <label class="w-full"><input type="number" class="leverage-input w-full text-[16px] border px-2" value="${instrument.leverage}"></label>
       </div>
     </div>`;
   instrumentList.appendChild(div);
