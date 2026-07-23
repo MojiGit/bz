@@ -84,10 +84,19 @@ exitBuilderBtn.addEventListener('click', () => {
 // Strike choices as multiples of the current price, from 0.8x to 1.2x in 0.05 steps
 const STRIKE_MULTIPLIERS = [0.8, 0.85, 0.9, 0.95, 1, 1.05, 1.1, 1.15, 1.2];
 
+// Date.now() alone is not unique: the prefill loop in enterBuildMode creates every leg of a
+// multi-leg template within the same millisecond, so all of them ended up sharing one id —
+// removing any one then stripped the whole strategy from customInstruments while deleting a
+// single card. The counter makes each id distinct regardless of how fast legs are created.
+let instrumentSeq = 0;
+function nextInstrumentId() {
+  return `inst-${Date.now()}-${instrumentSeq++}`;
+}
+
 // Add instrument to list
 function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1) {
   //it only allows to add long-call options!
-  const instrumentId = `inst-${Date.now()}`;
+  const instrumentId = nextInstrumentId();
   const instrument = {
     id: instrumentId,
     asset: 'opt',
@@ -180,7 +189,7 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
 // Add instrument to list
 function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage = 1) {
   //it only allows to add long-call options! 
-  const instrumentId = `inst-${Date.now()}`;
+  const instrumentId = nextInstrumentId();
   const instrument = {
     id: instrumentId,
     asset: 'perp',
