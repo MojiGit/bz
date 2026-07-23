@@ -73,7 +73,7 @@ async function fetchCurrentPrice(tokenId) {
 }
 
 //variable to store the current strategy dployed
-let selectedStrategyId;
+export let selectedStrategyId;
 export let strategyComponents;
 
 // token's buttons (ETH, WBTC, etc.), Dynamically update chart scale 
