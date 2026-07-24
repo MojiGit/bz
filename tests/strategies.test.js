@@ -44,7 +44,7 @@ const ChartStub = function () {};
 ChartStub.register = function () {};
 globalThis.Chart = ChartStub;
 
-const { calculateOptionPNL, calculatePerpPNL, generatePremium } = await import('../strategies.js');
+const { calculateOptionPNL, calculatePerpPNL, combinePNLCurves, generatePremium } = await import('../strategies.js');
 
 // --- Fixtures -------------------------------------------------------------------------
 const spotPrice = 100; // round number, easy to reason about
@@ -209,4 +209,85 @@ test('13. leverage 3 long PnL is exactly 3x leverage 1 long PnL at every price',
       `at price ${lev1[i].price}: lev3 ${lev3[i].pnl} !== 3 * ${lev1[i].pnl}`,
     );
   }
+});
+
+// --- combinePNLCurves -----------------------------------------------------------------
+// Builds a { price, pnl }[] from a list of prices and a parallel list of pnl values.
+function curve(prices, pnls) {
+  return prices.map((price, i) => ({ price, pnl: pnls[i] }));
+}
+
+test('14. two arrays with matching prices sum index-wise', () => {
+  const prices = [90, 100, 110];
+  const A = curve(prices, [-10, 0, 10]);
+  const B = curve(prices, [5, 5, 5]);
+  const res = combinePNLCurves([A, B]);
+  assert.strictEqual(res.length, prices.length);
+  for (let i = 0; i < res.length; i++) {
+    assert.strictEqual(res[i].price, A[i].price); // price taken from the first array
+    assert.ok(
+      close(res[i].pnl, A[i].pnl + B[i].pnl),
+      `at index ${i}: expected ${A[i].pnl + B[i].pnl}, got ${res[i].pnl}`,
+    );
+  }
+});
+
+test('15. four arrays (iron-condor-shaped) sum index-wise', () => {
+  const prices = [90, 100, 110];
+  const legs = [
+    curve(prices, [-10, 0, 10]),
+    curve(prices, [5, 5, 5]),
+    curve(prices, [2, -3, 4]),
+    curve(prices, [1, 1, -8]),
+  ];
+  const res = combinePNLCurves(legs);
+  assert.strictEqual(res.length, prices.length);
+  for (let i = 0; i < res.length; i++) {
+    const expected = legs.reduce((sum, leg) => sum + leg[i].pnl, 0);
+    assert.strictEqual(res[i].price, legs[0][i].price);
+    assert.ok(close(res[i].pnl, expected), `at index ${i}: expected ${expected}, got ${res[i].pnl}`);
+  }
+});
+
+test('16. empty input returns an empty array', () => {
+  assert.deepStrictEqual(combinePNLCurves([]), []);
+});
+
+test('17. single-array input returns the same price/pnl at every index', () => {
+  const A = curve([90, 100, 110], [-10, 0, 10]);
+  const res = combinePNLCurves([A]);
+  assert.strictEqual(res.length, A.length);
+  for (let i = 0; i < res.length; i++) {
+    assert.strictEqual(res[i].price, A[i].price);
+    assert.ok(close(res[i].pnl, A[i].pnl), `at index ${i}: expected ${A[i].pnl}, got ${res[i].pnl}`);
+  }
+});
+
+// Case 5 (spec): mismatched-length inputs. DOCUMENTED, ORDER-DEPENDENT behavior as it
+// exists today (not a claim about what it *should* do):
+//   - The loop length is governed by the FIRST array's length.
+//   - If a later array is LONGER than the first, its trailing elements are silently
+//     ignored (result truncated to the first array's length) — no throw.
+//   - If a later array is SHORTER than the first, indexing past its end reads `undefined`
+//     and the function throws a TypeError.
+// This test pins that asymmetry so a future silent change is caught. This input shape does
+// not occur in production (all legs share one priceRange).
+test('18. mismatched-length inputs: current order-dependent behavior', () => {
+  const short = curve([90, 100, 110], [1, 2, 3]);
+  const long = curve([90, 100, 110, 120, 130], [10, 20, 30, 40, 50]);
+
+  // First array shorter than the second -> truncates to the first array's length (3),
+  // extra elements of the longer array are ignored, no throw.
+  const res = combinePNLCurves([short, long]);
+  assert.strictEqual(res.length, short.length);
+  for (let i = 0; i < res.length; i++) {
+    assert.strictEqual(res[i].price, short[i].price);
+    assert.ok(
+      close(res[i].pnl, short[i].pnl + long[i].pnl),
+      `at index ${i}: expected ${short[i].pnl + long[i].pnl}, got ${res[i].pnl}`,
+    );
+  }
+
+  // First array longer than a later array -> indexing past the shorter array's end throws.
+  assert.throws(() => combinePNLCurves([long, short]), TypeError);
 });
