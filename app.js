@@ -1,7 +1,7 @@
 
-/* 
+/*
 
-Carouserl use cases
+Carousel use cases
 
 */
 
@@ -129,15 +129,15 @@ window.addEventListener('scroll', () => {
 });
 
 
-  const menu = document.getElementById('mobile-menu');
-  const button = document.getElementById('mobile-menu-button');
+const menu = document.getElementById('mobile-menu');
+const button = document.getElementById('mobile-menu-button');
 
-  let menuOpen = false;
+let menuOpen = false;
 
-  button.addEventListener('click', () => {
-    menuOpen = !menuOpen;
-    menu.classList.toggle('opacity-0', !menuOpen);
-    menu.classList.toggle('pointer-events-none', !menuOpen);
-    menu.classList.toggle('opacity-100', menuOpen);
-  });
+button.addEventListener('click', () => {
+  menuOpen = !menuOpen;
+  menu.classList.toggle('opacity-0', !menuOpen);
+  menu.classList.toggle('pointer-events-none', !menuOpen);
+  menu.classList.toggle('opacity-100', menuOpen);
+});
 

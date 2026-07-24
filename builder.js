@@ -95,7 +95,6 @@ function nextInstrumentId() {
 
 // Add instrument to list
 function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1) {
-  //it only allows to add long-call options!
   const instrumentId = nextInstrumentId();
   const instrument = {
     id: instrumentId,
@@ -188,7 +187,6 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
 
 // Add instrument to list
 function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage = 1) {
-  //it only allows to add long-call options! 
   const instrumentId = nextInstrumentId();
   const instrument = {
     id: instrumentId,
