@@ -44,7 +44,7 @@ const ChartStub = function () {};
 ChartStub.register = function () {};
 globalThis.Chart = ChartStub;
 
-const { calculateOptionPNL, calculatePerpPNL, combinePNLCurves, generatePremium } = await import('../strategies.js');
+const { calculateOptionPNL, calculatePerpPNL, combinePNLCurves, findBreakevenPoints, generatePremium } = await import('../strategies.js');
 
 // --- Fixtures -------------------------------------------------------------------------
 const spotPrice = 100; // round number, easy to reason about
@@ -290,4 +290,57 @@ test('18. mismatched-length inputs: current order-dependent behavior', () => {
 
   // First array longer than a later array -> indexing past the shorter array's end throws.
   assert.throws(() => combinePNLCurves([long, short]), TypeError);
+});
+
+// --- findBreakevenPoints --------------------------------------------------------------
+// Arrays are built by hand (not via calculateOptionPNL/combinePNLCurves) to keep this
+// function's tests isolated from the others.
+function nearAny(list, target, tol = 1) {
+  return list.some(b => Math.abs(b - target) <= tol);
+}
+
+test('19. long call single breakeven within $1 of strike+premium', () => {
+  // strike=100, premium=5: flat -5 below strike, rising 1:1 above it.
+  const arr = curve([90, 95, 100, 105, 110], [-5, -5, -5, 0, 5]);
+  const res = findBreakevenPoints(arr);
+  assert.strictEqual(res.length, 1);
+  assert.ok(Math.abs(res[0] - 105) <= 1, `expected ~105, got ${res[0]}`);
+});
+
+test('20. long put single breakeven within $1 of strike-premium', () => {
+  // strike=100, premium=5: rising as price falls below strike, flat -5 above it.
+  const arr = curve([90, 95, 100, 105, 110], [5, 0, -5, -5, -5]);
+  const res = findBreakevenPoints(arr);
+  assert.strictEqual(res.length, 1);
+  assert.ok(Math.abs(res[0] - 95) <= 1, `expected ~95, got ${res[0]}`);
+});
+
+test('21. no breakeven when pnl is positive everywhere', () => {
+  const arr = curve([90, 95, 100, 105, 110], [3, 4, 5, 4, 3]);
+  assert.deepStrictEqual(findBreakevenPoints(arr), []);
+});
+
+test('22. no breakeven when pnl is negative everywhere', () => {
+  const arr = curve([90, 95, 100, 105, 110], [-3, -4, -5, -4, -3]);
+  assert.deepStrictEqual(findBreakevenPoints(arr), []);
+});
+
+test('23. iron-condor shape yields exactly 2 breakevens near the two crossings', () => {
+  // negative low end -> positive plateau -> negative high end; crossings at 85 and 115.
+  const arr = curve([80, 90, 100, 110, 120], [-5, 5, 5, 5, -5]);
+  const res = findBreakevenPoints(arr);
+  assert.strictEqual(res.length, 2);
+  assert.ok(nearAny(res, 85), `expected a breakeven near 85, got ${JSON.stringify(res)}`);
+  assert.ok(nearAny(res, 115), `expected a breakeven near 115, got ${JSON.stringify(res)}`);
+});
+
+test('24. exact-zero sample with adjacent sign change is not double-counted', () => {
+  // A real sample lands exactly on 0 at price 100, preceded by a negative pnl. The function
+  // pushes this crossing twice (once via the sign-change branch, once via the pnl===0
+  // branch); the Set dedup must collapse it to a single breakeven. This regression-tests
+  // the duplicate-push fix that was previously only verified by hand.
+  const arr = curve([95, 100, 105], [-5, 0, 5]);
+  const res = findBreakevenPoints(arr);
+  assert.deepStrictEqual(res, [100]);
+  assert.strictEqual(res.filter(b => b === 100).length, 1);
 });
