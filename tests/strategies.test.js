@@ -44,7 +44,7 @@ const ChartStub = function () {};
 ChartStub.register = function () {};
 globalThis.Chart = ChartStub;
 
-const { calculateOptionPNL, calculatePerpPNL, combinePNLCurves, findBreakevenPoints, generatePremium } = await import('../strategies.js');
+const { calculateOptionPNL, calculatePerpPNL, combinePNLCurves, findBreakevenPoints, generateDynamicPriceRange, generatePremium } = await import('../strategies.js');
 
 // --- Fixtures -------------------------------------------------------------------------
 const spotPrice = 100; // round number, easy to reason about
@@ -343,4 +343,53 @@ test('24. exact-zero sample with adjacent sign change is not double-counted', ()
   const res = findBreakevenPoints(arr);
   assert.deepStrictEqual(res, [100]);
   assert.strictEqual(res.filter(b => b === 100).length, 1);
+});
+
+// --- generateDynamicPriceRange --------------------------------------------------------
+test('25. round spot (100): length 41, min 80, max 120, spot present once', () => {
+  const out = generateDynamicPriceRange(100);
+  assert.strictEqual(out.length, 41);
+  assert.strictEqual(Math.min(...out), 80);
+  assert.strictEqual(Math.max(...out), 120);
+  assert.strictEqual(out.filter(v => v === 100).length, 1);
+});
+
+test('26. realistic non-round spot (64962.17): endpoints, inserted spot, sorted, no dups', () => {
+  const spot = 64962.17;
+  const step = spot * 0.01;
+  const out = generateDynamicPriceRange(spot);
+  const min = Math.min(...out);
+  const max = Math.max(...out);
+
+  // Low end lands within rounding of spot*0.8.
+  assert.ok(Math.abs(min - spot * 0.8) <= 1, `min ${min} not within 1 of ${spot * 0.8}`);
+
+  // High end: DOCUMENTED actual behavior. The loop bound (`price <= spot*1.2`) with a
+  // floating-point start leaves the top sample up to one full step (1% of spot) short of
+  // spot*1.2 for non-round spots -- it does NOT land within $1 of 1.2x here. So we assert
+  // the true envelope: max never exceeds 1.2x and is within one step below it.
+  assert.ok(max <= spot * 1.2 + 1, `max ${max} exceeds spot*1.2 ${spot * 1.2}`);
+  assert.ok(max >= spot * 1.2 - step - 1, `max ${max} is more than one step below spot*1.2`);
+
+  // The "ensure current price is included" fallback: rounded spot present exactly once.
+  const roundedSpot = Math.round(spot); // 64962
+  assert.strictEqual(out.filter(v => v === roundedSpot).length, 1);
+
+  // Strictly increasing => sorted ascending AND no duplicate values anywhere.
+  for (let i = 1; i < out.length; i++) {
+    assert.ok(out[i] > out[i - 1], `not strictly ascending at index ${i}: ${out[i - 1]} then ${out[i]}`);
+  }
+});
+
+test('27. invalid spotPrice throws (0, negative, NaN)', () => {
+  assert.throws(() => generateDynamicPriceRange(0));
+  assert.throws(() => generateDynamicPriceRange(-5));
+  assert.throws(() => generateDynamicPriceRange(NaN));
+});
+
+test('28. step sanity: spot=100 consecutive values differ by exactly 1', () => {
+  const out = generateDynamicPriceRange(100);
+  for (let i = 1; i < out.length; i++) {
+    assert.strictEqual(out[i] - out[i - 1], 1);
+  }
 });
