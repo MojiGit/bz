@@ -44,7 +44,7 @@ const ChartStub = function () {};
 ChartStub.register = function () {};
 globalThis.Chart = ChartStub;
 
-const { calculateOptionPNL, calculatePerpPNL, combinePNLCurves, findBreakevenPoints, generateDynamicPriceRange, generatePremium } = await import('../strategies.js');
+const { calculateOptionPNL, calculatePerpPNL, combinePNLCurves, findBreakevenPoints, generateDynamicPriceRange, generatePremium, roundToStrikeStep } = await import('../strategies.js');
 
 // --- Fixtures -------------------------------------------------------------------------
 const spotPrice = 100; // round number, easy to reason about
@@ -392,4 +392,48 @@ test('28. step sanity: spot=100 consecutive values differ by exactly 1', () => {
   for (let i = 1; i < out.length; i++) {
     assert.strictEqual(out[i] - out[i - 1], 1);
   }
+});
+
+// --- roundToStrikeStep ----------------------------------------------------------------
+// The live Bitcoin symbol is 'WBTC'; only the literal 'ETH' triggers the ETH ladder, so
+// 'WBTC' exercises the BTC step sizes.
+test('29. BTC near band rounds to nearest $500', () => {
+  // spot 60000, within +-10% (diff 1713.9 <= 6000) -> $500 step.
+  assert.strictEqual(roundToStrikeStep(61713.90, 60000, 'WBTC'), 61500);
+});
+
+test('30. BTC far band rounds to nearest $1,000', () => {
+  // spot 60000, diff 12300 > 6000 -> $1,000 step.
+  assert.strictEqual(roundToStrikeStep(72300, 60000, 'WBTC'), 72000);
+});
+
+test('31. ETH near band rounds to nearest $25', () => {
+  // spot 3000, diff 13 <= 300 -> $25 step.
+  assert.strictEqual(roundToStrikeStep(3013, 3000, 'ETH'), 3025);
+});
+
+test('32. ETH far band rounds to nearest $50', () => {
+  // spot 3000, diff 630 > 300 -> $50 step.
+  assert.strictEqual(roundToStrikeStep(3630, 3000, 'ETH'), 3650);
+});
+
+test('33. strike exactly at the +-10% threshold uses the near step', () => {
+  // spot 55000, raw 60500 sits exactly at +10% (diff 5500 == 0.1 * 55000). The <= band is
+  // inclusive so the near ($500) step applies -> 60500. The far ($1,000) step would instead
+  // give round(60.5)*1000 = 61000, so this value proves the near step was chosen.
+  assert.strictEqual(roundToStrikeStep(60500, 55000, 'WBTC'), 60500);
+});
+
+test('34. null/undefined tokenSymbol falls back to BTC steps without throwing', () => {
+  assert.strictEqual(roundToStrikeStep(61713.90, 60000, null), 61500);
+  assert.strictEqual(roundToStrikeStep(61713.90, 60000, undefined), 61500);
+});
+
+test('35. unrecognized tokenSymbol (SOL) also falls back to BTC steps', () => {
+  // Everything but literal 'ETH' gets BTC steps: SOL matches WBTC, not ETH.
+  assert.strictEqual(roundToStrikeStep(61713.90, 60000, 'SOL'), 61500);
+  assert.strictEqual(
+    roundToStrikeStep(61713.90, 60000, 'SOL'),
+    roundToStrikeStep(61713.90, 60000, 'WBTC'),
+  );
 });

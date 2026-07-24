@@ -81,9 +81,6 @@ exitBuilderBtn.addEventListener('click', () => {
   mvp.updateChartForToken();
 });
 
-// Strike choices as multiples of the current price, from 0.8x to 1.2x in 0.05 steps
-const STRIKE_MULTIPLIERS = [0.8, 0.85, 0.9, 0.95, 1, 1.05, 1.1, 1.15, 1.2];
-
 // Date.now() alone is not unique: the prefill loop in enterBuildMode creates every leg of a
 // multi-leg template within the same millisecond, so all of them ended up sharing one id —
 // removing any one then stripped the whole strategy from customInstruments while deleting a
@@ -135,17 +132,47 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
 
   const strikeSelect = div.querySelector('.strike-select');
 
-  // Populate strike dropdown with values around the current price
+  // Populate the strike dropdown with a round-dollar ladder across spot +-20%, using
+  // roundToStrikeStep's per-token step sizes (tighter near the money, wider in the wings).
+  // The option count varies with token and spot and is intentionally not the old fixed 9.
   function populateStrikeOptions() {
     strikeSelect.innerHTML = '';
-    STRIKE_MULTIPLIERS.forEach(mult => {
-      const strikeValue = Math.round(mvp.currentPrice * mult);
+    const spot = mvp.currentPrice;
+    const token = mvp.selectedTokenSymbol;
+    if (!spot || isNaN(spot) || spot <= 0) return;
+
+    const low = spot * 0.8;
+    const high = spot * 1.2;
+
+    // Enumerate distinct round-dollar strikes by snapping each dollar in the band to its
+    // ladder step via roundToStrikeStep, then de-duping. This keeps the step sizes defined in
+    // exactly one place (roundToStrikeStep) instead of duplicating them here.
+    const seen = new Set();
+    const strikes = [];
+    for (let p = Math.ceil(low); p <= high; p++) {
+      const s = Strategies.roundToStrikeStep(p, spot, token);
+      if (s >= low && s <= high && !seen.has(s)) {
+        seen.add(s);
+        strikes.push(s);
+      }
+    }
+    strikes.sort((a, b) => a - b);
+
+    strikes.forEach(strikeValue => {
       const option = document.createElement('option');
       option.value = strikeValue;
       option.textContent = strikeValue;
       strikeSelect.appendChild(option);
     });
-    strikeSelect.value = Math.round(instrument.strike);
+
+    // Preserve sync: select the ladder strike nearest the leg's current strike, then re-sync
+    // instrument.strike to it so the dropdown and the leg can never drift apart.
+    const target = Math.round(instrument.strike);
+    let nearest = strikes[0];
+    for (const s of strikes) {
+      if (Math.abs(s - target) < Math.abs(nearest - target)) nearest = s;
+    }
+    strikeSelect.value = nearest;
     instrument.strike = parseFloat(strikeSelect.value);
   }
 

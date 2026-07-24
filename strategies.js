@@ -138,6 +138,21 @@ export function generatePremium(strike, position, spotPrice = currentPrice) {
   }
 }
 
+// Round a raw strike to the nearest round-dollar step on a per-token ladder. The step
+// tightens near the money and widens in the wings: BTC uses $500 within ±10% of spot and
+// $1,000 beyond it; ETH uses $25 within ±10% and $50 beyond. tokenSymbol can be
+// null/undefined before the first price resolves, so it falls back to the BTC ladder rather
+// than throwing.
+export function roundToStrikeStep(rawStrike, spotPrice, tokenSymbol) {
+  // Unrecognized/null symbols silently default to the BTC steps — intentional while only WBTC/ETH exist; revisit if a third token is ever added.
+  const isEth = tokenSymbol === 'ETH';
+  const nearStep = isEth ? 25 : 500;
+  const farStep = isEth ? 50 : 1000;
+  const withinBand = Math.abs(rawStrike - spotPrice) <= 0.1 * spotPrice;
+  const step = withinBand ? nearStep : farStep;
+  return Math.round(rawStrike / step) * step;
+}
+
 // Normalize a leg/component from either schema into one common absolute-value shape.
 // strategiesIdMap components (this file) store strike/entry as a ratio of spot, converted
 // at point of use. builder.js instruments store strike/entry as absolute dollars already,
@@ -199,11 +214,11 @@ export async function generateStrategy(strategyId){
   for (const inst of strategiesIdMap[strategyId].components){
     let strikeOrEntryAbsolute;
     if (inst.asset === 'opt'){
-      strikeOrEntryAbsolute = inst.strike * currentPrice;
+      strikeOrEntryAbsolute = roundToStrikeStep(inst.strike * currentPrice, currentPrice, selectedTokenSymbol);
       pnl = calculateOptionPNL(inst.type, strikeOrEntryAbsolute, inst.size, inst.position);
       strategy.strikePrices.push(strikeOrEntryAbsolute);
     } else if (inst.asset === 'perp'){
-      strikeOrEntryAbsolute = inst.entry * currentPrice;
+      strikeOrEntryAbsolute = roundToStrikeStep(inst.entry * currentPrice, currentPrice, selectedTokenSymbol);
       pnl = calculatePerpPNL(strikeOrEntryAbsolute, inst.size, inst.leverage, inst.position);
       strategy.strikePrices.push(strikeOrEntryAbsolute);
     }
