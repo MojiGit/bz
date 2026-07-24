@@ -44,7 +44,7 @@ const ChartStub = function () {};
 ChartStub.register = function () {};
 globalThis.Chart = ChartStub;
 
-const { calculateOptionPNL, generatePremium } = await import('../strategies.js');
+const { calculateOptionPNL, calculatePerpPNL, generatePremium } = await import('../strategies.js');
 
 // --- Fixtures -------------------------------------------------------------------------
 const spotPrice = 100; // round number, easy to reason about
@@ -142,6 +142,71 @@ test('8. short put is the exact inverse of the long put at every price', () => {
     assert.ok(
       close(short[i].pnl, -long[i].pnl),
       `at price ${long[i].price}: short ${short[i].pnl} !== -(${long[i].pnl})`,
+    );
+  }
+});
+
+// --- calculatePerpPNL -----------------------------------------------------------------
+// Unlike the option premium tests, perp PnL is a direct closed-form formula that does not
+// depend on another module's output, so asserting the formula directly in the test is the
+// correct check here.
+const entryPrice = 100;
+const perpQuantity = 1;
+const perpPrices = [80, 100, 120]; // loss, breakeven-at-entry, profit
+
+test('9. long perp leverage 1 matches (price - entry) * qty * leverage', () => {
+  const leverage = 1;
+  const res = calculatePerpPNL(entryPrice, perpQuantity, leverage, 'long', perpPrices);
+  assert.strictEqual(res.length, perpPrices.length);
+  for (const { price, pnl } of res) {
+    const expected = (price - entryPrice) * perpQuantity * leverage;
+    assert.ok(close(pnl, expected), `at price ${price}: expected ${expected}, got ${pnl}`);
+  }
+});
+
+test('10. short perp leverage 1: closed-form and inverse of long', () => {
+  const leverage = 1;
+  const short = calculatePerpPNL(entryPrice, perpQuantity, leverage, 'short', perpPrices);
+  const long = calculatePerpPNL(entryPrice, perpQuantity, leverage, 'long', perpPrices);
+  assert.strictEqual(short.length, perpPrices.length);
+  for (let i = 0; i < short.length; i++) {
+    const price = short[i].price;
+    // closed-form check
+    const expected = (entryPrice - price) * perpQuantity * leverage;
+    assert.ok(close(short[i].pnl, expected), `at price ${price}: expected ${expected}, got ${short[i].pnl}`);
+    // inverse-of-long check
+    assert.strictEqual(short[i].price, long[i].price);
+    assert.ok(close(short[i].pnl, -long[i].pnl), `at price ${price}: short ${short[i].pnl} !== -(${long[i].pnl})`);
+  }
+});
+
+test('11. long perp leverage 3 applies the multiplier', () => {
+  const leverage = 3;
+  const res = calculatePerpPNL(entryPrice, perpQuantity, leverage, 'long', perpPrices);
+  for (const { price, pnl } of res) {
+    const expected = (price - entryPrice) * perpQuantity * leverage;
+    assert.ok(close(pnl, expected), `at price ${price}: expected ${expected}, got ${pnl}`);
+  }
+});
+
+test('12. short perp leverage 3 applies the multiplier', () => {
+  const leverage = 3;
+  const res = calculatePerpPNL(entryPrice, perpQuantity, leverage, 'short', perpPrices);
+  for (const { price, pnl } of res) {
+    const expected = (entryPrice - price) * perpQuantity * leverage;
+    assert.ok(close(pnl, expected), `at price ${price}: expected ${expected}, got ${pnl}`);
+  }
+});
+
+test('13. leverage 3 long PnL is exactly 3x leverage 1 long PnL at every price', () => {
+  const lev1 = calculatePerpPNL(entryPrice, perpQuantity, 1, 'long', perpPrices);
+  const lev3 = calculatePerpPNL(entryPrice, perpQuantity, 3, 'long', perpPrices);
+  assert.strictEqual(lev3.length, lev1.length);
+  for (let i = 0; i < lev1.length; i++) {
+    assert.strictEqual(lev3[i].price, lev1[i].price);
+    assert.ok(
+      close(lev3[i].pnl, 3 * lev1[i].pnl),
+      `at price ${lev1[i].price}: lev3 ${lev3[i].pnl} !== 3 * ${lev1[i].pnl}`,
     );
   }
 });
