@@ -2,10 +2,10 @@
 === PNL Calculation Functions ===
 These functions calculate PNL for different trading strategies, including spot, perpetual futures, and options.
 */
-import { currentPrice, selectedTokenSymbol, priceRange } from "./mvp.js";
+import { currentPrice, selectedTokenSymbol, priceRange as importedPriceRange } from "./mvp.js";
 
 // Perpetual PNL
-export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 'long') {
+export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 'long', priceRange = importedPriceRange) {
   return priceRange.map(currentPrice => {
     if(position === 'short'){
       const pnl = (entryPrice - currentPrice) * quantity * leverage;
@@ -17,7 +17,7 @@ export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 
 }
 
 // Option PNL (Call or Put)
-export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long') {
+export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long', spotPrice = currentPrice, priceRange = importedPriceRange) {
   return priceRange.map(currentPrice => {
     let intrinsicValue;
     if (optionType === 'call') {
@@ -28,7 +28,7 @@ export function calculateOptionPNL(optionType, strikePrice, quantity = 1, positi
       throw new Error("Invalid option type");
     }
 
-    const totalPNL = (intrinsicValue - generatePremium(strikePrice, optionType)) * quantity;
+    const totalPNL = (intrinsicValue - generatePremium(strikePrice, optionType, spotPrice)) * quantity;
     if (position === 'short') {
       // If the position is short, we invert the PNL
       return { price: currentPrice, pnl: -totalPNL };
@@ -80,14 +80,14 @@ export function findBreakevenPoints(pnlArray) {
 }
 
 // Generate price range based on current price
-export function generateDynamicPriceRange() {
-  if (!currentPrice || isNaN(currentPrice) || currentPrice <= 0) {
+export function generateDynamicPriceRange(spotPrice = currentPrice) {
+  if (!spotPrice || isNaN(spotPrice) || spotPrice <= 0) {
     throw new Error('Invalid currentPrice for price range');
   }
-  const roundedCurrent = Math.round(currentPrice);
-  const min = currentPrice * 0.8;
-  const max = currentPrice * 1.2;
-  const step = currentPrice * 0.01;
+  const roundedCurrent = Math.round(spotPrice);
+  const min = spotPrice * 0.8;
+  const max = spotPrice * 1.2;
+  const step = spotPrice * 0.01;
   const prices = [];
   for (let price = min; price <= max; price += step) {
     prices.push(Math.round(price));
@@ -108,29 +108,29 @@ export function generateDynamicPriceRange() {
 // rounding noise at realistic spot prices and far narrower than one strike-ladder step.
 const TIER_EPSILON = 0.001;
 
-export function generatePremium(strike, position) {
+export function generatePremium(strike, position, spotPrice = currentPrice) {
   const nearRate = 0.08;
   const midRate = 0.04;
   const farRate = 0.02;
 
-  const ratio = strike / currentPrice;
+  const ratio = strike / spotPrice;
   const isFar = ratio <= 0.9 + TIER_EPSILON || ratio >= 1.1 - TIER_EPSILON;
   const isMid = ratio <= 0.95 + TIER_EPSILON || ratio >= 1.05 - TIER_EPSILON;
 
   if (position === 'call') {
     if (isFar) {
-      return Math.max(currentPrice - strike, 0) + strike * farRate;
+      return Math.max(spotPrice - strike, 0) + strike * farRate;
     }
     if (isMid) {
-      return Math.max(currentPrice - strike, 0) + strike * midRate;
+      return Math.max(spotPrice - strike, 0) + strike * midRate;
     }
     return strike * nearRate;
   } else if (position === 'put') {
     if (isFar) {
-      return Math.max(strike - currentPrice, 0) + strike * farRate;
+      return Math.max(strike - spotPrice, 0) + strike * farRate;
     }
     if (isMid) {
-      return Math.max(strike - currentPrice, 0) + strike * midRate;
+      return Math.max(strike - spotPrice, 0) + strike * midRate;
     }
     return strike * nearRate;
   } else {
