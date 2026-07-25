@@ -17,7 +17,9 @@ export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 
 }
 
 // Option PNL (Call or Put)
-export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long', spotPrice = currentPrice, priceRange = importedPriceRange) {
+// tierRatioOverride: see generatePremium — lets a caller price the leg's tier off its designed
+// ratio while the (rounded) strikePrice still drives the payoff. Null/omitted = unchanged.
+export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long', spotPrice = currentPrice, priceRange = importedPriceRange, tierRatioOverride = null) {
   return priceRange.map(currentPrice => {
     let intrinsicValue;
     if (optionType === 'call') {
@@ -28,7 +30,7 @@ export function calculateOptionPNL(optionType, strikePrice, quantity = 1, positi
       throw new Error("Invalid option type");
     }
 
-    const totalPNL = (intrinsicValue - generatePremium(strikePrice, optionType, spotPrice)) * quantity;
+    const totalPNL = (intrinsicValue - generatePremium(strikePrice, optionType, spotPrice, tierRatioOverride)) * quantity;
     if (position === 'short') {
       // If the position is short, we invert the PNL
       return { price: currentPrice, pnl: -totalPNL };
@@ -106,14 +108,23 @@ export function generateDynamicPriceRange(spotPrice = currentPrice) {
 // absolutes made that sub-dollar difference flip the tier, and the tiers are 2x apart, so
 // the same leg silently priced at double or half. TIER_EPSILON is far wider than dollar
 // rounding noise at realistic spot prices and far narrower than one strike-ladder step.
+// TIER_EPSILON alone is NOT enough for template legs: roundToStrikeStep moves a strike by up
+// to half a ladder step ($500/$1,000 on BTC, $25/$50 on ETH), which shifts strike/spot by up to
+// ~0.008 (BTC) / ~0.013 (ETH) — an order of magnitude past the epsilon. A template leg authored
+// exactly on a boundary (0.9/0.95/1.05/1.1) therefore crosses it, and since adjacent tiers are
+// 2x apart the leg silently prices at double. Widening the epsilon can't fix this (the required
+// width scales with step/spot, and would swallow genuinely-near-boundary strikes), so callers
+// that round a designed ratio pass that ratio as tierRatioOverride instead.
 const TIER_EPSILON = 0.001;
 
-export function generatePremium(strike, position, spotPrice = currentPrice) {
+// tierRatioOverride selects WHICH tier applies (far/mid/near); `strike` is still what the
+// magnitude and intrinsic-value terms are computed from. Omit it and nothing changes.
+export function generatePremium(strike, position, spotPrice = currentPrice, tierRatioOverride = null) {
   const nearRate = 0.08;
   const midRate = 0.04;
   const farRate = 0.02;
 
-  const ratio = strike / spotPrice;
+  const ratio = tierRatioOverride ?? strike / spotPrice;
   const isFar = ratio <= 0.9 + TIER_EPSILON || ratio >= 1.1 - TIER_EPSILON;
   const isMid = ratio <= 0.95 + TIER_EPSILON || ratio >= 1.05 - TIER_EPSILON;
 
@@ -215,7 +226,9 @@ export async function generateStrategy(strategyId){
     let strikeOrEntryAbsolute;
     if (inst.asset === 'opt'){
       strikeOrEntryAbsolute = roundToStrikeStep(inst.strike * currentPrice, currentPrice, selectedTokenSymbol);
-      pnl = calculateOptionPNL(inst.type, strikeOrEntryAbsolute, inst.size, inst.position);
+      // Payoff uses the rounded, tradeable strike; the premium tier is decided by the leg's
+      // designed ratio so rounding can't push it across a boundary (see generatePremium).
+      pnl = calculateOptionPNL(inst.type, strikeOrEntryAbsolute, inst.size, inst.position, undefined, undefined, inst.strike);
       strategy.strikePrices.push(strikeOrEntryAbsolute);
     } else if (inst.asset === 'perp'){
       strikeOrEntryAbsolute = roundToStrikeStep(inst.entry * currentPrice, currentPrice, selectedTokenSymbol);
