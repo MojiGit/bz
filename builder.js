@@ -54,7 +54,10 @@ export function enterBuildMode() {
   if(mvp.strategyComponents){
     for (const inst of mvp.strategyComponents){
       if(inst.asset === 'opt'){
-        addOption(inst.type, inst.position, inst.strike, inst.size);
+        // strategiesIdMap stores `strike` as a ratio of spot, so it serves as both the raw
+        // strike to convert AND the leg's designed ratio — passed twice on purpose. Only
+        // prefilled legs get the second one; the "+ Option" button omits it.
+        addOption(inst.type, inst.position, inst.strike, inst.size, inst.strike);
       }
       if(inst.asset === 'perp'){
         addPerp(inst.position, inst.entry, inst.size, inst.leverage);
@@ -91,7 +94,12 @@ function nextInstrumentId() {
 }
 
 // Add instrument to list
-function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1) {
+// designRatio: the strike/spot ratio this leg was DESIGNED at in strategiesIdMap (0.95, 1.1,
+// ...), carried through prefill so premium tiering can be decided off it rather than off the
+// rounded dollar strike (see generatePremium's tierRatioOverride). Deliberately left
+// undefined for legs built by hand — they have no designed ratio, only where they sit — and
+// cleared once the user moves the strike themselves.
+function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 1, designRatio) {
   const instrumentId = nextInstrumentId();
   const instrument = {
     id: instrumentId,
@@ -102,6 +110,7 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
     size: optSize,
     leverage: 1,
     color: '#D8DDEF',
+    designRatio,
   };
   customInstruments.push(instrument);
 
@@ -200,6 +209,11 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
 
   strikeSelect.addEventListener('change', e => {
     instrument.strike = parseFloat(e.target.value);
+    // The leg is no longer where the template designed it, so its designed ratio no longer
+    // describes it — drop it and let the leg tier itself off where it actually sits. Note
+    // this is the USER moving the strike; populateStrikeOptions' own snap-to-ladder re-sync
+    // above must not clear it, since that is the prefill landing on a tradeable strike.
+    instrument.designRatio = undefined;
     charts.updateBuilderChart();
   });
   div.querySelector('.size-input')?.addEventListener('input', e => {

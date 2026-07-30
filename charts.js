@@ -177,7 +177,11 @@ export async function updateBuilderChart() {
     let label;
     let strikeOrEntry;
     if ( inst.asset === 'opt'){
-      data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position);
+      // Payoff uses the leg's real (rounded) strike; the premium tier comes from the design
+      // ratio it was prefilled at, so rounding can't push it across a tier boundary (see
+      // generatePremium). Legs added by hand — and prefilled legs whose strike the user has
+      // since moved — carry no designRatio and pass null, tiering off their real strike.
+      data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position, undefined, undefined, inst.designRatio ?? null);
       strikePrices.push(inst.strike)
       strikeOrEntry = inst.strike;
     }
