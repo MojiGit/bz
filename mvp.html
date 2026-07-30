@@ -122,7 +122,7 @@
                 </div>
 
                 <!-- Instrument buttons + list (only this part scrolls) -->
-                <div class="flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto no-scrollbar p-2">
+                <div class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto no-scrollbar p-2">
 
                     <!-- Strategy this session started from (read-only, filled by builder.js) -->
                     <div id="builder-strategy-title" class="flex flex-row items-center gap-2"></div>
@@ -137,8 +137,13 @@
                         </button>
                     </div>
 
+                    <!-- Quote (no handler wired yet) -->
+                    <button id="get-quote" class="px-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[14px]">
+                        Quote
+                    </button>
+
                     <!-- Instruments List -->
-                    <div id="instrument-list" class="grid gap-4"></div>
+                    <div id="instrument-list" class="grid gap-2"></div>
 
                 </div>
 
