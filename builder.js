@@ -127,10 +127,27 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
         <button data-remove="${instrumentId}" class="text-gray-500 text-[10px]">X</button>
       </div>
       <div class="flex flex-row items-start gap-2 min-w-0">
-        <label class="flex flex-col gap-1 w-full min-w-0">
+        <!-- Deliberately a <div>, not a <label>: a label forwards clicks to its labelable
+             descendant, which here is the hidden <select>, popping the native picker on top
+             of the custom one. The caption is a plain span instead. -->
+        <div class="flex flex-col gap-1 w-full min-w-0">
           <span class="text-[10px] text-gray-400">Strike</span>
-          <select class="strike-select w-full text-[12px] border px-2"></select>
-        </label>
+          <div class="strike-field relative w-full min-w-0">
+            <!-- Source of truth. Still a real <select>, still filled by populateStrikeOptions,
+                 still carrying the change listener that owns instrument.strike/designRatio.
+                 Visually hidden rather than display:none so it stays a live form control; the
+                 custom UI below only presents it. tabindex/aria-hidden move the keyboard stop
+                 to the trigger so one control is not two tab stops. -->
+            <select class="strike-select absolute inset-0 w-full h-full opacity-0 pointer-events-none" tabindex="-1" aria-hidden="true"></select>
+            <button type="button" class="strike-trigger relative w-full text-[12px] border px-2 bg-white text-left flex flex-row items-center justify-between gap-1" aria-haspopup="listbox" aria-expanded="false">
+              <span class="strike-trigger-label truncate"></span>
+              <span class="text-[10px] text-gray-400 shrink-0" aria-hidden="true">&#9662;</span>
+            </button>
+            <!-- ~132px is 5.5 rows at py-1/text-[12px]: the half row is the affordance that
+                 says the list scrolls, since it can run 20-40 strikes. -->
+            <div class="strike-popup hidden absolute left-0 right-0 top-full mt-1 z-20 max-h-[132px] overflow-y-auto rounded border border-[#D8DDEF] bg-white shadow-lg" role="listbox"></div>
+          </div>
+        </div>
         <label class="flex flex-col gap-1 w-full min-w-0">
           <span class="text-[10px] text-gray-400">Size</span>
           <input type="number" class="size-input w-full text-[12px] border px-2" value="${instrument.size}">
@@ -222,6 +239,91 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
   });
 
   populateStrikeOptions();
+
+  // === Custom strike dropdown ===========================================================
+  // Presentation only. The native <select> above remains the single source of truth: the
+  // ladder is still generated in populateStrikeOptions, and instrument.strike / designRatio
+  // are still owned exclusively by the change listener registered further up. This UI drives
+  // that listener the same way a user driving a native select would — set .value, dispatch a
+  // real 'change' — so none of that logic is duplicated here and cannot drift from it.
+  const strikeField = div.querySelector('.strike-field');
+  const strikeTrigger = div.querySelector('.strike-trigger');
+  const strikeTriggerLabel = div.querySelector('.strike-trigger-label');
+  const strikePopup = div.querySelector('.strike-popup');
+
+  const formatStrike = value => Number(value).toLocaleString('en-US');
+
+  function syncStrikeTrigger() {
+    strikeTriggerLabel.textContent = strikeSelect.value ? formatStrike(strikeSelect.value) : '--';
+  }
+
+  function onStrikeOutsideClick(e) {
+    if (!strikeField.contains(e.target)) closeStrikePopup();
+  }
+
+  function onStrikeKeydown(e) {
+    if (e.key === 'Escape') closeStrikePopup();
+  }
+
+  function closeStrikePopup() {
+    strikePopup.classList.add('hidden');
+    strikeTrigger.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('click', onStrikeOutsideClick);
+    document.removeEventListener('keydown', onStrikeKeydown);
+  }
+
+  function openStrikePopup() {
+    // Rebuilt from the live <option> list on every open, so the ladder stays defined in
+    // exactly one place and this can never render a stale copy of it.
+    strikePopup.innerHTML = '';
+    let selectedRow = null;
+
+    div.querySelectorAll('.strike-select option').forEach(opt => {
+      const isSelected = opt.value === strikeSelect.value;
+      const row = document.createElement('button');
+      row.type = 'button';
+      row.setAttribute('role', 'option');
+      row.setAttribute('aria-selected', String(isSelected));
+      row.className = 'strike-option block w-full text-left text-[12px] px-2 py-1 hover:bg-[#F4FFF9]' +
+        (isSelected ? ' bg-[#F4FFF9] font-semibold' : '');
+      row.textContent = formatStrike(opt.value);
+
+      row.addEventListener('click', () => {
+        strikeSelect.value = opt.value;
+        // This is the whole point of keeping the real select: the existing change listener
+        // does the parseFloat, clears designRatio and re-renders. Nothing to duplicate.
+        strikeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        closeStrikePopup();
+      });
+
+      if (isSelected) selectedRow = row;
+      strikePopup.appendChild(row);
+    });
+
+    strikePopup.classList.remove('hidden');
+    strikeTrigger.setAttribute('aria-expanded', 'true');
+
+    // Land on the current strike rather than at the top of a 20-40 row list.
+    if (selectedRow) {
+      strikePopup.scrollTop = Math.max(
+        0, selectedRow.offsetTop - (strikePopup.clientHeight - selectedRow.offsetHeight) / 2);
+    }
+
+    // Registered only while open. Attaching during the opening click is safe because
+    // onStrikeOutsideClick ignores clicks inside the field, which includes the trigger.
+    document.addEventListener('click', onStrikeOutsideClick);
+    document.addEventListener('keydown', onStrikeKeydown);
+  }
+
+  strikeTrigger.addEventListener('click', () => {
+    if (strikePopup.classList.contains('hidden')) openStrikePopup();
+    else closeStrikePopup();
+  });
+
+  // Additive presentation mirror — the state-owning change listener above is untouched. This
+  // keeps the trigger face correct no matter what moves the select's value.
+  strikeSelect.addEventListener('change', syncStrikeTrigger);
+  syncStrikeTrigger();
 
   charts.updateBuilderChart();
 }
