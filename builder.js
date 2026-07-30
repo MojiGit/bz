@@ -115,16 +115,20 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
   customInstruments.push(instrument);
 
   const div = document.createElement('div');
-  div.className = 'flex flex-col gap-1 p-1.5 border border-[#D8DDEF] shadow-sm rounded-lg';
+  div.className = 'flex flex-col gap-1.5 p-1.5 md:gap-1 border border-[#D8DDEF] shadow-sm rounded-lg';
   div.id = instrumentId;
   div.innerHTML = `
-    <div class="grid grid-rows-2 gap-1">
-      <div class="flex flex-row justify-between items-center gap-1 min-w-0">
-        <div class="flex flex-row items-center gap-1 min-w-0">
-          <button type="button" class="position-btn text-[12px] leading-tight font-semibold uppercase px-1.5 py-0.5 rounded border border-[#D8DDEF] bg-white hover:bg-gray-200">${positionLabel(instrument.position)}</button>
-          <button type="button" class="type-btn text-[12px] leading-tight font-semibold uppercase px-1.5 py-0.5 rounded border border-[#D8DDEF] bg-white hover:bg-gray-200">${instrument.type}</button>
+    <div class="grid grid-rows-2 gap-1.5 md:gap-1">
+      <div class="flex flex-row justify-between items-center gap-1.5 md:gap-1 min-w-0">
+        <div class="flex flex-row items-center gap-1.5 md:gap-1 min-w-0">
+          <button type="button" class="position-btn text-[12px] leading-tight font-semibold uppercase px-2 py-0.5 md:px-1.5 md:py-[1px] rounded border border-[#D8DDEF] bg-white hover:bg-gray-200">${positionLabel(instrument.position)}</button>
+          <button type="button" class="type-btn text-[12px] leading-tight font-semibold uppercase px-2 py-0.5 md:px-1.5 md:py-[1px] rounded border border-[#D8DDEF] bg-white hover:bg-gray-200">${instrument.type}</button>
         </div>
-        <button data-remove="${instrumentId}" class="text-gray-500 text-[10px]">X</button>
+        <!-- 20px is a deliberate trade: row density over the 24px minimum touch target this
+             control used to meet. It still gets a real hit box rather than a bare 10px glyph,
+             and it is destructive-but-recoverable (re-add the leg), so the cost of the
+             occasional missed tap is low. Revisit if removals start going wrong in practice. -->
+        <button data-remove="${instrumentId}" aria-label="Remove leg" class="text-gray-500 shrink-0 flex items-center justify-center text-[12px] leading-none min-w-[20px] min-h-[20px] rounded hover:bg-gray-200 md:text-[10px] md:min-w-0 md:min-h-0 md:hover:bg-transparent">X</button>
       </div>
       <div class="flex flex-row items-start gap-1.5 min-w-0">
         <!-- Deliberately a <div>, not a <label>: a label forwards clicks to its labelable
@@ -139,18 +143,19 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
                  custom UI below only presents it. tabindex/aria-hidden move the keyboard stop
                  to the trigger so one control is not two tab stops. -->
             <select class="strike-select absolute inset-0 w-full h-full opacity-0 pointer-events-none" tabindex="-1" aria-hidden="true"></select>
-            <button type="button" class="strike-trigger relative w-full text-[12px] leading-tight border px-2 py-0.5 bg-white text-left flex flex-row items-center justify-between gap-1" aria-haspopup="listbox" aria-expanded="false">
+            <button type="button" class="strike-trigger relative w-full text-[16px] leading-tight border px-2 py-1 md:text-[12px] md:py-0.5 bg-white text-left flex flex-row items-center justify-between gap-1" aria-haspopup="listbox" aria-expanded="false">
               <span class="strike-trigger-label truncate"></span>
               <span class="text-[10px] text-gray-400 shrink-0" aria-hidden="true">&#9662;</span>
             </button>
-            <!-- ~132px is 5.5 rows at py-1/text-[12px]: the half row is the affordance that
-                 says the list scrolls, since it can run 20-40 strikes. -->
-            <div class="strike-popup hidden absolute left-0 right-0 top-full mt-1 z-20 max-h-[132px] overflow-y-auto rounded border border-[#D8DDEF] bg-white shadow-lg" role="listbox"></div>
+            <!-- Both caps are ~5.5 rows at their own row height (mobile rows are taller for
+                 touch), so the half row that says "this scrolls" survives at either size —
+                 the list can run 20-40 strikes. -->
+            <div class="strike-popup hidden absolute left-0 right-0 top-full mt-1 z-20 max-h-[168px] md:max-h-[132px] overflow-y-auto overscroll-contain rounded border border-[#D8DDEF] bg-white shadow-lg" role="listbox"></div>
           </div>
         </div>
         <label class="flex flex-col gap-0.5 w-full min-w-0">
           <span class="text-[10px] text-gray-400">Size</span>
-          <input type="number" class="size-input w-full text-[12px] leading-tight border px-2 py-0.5" value="${instrument.size}">
+          <input type="number" class="size-input w-full text-[16px] leading-tight border px-2 py-1 md:text-[12px] md:py-0.5" value="${instrument.size}">
         </label>
       </div>
     </div>`;
@@ -284,7 +289,7 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
       row.type = 'button';
       row.setAttribute('role', 'option');
       row.setAttribute('aria-selected', String(isSelected));
-      row.className = 'strike-option block w-full text-left text-[12px] px-2 py-1 hover:bg-[#F4FFF9]' +
+      row.className = 'strike-option block w-full text-left text-[14px] leading-tight px-2.5 py-1.5 md:text-[12px] md:px-2 md:py-1 hover:bg-[#F4FFF9]' +
         (isSelected ? ' bg-[#F4FFF9] font-semibold' : '');
       row.textContent = formatStrike(opt.value);
 
@@ -343,25 +348,29 @@ function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage
   customInstruments.push(instrument);
 
   const div = document.createElement('div');
-  div.className = 'flex flex-col gap-1 p-1.5 border border-[#D8DDEF] shadow-sm rounded-lg';
+  div.className = 'flex flex-col gap-1.5 p-1.5 md:gap-1 border border-[#D8DDEF] shadow-sm rounded-lg';
   div.id = instrumentId;
   div.innerHTML = `
-    <div class="grid grid-rows-2 gap-1">
-      <div class="flex flex-row justify-between items-center gap-1 min-w-0">
-        <div class="flex flex-row items-center gap-1 min-w-0">
-          <button type="button" class="position-btn text-[12px] leading-tight font-semibold uppercase px-1.5 py-0.5 rounded border border-[#D8DDEF] bg-white hover:bg-gray-200">${positionLabel(instrument.position)}</button>
-          <span class="text-[12px] leading-tight font-semibold uppercase px-1.5 py-0.5 rounded border border-[#D8DDEF] bg-white">PERP</span>
+    <div class="grid grid-rows-2 gap-1.5 md:gap-1">
+      <div class="flex flex-row justify-between items-center gap-1.5 md:gap-1 min-w-0">
+        <div class="flex flex-row items-center gap-1.5 md:gap-1 min-w-0">
+          <button type="button" class="position-btn text-[12px] leading-tight font-semibold uppercase px-2 py-0.5 md:px-1.5 md:py-[1px] rounded border border-[#D8DDEF] bg-white hover:bg-gray-200">${positionLabel(instrument.position)}</button>
+          <span class="text-[12px] leading-tight font-semibold uppercase px-2 py-0.5 md:px-1.5 md:py-[1px] rounded border border-[#D8DDEF] bg-white">PERP</span>
         </div>
-        <button data-remove="${instrumentId}" class="text-gray-500 text-[10px]">X</button>
+        <!-- 20px is a deliberate trade: row density over the 24px minimum touch target this
+             control used to meet. It still gets a real hit box rather than a bare 10px glyph,
+             and it is destructive-but-recoverable (re-add the leg), so the cost of the
+             occasional missed tap is low. Revisit if removals start going wrong in practice. -->
+        <button data-remove="${instrumentId}" aria-label="Remove leg" class="text-gray-500 shrink-0 flex items-center justify-center text-[12px] leading-none min-w-[20px] min-h-[20px] rounded hover:bg-gray-200 md:text-[10px] md:min-w-0 md:min-h-0 md:hover:bg-transparent">X</button>
       </div>
       <div class="flex flex-row items-start gap-1.5 min-w-0">
         <label class="flex flex-col gap-0.5 w-full min-w-0">
           <span class="text-[10px] text-gray-400">Entry</span>
-          <input type="number" class="entry-input w-full text-[12px] leading-tight border px-2 py-0.5" value="${instrument.entry}">
+          <input type="number" class="entry-input w-full text-[16px] leading-tight border px-2 py-1 md:text-[12px] md:py-0.5" value="${instrument.entry}">
         </label>
         <label class="flex flex-col gap-0.5 w-full min-w-0">
           <span class="text-[10px] text-gray-400">Size</span>
-          <input type="number" class="size-input w-full text-[12px] leading-tight border px-2 py-0.5" value="${instrument.size}">
+          <input type="number" class="size-input w-full text-[16px] leading-tight border px-2 py-1 md:text-[12px] md:py-0.5" value="${instrument.size}">
         </label>
       </div>
     </div>`;

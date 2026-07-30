@@ -67,13 +67,18 @@
     </div>
     
     <!-- Dashboard -->
-    <section id="dashboard" class="grid grid-cols-[340px_minmax(0,1fr)] gap-3 p-3">
+    <!-- Single column on phones: the 340px track plus a chart column overflows a ~390px
+         viewport horizontally. Side-by-side returns at md. -->
+    <section id="dashboard" class="grid grid-cols-1 md:grid-cols-[340px_minmax(0,1fr)] gap-3 p-3">
 
         <!-- Left column: menu options and strategy builder share this column, only one visible at a time -->
         <div>
 
             <!--menu options-->
-            <div id="menu" class="w-full border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[calc(100vh_-_104px)] flex flex-col">
+            <!-- On phones the panel wraps its content (header + filters + the capped list)
+                 rather than claiming a slice of the viewport, so nothing below it is pushed
+                 off screen. dvh at md is irrelevant; the desktop fixed height is unchanged. -->
+            <div id="menu" class="w-full border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-auto md:h-[calc(100vh_-_104px)] flex flex-col">
 
                 <!-- Header (fixed, does not scroll) -->
                 <div class="flex flex-row items-center justify-between p-2 border-b border-[#D8DDEF]">
@@ -106,12 +111,20 @@
                 </div>
 
                 <!--Strategies (only this part scrolls) -->
-                <div id="strategy-container" class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto no-scrollbar"></div>
+                <!--Strategies (only this part scrolls)
+                     On phones the list is a definite 228px instead of filling the panel: a
+                     collapsed card is ~35px plus the 8px gap, so that shows 5 and cuts into
+                     the 6th. Landing mid-card is deliberate — .no-scrollbar hides the
+                     scrollbar (styles.css), so the clipped row is the only cue that the list
+                     scrolls. flex-none because an auto-height flex parent cannot size a
+                     flex-1 child (its 0% basis would collapse the list); at md it goes back
+                     to filling the fixed-height panel. -->
+                <div id="strategy-container" class="flex flex-col gap-2 flex-none h-[228px] md:flex-1 md:h-auto min-h-0 overflow-y-auto no-scrollbar"></div>
 
             </div>
 
             <!-- Strategy Builder UI -->
-            <div id="strategy-builder-board" class="hidden w-full border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[calc(100vh_-_104px)] flex flex-col">
+            <div id="strategy-builder-board" class="hidden w-full border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[70dvh] md:h-[calc(100vh_-_104px)] flex flex-col">
 
                 <!-- Header (fixed, does not scroll) -->
                 <div class="flex flex-row items-center justify-between p-2 border-b border-[#D8DDEF]">
@@ -121,30 +134,42 @@
                     <button id="exit-builder" class="text-[16px] px-1 hover:bg-gray-200 rounded font-semibold text-black"> Exit</button>
                 </div>
 
-                <!-- Instrument buttons + list (only this part scrolls) -->
-                <div class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto no-scrollbar p-2">
+                <!-- Strategy title + add buttons (pinned, does not scroll).
+                     flex-none so this keeps its natural height instead of being compressed by
+                     the scroll region below it. The p-2 and gap-2 were previously inherited
+                     from the scroll wrapper this block used to live in, so they are restated
+                     here rather than being new styling. -->
+                <div class="flex flex-col gap-2 flex-none p-2">
 
                     <!-- Strategy this session started from (read-only, filled by builder.js) -->
                     <div id="builder-strategy-title" class="flex flex-row items-center gap-2"></div>
 
                     <!-- Instrument buttons -->
                     <div class="flex flex-col-2 gap-2">
-                        <button id="add-option" class="px-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[14px]">
+                        <button id="add-option" class="px-1 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[13px] md:text-[14px]">
                             + Option
                         </button>
-                        <button id="add-perp" class="px-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[14px]">
+                        <button id="add-perp" class="px-1 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[13px] md:text-[14px]">
                             + Perp
                         </button>
                     </div>
 
-                    <!-- Quote (no handler wired yet) -->
-                    <button id="get-quote" class="px-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[14px]">
+                </div>
+
+                <!-- Instruments List (the ONLY part that scrolls).
+                     Keeps p-2 because #instrument-list has no self-inset of its own, unlike
+                     #menu's card list where each card carries mx-1. -->
+                <div class="flex-1 min-h-0 overflow-y-auto no-scrollbar p-2">
+                    <div id="instrument-list" class="grid gap-2"></div>
+                </div>
+
+                <!-- Quote (pinned footer, does not scroll; no handler wired yet).
+                     border-t mirrors the header's border-b so the scrolling list reads as
+                     bounded on both ends rather than running off the panel edge. -->
+                <div class="flex-none p-2 border-t border-[#D8DDEF]">
+                    <button id="get-quote" class="px-1 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[13px] md:text-[14px]">
                         Quote
                     </button>
-
-                    <!-- Instruments List -->
-                    <div id="instrument-list" class="grid gap-2"></div>
-
                 </div>
 
             </div>
@@ -152,7 +177,7 @@
         </div>
 
         <!--Chart-->
-        <div class="w-full px-2 border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[calc(100vh_-_104px)] flex flex-col">
+        <div class="w-full px-2 border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[60dvh] md:h-[calc(100vh_-_104px)] flex flex-col">
             
                              <!-- Header (fixed, does not scroll) -->
             <div class="flex flex-row items-center justify-between p-2 border-b border-[#D8DDEF]">
