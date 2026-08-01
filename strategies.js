@@ -102,48 +102,49 @@ export function generateDynamicPriceRange(spotPrice = currentPrice) {
   return prices;
 }
 
-// Tier boundaries are compared on the strike/spot RATIO, not on absolute dollars. Template
-// strikes are authored as exact multiples of spot and so land exactly on a boundary, while
-// the builder rounds its strikes to whole dollars (populateStrikeOptions) — comparing
-// absolutes made that sub-dollar difference flip the tier, and the tiers are 2x apart, so
-// the same leg silently priced at double or half. TIER_EPSILON is far wider than dollar
-// rounding noise at realistic spot prices and far narrower than one strike-ladder step.
-// TIER_EPSILON alone is NOT enough for template legs: roundToStrikeStep moves a strike by up
-// to half a ladder step ($500/$1,000 on BTC, $25/$50 on ETH), which shifts strike/spot by up to
-// ~0.008 (BTC) / ~0.013 (ETH) — an order of magnitude past the epsilon. A template leg authored
-// exactly on a boundary (0.9/0.95/1.05/1.1) therefore crosses it, and since adjacent tiers are
-// 2x apart the leg silently prices at double. Widening the epsilon can't fix this (the required
-// width scales with step/spot, and would swallow genuinely-near-boundary strikes), so callers
-// that round a designed ratio pass that ratio as tierRatioOverride instead.
-const TIER_EPSILON = 0.001;
+// Premium as a single smooth, convex curve in strike — a "rounded corner" on intrinsic value
+// itself, rather than intrinsic plus a separate hump of extrinsic value stacked on top.
+//
+// A hump (Gaussian or otherwise) is inherently CONCAVE right at its own peak — any function
+// that rises then falls has an interior maximum, which a convex function can never have. That
+// concavity is what let a long iron condor/butterfly collect more net credit than its own
+// maximum possible loss: a riskless arbitrage no real market allows (see tests/arbitrage.test.js
+// for why — real listed markets enforce exactly this "combined credit can't exceed max single-
+// wing width" bound as a live sanity check on option chains). Monotonicity (previous step) rules
+// out premium rising with strike; convexity is the strictly stronger property that also rules
+// out THIS failure mode, and every other multi-leg combination that isn't a plain vertical
+// spread.
+//
+// smoothedIntrinsic(x, spotPrice) = (x + sqrt(x^2 + eps^2)) / 2 is the standard hyperbolic
+// smoothing of max(x, 0): as eps -> 0 it converges to intrinsic value exactly, and for any
+// eps > 0 it is PROVABLY convex everywhere —
+//   d^2/dx^2 = eps^2 / (2 * (x^2 + eps^2)^1.5) > 0 for every x
+// — with no calibration against particular strikes required, unlike the Gaussian's margin.
+// It also keeps every property already relied on: slope stays in (-1, 0) for calls / (0, 1)
+// for puts (so a single vertical spread still can't cost more than its width), premium(x=0) is
+// still EXTRINSIC_ATM_RATE * spotPrice (continuous with the previous two steps' ATM value), and
+// call/put parity — Call(K) - Put(K) = S - K — holds exactly (both formulas share the same
+// sqrt(x^2+eps^2) term with x negated, which cancels in the difference).
+const EXTRINSIC_ATM_RATE = 0.08;
 
-// tierRatioOverride selects WHICH tier applies (far/mid/near); `strike` is still what the
-// magnitude and intrinsic-value terms are computed from. Omit it and nothing changes.
+function smoothedIntrinsic(x, spotPrice) {
+  const eps = 2 * EXTRINSIC_ATM_RATE * spotPrice; // premium(x=0) == eps/2 == EXTRINSIC_ATM_RATE * spotPrice
+  return (x + Math.sqrt(x * x + eps * eps)) / 2;
+}
+
+// tierRatioOverride: same role as before — price the leg off the moneyness it was DESIGNED at
+// (strategiesIdMap's ratio) rather than the moneyness its rounded, tradeable strike happens to
+// land on, so a template leg's premium can't drift with the strike ladder. It no longer exists
+// to dodge a pricing cliff (continuity means there isn't one); it's a precision nicety now, not
+// a correctness requirement the way it was for the old tier table.
 export function generatePremium(strike, position, spotPrice = currentPrice, tierRatioOverride = null) {
-  const nearRate = 0.08;
-  const midRate = 0.04;
-  const farRate = 0.02;
-
   const ratio = tierRatioOverride ?? strike / spotPrice;
-  const isFar = ratio <= 0.9 + TIER_EPSILON || ratio >= 1.1 - TIER_EPSILON;
-  const isMid = ratio <= 0.95 + TIER_EPSILON || ratio >= 1.05 - TIER_EPSILON;
+  const moneyness = spotPrice * (1 - ratio); // > 0 the more ITM a call is; < 0 the more ITM a put is
 
   if (position === 'call') {
-    if (isFar) {
-      return Math.max(spotPrice - strike, 0) + strike * farRate;
-    }
-    if (isMid) {
-      return Math.max(spotPrice - strike, 0) + strike * midRate;
-    }
-    return strike * nearRate;
+    return smoothedIntrinsic(moneyness, spotPrice);
   } else if (position === 'put') {
-    if (isFar) {
-      return Math.max(strike - spotPrice, 0) + strike * farRate;
-    }
-    if (isMid) {
-      return Math.max(strike - spotPrice, 0) + strike * midRate;
-    }
-    return strike * nearRate;
+    return smoothedIntrinsic(-moneyness, spotPrice);
   } else {
     throw new Error("Invalid position type. Use 'call' or 'put'.");
   }

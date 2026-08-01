@@ -186,20 +186,32 @@ test('B1. builder prefill prices every leg identically to the Templates path', a
   });
 
   // Documented reference values for the pinned fixture spot, kept as a canary so a change in
-  // tier rates or ladder steps is noticed rather than silently absorbed by the equality above.
-  // Skipped automatically if FIXTURE_SPOT is ever retuned.
+  // the premium formula or ladder steps is noticed rather than silently absorbed by the
+  // equality above. Skipped automatically if FIXTURE_SPOT is ever retuned.
+  //
+  // Compared with a tolerance rather than assert.deepStrictEqual: generatePremium's curve is
+  // now the smoothed-intrinsic formula (see strategies.js), so these are irrational and the two
+  // legs at |moneyness| = 0.1 (Long Put / Long Call) differ in their last couple of significant
+  // digits between runs/engines from ordinary floating-point rounding — not from any behavior
+  // difference. A doubling regression (the original bug) would still miss this tolerance by
+  // orders of magnitude, so it still catches what it's meant to.
   if (FIXTURE_SPOT === 64519) {
-    assert.deepStrictEqual(
-      builderPremiums.map(l => [l.label, l.premium]),
-      [
-        ['Short Put 61,500', 2460],
-        ['Long Put 58,000', 1160],
-        ['Short Call 67,500', 2700],
-        ['Long Call 71,000', 1420],
-      ],
-      'premiums at the pinned fixture spot changed — the short legs doubling to 4920/5400 is ' +
-      'the original bug reappearing');
-    }
+    const expected = [
+      ['Short Put 61,500', 3794.70260328082],
+      ['Long Put 58,000', 2860.760286591601],
+      ['Short Call 67,500', 3794.70260328082],
+      ['Long Call 71,000', 2860.760286591601],
+    ];
+    builderPremiums.forEach((leg, i) => {
+      assert.strictEqual(leg.label, expected[i][0]);
+      assert.ok(
+        Math.abs(leg.premium - expected[i][1]) < 1e-6,
+        `${leg.label}: premium at the pinned fixture spot changed — expected ~${expected[i][1]}, ` +
+        `got ${leg.premium}. If this is a doubling (~${(expected[i][1] * 2).toFixed(2)}), the ` +
+        'original tier-boundary bug has reappeared; otherwise the extrinsic-value formula changed ' +
+        'and these reference values need retuning.');
+    });
+  }
 });
 
 // =========================================================================================
