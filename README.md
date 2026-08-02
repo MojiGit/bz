@@ -1,6 +1,6 @@
-# Beta — Options Strategy Explorer
+# Delta — Options Strategy Explorer
 
-Beta is a simple, visual tool for designing and understanding crypto options strategies
+Delta is a simple, visual tool for designing and understanding crypto options strategies
 **before** you ever put money on the line. Pick an asset, choose a ready-made strategy or
 build your own, and instantly see how it would perform across a range of prices — profit,
 loss, and break-even, all on one chart.
@@ -41,7 +41,7 @@ happens to my trade?"**
 
 ## Using a ready-made strategy
 
-Beta comes with a shelf of classic strategies, each shown as a card. Tap a card to expand it
+Delta comes with a shelf of classic strategies, each shown as a card. Tap a card to expand it
 and load its payoff chart.
 
 Each card tells you, in plain terms:

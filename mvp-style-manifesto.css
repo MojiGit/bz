@@ -1,4 +1,4 @@
-/* Beta Zero — Direction C ("Manifesto") applied at UI density to the strategy builder.
+/* Zero Delta — Direction C ("Manifesto") applied at UI density to the strategy builder.
    Loaded AFTER styles.css and the Tailwind CDN script; every rule here only recolors/reshapes
    elements that already exist in mvp.html — no structural changes, no renamed hooks.
    !important matches the precedent already set in styles.css for beating Tailwind's utility
