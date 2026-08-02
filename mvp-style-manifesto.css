@@ -1,0 +1,237 @@
+/* Beta Zero — Direction C ("Manifesto") applied at UI density to the strategy builder.
+   Loaded AFTER styles.css and the Tailwind CDN script; every rule here only recolors/reshapes
+   elements that already exist in mvp.html — no structural changes, no renamed hooks.
+   !important matches the precedent already set in styles.css for beating Tailwind's utility
+   classes (which mvp.js/builder.js toggle by exact string and must keep working). */
+
+:root {
+  --bz-green: #00E083;
+  --bz-green-hover: #52FFB8;
+  --bz-near-black: #191308;
+  --bz-black: #000000;
+  --bz-pale: #D8DDEF;
+  --bz-white: #FFFFFF;
+  --bz-font-display: 'Bricolage Grotesque', sans-serif;
+  --bz-font-body: 'Public Sans', sans-serif;
+}
+
+body {
+  font-family: var(--bz-font-body) !important;
+  background: var(--bz-white) !important;
+}
+
+/* every panel currently sharing Tailwind's rounded-[10px] utility — flat corners plus a
+   signature green top edge so the three panels read as one system */
+.rounded-\[10px\] {
+  border-radius: 0 !important;
+  border-top: 4px solid var(--bz-green) !important;
+  border-color: var(--bz-near-black);
+  position: relative;
+}
+
+/* ===== Nav — light, but a confident 2px black rule instead of a soft gray hairline ===== */
+#main-navbar {
+  background: var(--bz-white) !important;
+  border: none !important;
+  border-bottom: 2px solid var(--bz-near-black) !important;
+  border-radius: 0 !important;
+}
+#mobile-menu-button {
+  color: var(--bz-near-black) !important;
+}
+#mobile-menu {
+  background: var(--bz-white) !important;
+  border: 2px solid var(--bz-near-black) !important;
+  border-radius: 0 !important;
+  color: var(--bz-near-black) !important;
+}
+#mobile-menu a {
+  color: var(--bz-near-black) !important;
+}
+#mobile-menu a:hover {
+  color: var(--bz-green-hover) !important;
+}
+#mobile-menu a:hover, #mobile-menu a:focus-visible {
+  color: #009f5f !important;
+}
+
+/* ===== Panel headers (static, not JS hooks) share this look via direct markup edits in
+   mvp.html; this just sets the family/tracking once for all of them). ===== */
+#menu h1, #strategy-builder-board h1, #dashboard h1 {
+  font-family: var(--bz-font-body) !important;
+  letter-spacing: 0.1em !important;
+}
+.bz-header-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: var(--bz-green);
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* ===== Sentiment + token filters — already brand-correct when active (JS sets
+   bg-[#00E083]/text-[#191308]/border-[#00E083]); this only styles shape + the inactive state. ===== */
+.sentiment-filter, .token-btn {
+  border-radius: 0 !important;
+  font-family: var(--bz-font-body) !important;
+  border: 1px solid transparent;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.token-btn {
+  border-color: var(--bz-pale);
+}
+.token-btn:hover:not(.active-token) {
+  background: var(--bz-pale) !important;
+}
+.sentiment-filter:hover:not(.active-filter) {
+  background: var(--bz-pale) !important;
+}
+
+#strategy-name-filter {
+  border-radius: 0 !important;
+  font-family: var(--bz-font-body) !important;
+}
+
+/* ===== Strategy template cards (class list set inside mvp.js; recolor via the exact
+   compound classes it toggles, without touching that file). data-sentiment is also set by
+   mvp.js on the same element, so it doubles as a free, JS-untouched styling hook. ===== */
+.strategy-block {
+  border-radius: 0 !important;
+  border-left-width: 4px !important;
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+.strategy-block[data-sentiment="bullish"] { border-left-color: var(--bz-green) !important; }
+.strategy-block[data-sentiment="bearish"] { border-left-color: var(--bz-near-black) !important; }
+.strategy-block[data-sentiment="neutral"] { border-left-color: var(--bz-pale) !important; }
+.strategy-block:hover {
+  border-color: var(--bz-near-black) !important;
+}
+/* expanded state: a full green field instead of a pale tint — the same confidence the
+   landing page spends on full color-field breaks, spent here on the one selected card */
+.strategy-block.bg-\[\#F4FFF9\] {
+  background-color: var(--bz-green) !important;
+  border-color: var(--bz-near-black) !important;
+}
+.strategy-block.bg-\[\#F4FFF9\] h1,
+.strategy-block.bg-\[\#F4FFF9\] h2,
+.strategy-block.bg-\[\#F4FFF9\] span,
+.strategy-block.bg-\[\#F4FFF9\] p {
+  color: var(--bz-near-black) !important;
+}
+.strategy-block button {
+  border-radius: 0 !important;
+  font-family: var(--bz-font-body) !important;
+}
+
+/* ===== Builder board buttons/instrument rows — solid near-black CTAs instead of generic
+   gray, flipping to green on hover/press like the landing page's primary buttons ===== */
+#add-option, #add-perp, #get-quote {
+  background: var(--bz-near-black) !important;
+  color: var(--bz-white) !important;
+  border-radius: 0 !important;
+  font-family: var(--bz-font-body) !important;
+  letter-spacing: 0.02em;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+#add-option:hover, #add-perp:hover, #get-quote:hover {
+  background: var(--bz-green) !important;
+  color: var(--bz-near-black) !important;
+}
+#exit-builder {
+  border-radius: 0 !important;
+  font-family: var(--bz-font-body) !important;
+  border: 1.5px solid var(--bz-near-black) !important;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+#exit-builder:hover {
+  background: var(--bz-near-black) !important;
+  color: var(--bz-white) !important;
+}
+#instrument-list > div {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.position-btn, .type-btn, .strike-trigger, .size-input, .entry-input {
+  border-radius: 0 !important;
+  font-family: var(--bz-font-body) !important;
+}
+.strike-popup {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: 1px solid var(--bz-near-black) !important;
+}
+.strike-option:hover, .strike-option.bg-\[\#F4FFF9\] {
+  background-color: rgba(0, 224, 131, 0.1) !important;
+}
+
+/* ===== Chart panel ===== */
+#pnlChart {
+  font-family: var(--bz-font-body);
+}
+/* token toggle reads as a segmented control instead of two loose text links */
+#token-buttons label { display: none; }
+#token-buttons .token-btn {
+  border: 1.5px solid var(--bz-near-black) !important;
+  padding: 6px 16px !important;
+  margin-right: -1.5px;
+}
+#token-buttons .token-btn.active-token {
+  border-color: var(--bz-near-black) !important;
+  position: relative;
+  z-index: 1;
+}
+.current-price-display h2 {
+  font-family: var(--bz-font-body) !important;
+  font-weight: 500 !important;
+  color: var(--bz-near-black) !important;
+}
+/* the one "hero number" in this UI — display type reserved for it, per the translation plan */
+.current-price-display p {
+  font-family: var(--bz-font-display) !important;
+  font-weight: 800 !important;
+  font-size: clamp(22px, 2.4vw, 32px) !important;
+  color: var(--bz-near-black) !important;
+  letter-spacing: -0.01em;
+}
+#premium-disclaimer {
+  font-family: var(--bz-font-body) !important;
+}
+
+/* ===== Focus states — visible everywhere, never the browser default blue ===== */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--bz-green) !important;
+  outline-offset: 2px !important;
+}
+
+/* ===== Disabled — no control in this app currently ships disabled, prepared for when one does */
+button:disabled, input:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+}
+
+/* ===== Prepared, currently unused: a loading-state utility for #get-quote once it's wired ===== */
+.bz-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+.bz-loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--bz-near-black);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: bz-spin 700ms linear infinite;
+}
+@keyframes bz-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bz-loading::after { animation: none; }
+}
