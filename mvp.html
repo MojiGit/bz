@@ -165,9 +165,10 @@
                     <div id="instrument-list" class="grid gap-2"></div>
                 </div>
 
-                <!-- Quote (pinned footer, does not scroll; no handler wired yet).
-                     border-t mirrors the header's border-b so the scrolling list reads as
-                     bounded on both ends rather than running off the panel edge. -->
+                <!-- Quote results (hidden until fetched) -->
+                <div id="quote-results" class="hidden flex-none max-h-[200px] overflow-y-auto no-scrollbar border-t border-[#D8DDEF] px-2 py-1.5 text-[11px] text-black"></div>
+
+                <!-- Quote button -->
                 <div class="flex-none p-2 border-t border-[#D8DDEF]">
                     <button id="get-quote" class="px-1 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[13px] md:text-[14px]">
                         Quote
@@ -238,5 +239,6 @@
 <script type="module" src="./strategies.js"></script>
 <script type="module" src="./builder.js"></script>
 <script type="module" src="./charts.js"></script>
+<script type="module" src="./quotes.js"></script>
 </body>
 </html>

@@ -9,6 +9,7 @@ export const strategyTitle = document.getElementById('builder-strategy-title');
 import * as charts from './charts.js';
 import * as mvp from './mvp.js';
 import * as Strategies from './strategies.js';
+import { fetchDeribitQuotes } from './quotes.js';
 
 
 export let customInstruments = [];
@@ -404,11 +405,91 @@ function addPerp(perpPositon = 'long', perpEntry = 1, perpSize = 1, perpLeverage
 
 // Add new instrument
 addOptionBtn.addEventListener('click', () => {
-  // For now default to long call
   addOption();
 });
 addPerpBtn.addEventListener('click', () => {
-  // For now default to long call
   addPerp();
+});
+
+// Quote button — fetch real prices from Deribit and display them
+const quoteBtn = document.getElementById('get-quote');
+const quotePanel = document.getElementById('quote-results');
+
+function renderQuotes(results) {
+  const fmt = (n, dec = 0) =>
+    n == null || isNaN(n) || n === 0
+      ? '—'
+      : `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })}`;
+  const fmtPct = n => n == null ? '—' : `${Number(n).toFixed(2)}%`;
+
+  let netPremium = 0;
+
+  const rows = results.map(q => {
+    if (q.error) {
+      return `<div class="py-1 text-red-400">${q.error}</div>`;
+    }
+    if (q.asset === 'opt') {
+      const sign = q.position === 'long' ? 1 : -1;
+      netPremium += q.mark * q.size * sign;
+      return `<div class="py-1 border-b border-[#D8DDEF] last:border-0">
+        <div class="flex justify-between gap-2">
+          <span class="font-semibold uppercase">${q.position === 'long' ? 'BUY' : 'SELL'} ${q.size} ${q.name}</span>
+          <span class="text-gray-400 shrink-0">IV ${fmtPct(q.iv)}</span>
+        </div>
+        <div class="flex gap-3 text-gray-500 mt-0.5">
+          <span>Bid <span class="text-black">${fmt(q.bid)}</span></span>
+          <span>Mark <span class="text-black font-semibold">${fmt(q.mark)}</span></span>
+          <span>Ask <span class="text-black">${fmt(q.ask)}</span></span>
+        </div>
+      </div>`;
+    }
+    if (q.asset === 'perp') {
+      return `<div class="py-1 border-b border-[#D8DDEF] last:border-0">
+        <div class="flex justify-between gap-2">
+          <span class="font-semibold uppercase">${q.position === 'long' ? 'BUY' : 'SELL'} ${q.size} ${q.name}</span>
+          <span class="text-gray-400 shrink-0">Funding ${fmtPct(q.funding)}/8h</span>
+        </div>
+        <div class="flex gap-3 text-gray-500 mt-0.5">
+          <span>Bid <span class="text-black">${fmt(q.bid)}</span></span>
+          <span>Mark <span class="text-black font-semibold">${fmt(q.mark)}</span></span>
+          <span>Ask <span class="text-black">${fmt(q.ask)}</span></span>
+        </div>
+      </div>`;
+    }
+    return '';
+  }).join('');
+
+  const netLabel = netPremium > 0
+    ? `Net cost: ${fmt(Math.abs(netPremium))}`
+    : netPremium < 0
+    ? `Net credit: ${fmt(Math.abs(netPremium))}`
+    : '';
+
+  quotePanel.innerHTML = `
+    <div class="flex justify-between items-center mb-1">
+      <span class="font-semibold uppercase tracking-wide text-gray-400">Quotes · Deribit</span>
+      ${netLabel ? `<span class="text-gray-500">${netLabel}</span>` : ''}
+    </div>
+    ${rows}
+  `;
+  quotePanel.classList.remove('hidden');
+}
+
+quoteBtn.addEventListener('click', async () => {
+  if (!customInstruments.length) return;
+  quotePanel.classList.add('hidden');
+  quoteBtn.textContent = 'Loading…';
+  quoteBtn.disabled = true;
+  try {
+    const results = await fetchDeribitQuotes(customInstruments, mvp.selectedTokenSymbol, mvp.currentPrice);
+    renderQuotes(results);
+  } catch (e) {
+    console.error('Quote fetch failed:', e);
+    quotePanel.innerHTML = `<div class="text-red-400">Failed to fetch quotes. Try again.</div>`;
+    quotePanel.classList.remove('hidden');
+  } finally {
+    quoteBtn.textContent = 'Quote';
+    quoteBtn.disabled = false;
+  }
 });
 
