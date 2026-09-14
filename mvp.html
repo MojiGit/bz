@@ -128,51 +128,62 @@
             <!-- Strategy Builder UI -->
             <div id="strategy-builder-board" class="hidden w-full border border-[#D8DDEF] rounded-[10px] bg-white overflow-hidden h-[70dvh] md:h-[calc(100vh_-_104px)] flex flex-col">
 
-                <!-- Header (fixed, does not scroll) -->
+                <!-- Header (always visible in both states) -->
                 <div class="flex flex-row items-center justify-between p-2 border-b border-[#D8DDEF]">
                     <h1 class="text-[13px] tracking-[0.08em] uppercase font-semibold text-[#191308]">
                         <span class="bz-header-dot"></span>Instruments
                     </h1>
-                    <button id="exit-builder" class="text-[16px] px-1 hover:bg-gray-200 rounded font-semibold text-black"> Exit</button>
+                    <button id="exit-builder" class="text-[13px] px-1 hover:bg-gray-200 rounded font-semibold text-black">← Back</button>
                 </div>
 
-                <!-- Strategy title + add buttons (pinned, does not scroll).
-                     flex-none so this keeps its natural height instead of being compressed by
-                     the scroll region below it. The p-2 and gap-2 were previously inherited
-                     from the scroll wrapper this block used to live in, so they are restated
-                     here rather than being new styling. -->
-                <div class="flex flex-col gap-2 flex-none p-2">
+                <!-- STATE 1 — Editing block (default visible) -->
+                <div id="builder-editing-block" class="flex-1 flex flex-col min-h-0">
 
-                    <!-- Strategy this session started from (read-only, filled by builder.js) -->
-                    <div id="builder-strategy-title" class="flex flex-row items-center gap-2"></div>
+                    <!-- Strategy title + add buttons (pinned) -->
+                    <div class="flex flex-col gap-2 flex-none p-2">
+                        <div id="builder-strategy-title" class="flex flex-row items-center gap-2"></div>
+                        <div class="flex flex-col-2 gap-2">
+                            <button id="add-option" class="px-1 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[13px] md:text-[14px]">
+                                + Option
+                            </button>
+                            <button id="add-perp" class="px-1 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[13px] md:text-[14px]">
+                                + Perp
+                            </button>
+                        </div>
+                    </div>
 
-                    <!-- Instrument buttons -->
-                    <div class="flex flex-col-2 gap-2">
-                        <button id="add-option" class="px-1 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[13px] md:text-[14px]">
-                            + Option
-                        </button>
-                        <button id="add-perp" class="px-1 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[13px] md:text-[14px]">
-                            + Perp
+                    <!-- Instrument list (scrolls) -->
+                    <div class="flex-1 min-h-0 overflow-y-auto no-scrollbar p-2">
+                        <div id="instrument-list" class="grid gap-2"></div>
+                    </div>
+
+                    <!-- Quote button pinned at bottom -->
+                    <div class="flex-none p-2 border-t border-[#D8DDEF]">
+                        <button id="get-quote" class="px-1 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[13px] md:text-[14px]">
+                            Quote
                         </button>
                     </div>
 
                 </div>
 
-                <!-- Instruments List (the ONLY part that scrolls).
-                     Keeps p-2 because #instrument-list has no self-inset of its own, unlike
-                     #menu's card list where each card carries mx-1. -->
-                <div class="flex-1 min-h-0 overflow-y-auto no-scrollbar p-2">
-                    <div id="instrument-list" class="grid gap-2"></div>
-                </div>
+                <!-- STATE 2 — Quoting block (hidden until quote mode is entered) -->
+                <div id="builder-quoting-block" class="hidden flex-1 flex flex-col min-h-0 overflow-y-auto no-scrollbar">
 
-                <!-- Quote results (hidden until fetched) -->
-                <div id="quote-results" class="hidden flex-none max-h-[260px] overflow-y-auto no-scrollbar border-t border-[#D8DDEF] px-2 py-1.5 text-[11px] text-black"></div>
+                    <!-- Summary strip: strategy info + count + EDIT link (not editable) -->
+                    <div class="flex-none flex items-center justify-between gap-2 px-2 py-1.5 bg-gray-50 border-b border-[#D8DDEF]">
+                        <div class="flex items-center gap-2 min-w-0 flex-wrap">
+                            <div id="quote-strip-title" class="flex items-center gap-2 min-w-0"></div>
+                            <span id="quote-strip-count" class="text-[10px] font-mono text-gray-400 shrink-0"></span>
+                        </div>
+                        <button id="edit-from-quote" class="text-[11px] font-bold uppercase tracking-wide text-[#191308] hover:text-[#00E083] shrink-0 px-1">Edit</button>
+                    </div>
 
-                <!-- Quote button -->
-                <div class="flex-none p-2 border-t border-[#D8DDEF]">
-                    <button id="get-quote" class="px-1 py-1 text-black bg-gray-200 rounded hover:bg-[#00E083] w-full font-semibold text-[13px] md:text-[14px]">
-                        Quote
-                    </button>
+                    <!-- Quotes section label + cards -->
+                    <div class="flex-none px-2 pt-2 pb-1">
+                        <span class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Quotes</span>
+                    </div>
+                    <div id="quote-results" class="flex flex-col gap-2 px-2 pb-2"></div>
+
                 </div>
 
             </div>

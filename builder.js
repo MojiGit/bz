@@ -6,6 +6,11 @@ export const addOptionBtn = document.getElementById('add-option');
 export const addPerpBtn = document.getElementById('add-perp');
 export const strategyTitle = document.getElementById('builder-strategy-title');
 
+const editingBlock   = document.getElementById('builder-editing-block');
+const quotingBlock   = document.getElementById('builder-quoting-block');
+const quoteStripTitle = document.getElementById('quote-strip-title');
+const quoteStripCount = document.getElementById('quote-strip-count');
+
 import * as charts from './charts.js';
 import * as mvp from './mvp.js';
 import * as Strategies from './strategies.js';
@@ -76,6 +81,12 @@ export async function enterBuildMode() {
   strategyBuilderBoard.classList.remove('hidden');
   builderMode = true;
 
+  // Always start in editing state, discarding any leftover quote mode from a prior session
+  showQuotes = false;
+  quotesByLeg = {};
+  editingBlock.classList.remove('hidden');
+  quotingBlock.classList.add('hidden');
+
   activeStrategyId = mvp.selectedStrategyId;
   renderStrategyTitle();
   await loadExpiries();
@@ -97,18 +108,6 @@ export async function enterBuildMode() {
   charts.updateBuilderChart();
 }
 
-function setEditingEnabled(enabled) {
-  const toggleEl = el => {
-    el.disabled = !enabled;
-    el.classList.toggle('opacity-40', !enabled);
-    el.classList.toggle('pointer-events-none', !enabled);
-  };
-  [addOptionBtn, addPerpBtn].forEach(toggleEl);
-  instrumentList.querySelectorAll(
-    '.type-btn, .position-btn, .strike-trigger, .size-input, .entry-input, .expiry-leg-select, [data-remove]'
-  ).forEach(toggleEl);
-}
-
 // Exit build mode
 export function exitBuilder(){
     strategyMenu.classList.remove('hidden');
@@ -121,7 +120,8 @@ export function exitBuilder(){
     cachedExpiries = [];
     showQuotes = false;
     quotesByLeg = {};
-    quotePanel.classList.add('hidden');
+    editingBlock.classList.remove('hidden');
+    quotingBlock.classList.add('hidden');
 }
 
 exitBuilderBtn.addEventListener('click', () => {
@@ -268,7 +268,7 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
   instrument.expiryTs = expiryLegSelect.value ? Number(expiryLegSelect.value) : null;
   expiryLegSelect.addEventListener('change', () => {
     instrument.expiryTs = expiryLegSelect.value ? Number(expiryLegSelect.value) : null;
-    quotePanel.classList.add('hidden'); // invalidate quotes on expiry change
+    resetQuoteMode(); // quotes are stale when expiry changes
   });
 
   // Listen to input changes
@@ -467,35 +467,31 @@ addPerpBtn.addEventListener('click', () => {
   addPerp();
 });
 
-// Quote button — fetch real prices from Deribit and display them
-const quoteBtn = document.getElementById('get-quote');
+// Quote button and results panel (DOM refs; both live inside their respective blocks)
+const quoteBtn   = document.getElementById('get-quote');
 const quotePanel = document.getElementById('quote-results');
 
-function renderQuotes(results) {
+// Render expandable quote cards into #quote-results inside the quoting block.
+function renderQuoteCards(results) {
   const fmt = (n, dec = 0) =>
     n == null || isNaN(n) || n === 0
       ? '—'
       : `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })}`;
   const fmtPct = n => n == null ? '—' : `${Number(n).toFixed(2)}%`;
 
-  // BTC-16SEP26-77500-C → CALL · $77,500 · 16 Sep 26
   function fmtOptName(q) {
-    const parts = q.name.split('-');
+    const parts = (q.name ?? '').split('-');
     const expRaw = parts[1] ?? '';
     const day = expRaw.slice(0, 2);
     const mon = expRaw.slice(2, 5);
-    const yr = expRaw.length >= 7 ? '20' + expRaw.slice(5) : '';
-    return `${q.type.toUpperCase()} · $${Number(q.strike).toLocaleString('en-US')} · ${day} ${mon} ${yr}`.trim();
+    const yr  = expRaw.length >= 7 ? '20' + expRaw.slice(5) : '';
+    return `${(q.type ?? '').toUpperCase()} · $${Number(q.strike).toLocaleString('en-US')} · ${day} ${mon} ${yr}`.trim();
   }
 
-  let netPremium = 0;
+  quotePanel.innerHTML = '';
 
-  const missingCount = results.filter(q => !q || q.error).length;
-  const partialNotice = missingCount > 0
-    ? `<div class="text-[10px] text-amber-500 mb-1.5 px-1">Chart shows ${results.length - missingCount}/${results.length} legs — missing legs excluded.</div>`
-    : '';
-
-  const rows = results.map(q => {
+  results.forEach(q => {
+    // — NO QUOTE card (error or null result) —
     if (!q || q.error) {
       const inst = customInstruments.find(x => x.id === q?.id);
       const instLabel = inst
@@ -503,99 +499,120 @@ function renderQuotes(results) {
             ? `${inst.type.toUpperCase()} · $${Number(inst.strike).toLocaleString('en-US')}`
             : 'PERP')
         : 'Unknown leg';
-      return `
-        <div class="py-1.5 border-b border-amber-200 last:border-0 bg-amber-50 rounded px-1 mb-0.5">
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-1.5 min-w-0">
-              <span class="text-[10px] font-bold shrink-0 text-amber-500">NO QUOTE</span>
-              <span class="text-[11px] font-semibold text-amber-700 truncate">${instLabel}</span>
-            </div>
-            <span class="text-[10px] text-amber-400 shrink-0 italic">adjust strike or expiry</span>
-          </div>
-          <div class="text-[10px] text-amber-400 mt-0.5">${q?.error ?? 'No response'}</div>
-        </div>`;
+      const div = document.createElement('div');
+      div.className = 'border border-amber-200 bg-amber-50 rounded-lg px-2 py-1.5';
+      div.innerHTML = `
+        <div class="flex items-center gap-1.5">
+          <span class="text-[10px] font-bold text-amber-500 shrink-0">NO QUOTE</span>
+          <span class="text-[11px] font-semibold text-amber-700 flex-1 min-w-0 truncate">${instLabel}</span>
+          <span class="text-[10px] text-amber-400 italic shrink-0">adjust strike or expiry</span>
+        </div>
+        <div class="text-[10px] text-amber-300 mt-0.5">${q?.error ?? 'No response'}</div>`;
+      quotePanel.appendChild(div);
+      return;
     }
 
-    const isBuy = q.position === 'long';
-    const posClass = isBuy ? 'text-[#00C96B]' : 'text-[#FF6B6B]';
-    const posLabel = isBuy ? 'BUY' : 'SELL';
+    // — Quote card (valid result) —
+    const isBuy     = q.position === 'long';
+    const posClass  = isBuy ? 'text-[#00C96B]' : 'text-[#FF6B6B]';
+    const posLabel  = isBuy ? 'BUY' : 'SELL';
+    const name      = q.asset === 'opt' ? fmtOptName(q) : (q.name ?? 'PERP');
+    const total     = q.mark != null ? q.mark * q.size : null;
+    const extraInfo = q.asset === 'opt'
+      ? `<span class="text-[10px] text-gray-400 shrink-0">IV ${fmtPct(q.iv)}</span>`
+      : `<span class="text-[10px] text-gray-400 shrink-0">Fund. ${fmtPct(q.funding)}/8h</span>`;
 
-    if (q.asset === 'opt') {
-      netPremium += q.mark * q.size * (isBuy ? 1 : -1);
-      return `
-        <div class="py-1.5 border-b border-[#D8DDEF] last:border-0">
-          <div class="flex items-center justify-between gap-2 mb-1">
-            <div class="flex items-center gap-1.5 min-w-0">
-              <span class="text-[10px] font-bold shrink-0 ${posClass}">${posLabel}</span>
-              <span class="text-[11px] font-semibold text-[#191308] truncate">${fmtOptName(q)}</span>
-            </div>
-            <span class="text-[10px] text-gray-400 shrink-0">IV ${fmtPct(q.iv)}</span>
+    const card = document.createElement('div');
+    card.className = 'border border-[#D8DDEF] rounded-lg overflow-hidden';
+    card.innerHTML = `
+      <button type="button" class="quote-card-header w-full flex items-center gap-1.5 px-2 py-1.5 text-left hover:bg-gray-50">
+        <span class="text-[10px] font-bold shrink-0 ${posClass}">${posLabel}</span>
+        <span class="text-[11px] font-semibold text-[#191308] flex-1 min-w-0 truncate">${name}</span>
+        <span class="text-[10px] text-gray-400 shrink-0">×${q.size}</span>
+        <span class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#00E083]"></span>Deribit
+        </span>
+        <span class="text-[10px] font-semibold text-[#191308] shrink-0">${fmt(total)}</span>
+        <span class="quote-card-chevron text-[9px] text-gray-400 shrink-0" style="display:inline-block;transition:transform 150ms">▼</span>
+      </button>
+      <div class="quote-card-detail hidden border-t border-[#D8DDEF]">
+        <div class="flex items-center gap-2 px-2 py-1.5">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#00E083] shrink-0"></span>
+          <span class="text-[11px] font-semibold text-[#191308] flex-1">Deribit</span>
+          <div class="grid grid-cols-3 gap-2 text-center text-[10px] mr-1">
+            <div class="flex flex-col"><span class="text-gray-400">Bid</span><span>${fmt(q.bid)}</span></div>
+            <div class="flex flex-col bg-[#F4FFF9] rounded px-1"><span class="text-gray-400">Mark</span><span class="font-bold">${fmt(q.mark)}</span></div>
+            <div class="flex flex-col"><span class="text-gray-400">Ask</span><span>${fmt(q.ask)}</span></div>
           </div>
-          <div class="grid grid-cols-3 gap-1 text-center text-[10px]">
-            <div class="flex flex-col"><span class="text-gray-400">Bid</span><span class="text-[#191308]">${fmt(q.bid)}</span></div>
-            <div class="flex flex-col bg-[#F4FFF9] rounded"><span class="text-gray-400">Mark</span><span class="text-[#191308] font-bold">${fmt(q.mark)}</span></div>
-            <div class="flex flex-col"><span class="text-gray-400">Ask</span><span class="text-[#191308]">${fmt(q.ask)}</span></div>
-          </div>
-        </div>`;
-    }
+          ${extraInfo}
+          <span class="text-[10px] text-[#00C96B] shrink-0 font-bold">✓</span>
+        </div>
+      </div>`;
 
-    if (q.asset === 'perp') {
-      return `
-        <div class="py-1.5 border-b border-[#D8DDEF] last:border-0">
-          <div class="flex items-center justify-between gap-2 mb-1">
-            <div class="flex items-center gap-1.5">
-              <span class="text-[10px] font-bold shrink-0 ${posClass}">${posLabel}</span>
-              <span class="text-[11px] font-semibold text-[#191308]">${q.name}</span>
-            </div>
-            <span class="text-[10px] text-gray-400 shrink-0">Fund. ${fmtPct(q.funding)}/8h</span>
-          </div>
-          <div class="grid grid-cols-3 gap-1 text-center text-[10px]">
-            <div class="flex flex-col"><span class="text-gray-400">Bid</span><span class="text-[#191308]">${fmt(q.bid)}</span></div>
-            <div class="flex flex-col bg-[#F4FFF9] rounded"><span class="text-gray-400">Mark</span><span class="text-[#191308] font-bold">${fmt(q.mark)}</span></div>
-            <div class="flex flex-col"><span class="text-gray-400">Ask</span><span class="text-[#191308]">${fmt(q.ask)}</span></div>
-          </div>
-        </div>`;
-    }
-    return '';
-  }).join('');
+    const header  = card.querySelector('.quote-card-header');
+    const detail  = card.querySelector('.quote-card-detail');
+    const chevron = card.querySelector('.quote-card-chevron');
+    header.addEventListener('click', () => {
+      const isOpen = !detail.classList.contains('hidden');
+      detail.classList.toggle('hidden', isOpen);
+      chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+    });
 
-  const absNet = Math.abs(netPremium);
-  const netColor = netPremium < 0 ? 'text-[#00C96B]' : 'text-[#191308]';
-  const netLabel = netPremium > 0 ? `Cost ${fmt(absNet)}`
-    : netPremium < 0 ? `Credit ${fmt(absNet)}`
-    : '';
-
-  quotePanel.innerHTML = `
-    <div class="flex items-center justify-between mb-1.5">
-      <div class="flex items-center gap-1.5">
-        <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#00E083] shrink-0"></span>
-        <span class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Live Quotes</span>
-        <span class="text-[10px] text-gray-400 border border-[#D8DDEF] rounded px-1">Deribit</span>
-      </div>
-      ${netLabel ? `<span class="text-[10px] font-semibold ${netColor}">${netLabel}</span>` : ''}
-    </div>
-    ${partialNotice}
-    ${rows}
-  `;
-  quotePanel.classList.remove('hidden');
+    quotePanel.appendChild(card);
+  });
 }
 
-quoteBtn.addEventListener('click', async () => {
-  // In quote mode: "Edit" → exit quote mode, restore editing
-  if (showQuotes) {
-    showQuotes = false;
-    quotesByLeg = {};
-    setEditingEnabled(true);
-    quoteBtn.textContent = 'Quote';
-    quotePanel.classList.add('hidden');
-    charts.updateBuilderChart();
-    const disc = document.getElementById('premium-disclaimer');
-    if (disc) disc.textContent = 'Payoff curves use estimated reference premiums for illustration only — not live market prices. Actual costs and breakevens will differ. Request a quote for real pricing.';
-    return;
+// Swap to quoting state: collapse editing block into summary strip + show quote cards.
+function enterQuoteMode(results) {
+  const info = Strategies.strategiesIdMap[activeStrategyId];
+  if (quoteStripTitle) {
+    quoteStripTitle.innerHTML = info
+      ? (activeStrategyId === 'custom'
+          ? `<span class="text-[13px] font-bold text-[#191308]">${info.name}</span>`
+          : `<span class="text-[13px] font-bold text-[#191308]">${info.name}</span>
+             <span class="text-[11px] text-gray-400 capitalize ml-1">${info.sentiment}</span>`)
+      : '';
+  }
+  if (quoteStripCount) {
+    const n = customInstruments.length;
+    quoteStripCount.textContent = `${n} instrument${n !== 1 ? 's' : ''}`;
   }
 
+  renderQuoteCards(results);
+
+  editingBlock.classList.add('hidden');
+  quotingBlock.classList.remove('hidden');
+  quotingBlock.classList.add('anim-fade-rise');
+  setTimeout(() => quotingBlock.classList.remove('anim-fade-rise'), 200);
+
+  const disc = document.getElementById('premium-disclaimer');
+  if (disc) disc.textContent = 'Payoff curves use live Deribit mark prices. Legs without quotes are excluded from the chart.';
+}
+
+// Restore editing state. Callable from the Edit button and from external resets.
+function exitQuoteMode() {
+  showQuotes = false;
+  quotesByLeg = {};
+
+  quotingBlock.classList.add('hidden');
+  editingBlock.classList.remove('hidden');
+  editingBlock.classList.add('anim-fade-rise');
+  setTimeout(() => editingBlock.classList.remove('anim-fade-rise'), 200);
+
+  charts.updateBuilderChart();
+  const disc = document.getElementById('premium-disclaimer');
+  if (disc) disc.textContent = 'Payoff curves use estimated reference premiums for illustration only — not live market prices. Actual costs and breakevens will differ. Request a quote for real pricing.';
+}
+
+// Exported for external callers (token change, template select, clear)
+export function resetQuoteMode() {
+  if (showQuotes) exitQuoteMode();
+}
+
+document.getElementById('edit-from-quote').addEventListener('click', () => exitQuoteMode());
+
+quoteBtn.addEventListener('click', async () => {
   if (!customInstruments.length) return;
-  quotePanel.classList.add('hidden');
   quoteBtn.textContent = 'Loading…';
   quoteBtn.disabled = true;
   try {
@@ -605,18 +622,12 @@ quoteBtn.addEventListener('click', async () => {
       if (r) quotesByLeg[r.id] = r;
     }
     showQuotes = true;
-    setEditingEnabled(false);
-    quoteBtn.textContent = 'Edit';
-    renderQuotes(results);
+    enterQuoteMode(results);
     charts.updateBuilderChart();
-    const disc = document.getElementById('premium-disclaimer');
-    if (disc) disc.textContent = 'Payoff curves use live Deribit mark prices. Legs without quotes are excluded from the chart.';
   } catch (e) {
     console.error('Quote fetch failed:', e);
-    quotePanel.innerHTML = `<div class="text-red-400">Failed to fetch quotes. Try again.</div>`;
-    quotePanel.classList.remove('hidden');
-    quoteBtn.textContent = 'Quote';
   } finally {
+    quoteBtn.textContent = 'Quote';
     quoteBtn.disabled = false;
   }
 });
