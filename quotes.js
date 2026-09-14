@@ -41,18 +41,52 @@ export async function fetchDeribitExpiries(token) {
 }
 
 // ─── Derive ──────────────────────────────────────────────────────────────────
+// Derive's HTTP POST endpoints don't send CORS headers, so we use their
+// WebSocket JSON-RPC interface instead — same methods, no preflight issues.
 
-const DERIVE = 'https://api.derive.xyz/v3';
+const DERIVE_WS_URL = 'wss://api.derive.xyz/v3/ws';
 
-async function deriveFetch(endpoint, params) {
-  const res = await fetch(`${DERIVE}/${endpoint}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(params),
+// Opens one WS connection and returns a { call(method, params), close() } handle.
+// Responses are demultiplexed by JSON-RPC id so concurrent calls work safely.
+function openDeriveWs() {
+  return new Promise((resolve, reject) => {
+    const ws = new WebSocket(DERIVE_WS_URL);
+    const pending = new Map();
+    let nextId = 1;
+
+    ws.onopen = () => resolve({
+      call(method, params) {
+        return new Promise((res, rej) => {
+          const id = nextId++;
+          pending.set(id, { resolve: res, reject: rej });
+          ws.send(JSON.stringify({ jsonrpc: '2.0', id, method, params }));
+          setTimeout(() => {
+            if (pending.has(id)) {
+              pending.delete(id);
+              rej(new Error(`Derive timeout: ${method}`));
+            }
+          }, 10000);
+        });
+      },
+      close() { ws.close(); },
+    });
+
+    ws.onmessage = e => {
+      const msg = JSON.parse(e.data);
+      if (msg.id != null && pending.has(msg.id)) {
+        const { resolve, reject } = pending.get(msg.id);
+        pending.delete(msg.id);
+        if (msg.error) reject(new Error(msg.error.message ?? JSON.stringify(msg.error)));
+        else resolve(msg.result);
+      }
+    };
+
+    ws.onerror = () => reject(new Error('Derive WebSocket error'));
+    ws.onclose = () => {
+      for (const { reject } of pending.values()) reject(new Error('Derive WebSocket closed'));
+      pending.clear();
+    };
   });
-  const json = await res.json();
-  if (json.error) throw new Error(json.error.message ?? JSON.stringify(json.error));
-  return json.result;
 }
 
 // expiryTs is in ms (from Deribit dropdown); Derive names use YYYYMMDD UTC.
@@ -85,63 +119,65 @@ function nearestDeriveOpt(instruments, strike, type, dateStr) {
 export async function fetchDeriveQuotes(instruments, token) {
   const currency = TOKEN_CURRENCY[token] ?? 'BTC';
 
-  const hasOpts = instruments.some(i => i.asset === 'opt');
-  let deriveInsts = null;
-  if (hasOpts) {
-    try {
-      const r = await deriveFetch('public/get_all_instruments', {
-        instrument_type: 'option',
-        currency,
-        expired: false,
-        page_size: 1000,
-      });
-      deriveInsts = r.instruments;
-    } catch (e) {
-      // CORS or network failure — return error objects for all legs so the
-      // Deribit path in the caller is unaffected.
-      return instruments.map(inst => ({ id: inst.id, source: 'Derive', error: `Derive unavailable: ${e.message}` }));
-    }
+  let ws;
+  try {
+    ws = await openDeriveWs();
+  } catch (e) {
+    return instruments.map(inst => ({ id: inst.id, source: 'Derive', error: `Derive unavailable: ${e.message}` }));
   }
 
-  return Promise.all(instruments.map(async inst => {
-    try {
-      if (inst.asset === 'opt') {
-        const dateStr = tsToYYYYMMDD(inst.expiryTs);
-        const matched = nearestDeriveOpt(deriveInsts, inst.strike, inst.type, dateStr);
-        if (!matched) return { id: inst.id, source: 'Derive', error: 'No instrument found on Derive' };
-        const t = await deriveFetch('public/get_ticker', { instrument_name: matched.instrument_name });
-        const mark = parseFloat(t.M);
-        if (mark === 0) return { id: inst.id, source: 'Derive', error: 'No active market on Derive (mark = 0)' };
-        const expiry = new Date(matched.option_details.expiry * 1000)
-          .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
-        return {
-          id: inst.id, asset: 'opt', type: inst.type, position: inst.position, size: inst.size,
-          source: 'Derive', name: matched.instrument_name,
-          strike: parseFloat(matched.option_details.strike), expiry,
-          bid:  parseFloat(t.b),
-          ask:  parseFloat(t.a),
-          mark,
-          iv: t.option_pricing ? parseFloat(t.option_pricing.v) : null,
-        };
-      }
-      if (inst.asset === 'perp') {
-        const name = `${currency}-PERP`;
-        const t = await deriveFetch('public/get_ticker', { instrument_name: name });
-        const mark = parseFloat(t.M);
-        if (mark === 0) return { id: inst.id, source: 'Derive', error: 'No active market on Derive (mark = 0)' };
-        return {
-          id: inst.id, asset: 'perp', position: inst.position, size: inst.size,
-          source: 'Derive', name,
-          bid:     parseFloat(t.b),
-          ask:     parseFloat(t.a),
-          mark,
-          funding: t.f != null ? parseFloat(t.f) : null,
-        };
-      }
-    } catch (e) {
-      return { id: inst.id, source: 'Derive', error: e.message };
+  try {
+    const hasOpts = instruments.some(i => i.asset === 'opt');
+    let deriveInsts = null;
+    if (hasOpts) {
+      const r = await ws.call('public/get_all_instruments', {
+        instrument_type: 'option', currency, expired: false, page_size: 1000,
+      });
+      deriveInsts = r.instruments;
     }
-  }));
+
+    return await Promise.all(instruments.map(async inst => {
+      try {
+        if (inst.asset === 'opt') {
+          const dateStr = tsToYYYYMMDD(inst.expiryTs);
+          const matched = nearestDeriveOpt(deriveInsts, inst.strike, inst.type, dateStr);
+          if (!matched) return { id: inst.id, source: 'Derive', error: 'No instrument found on Derive' };
+          const t = await ws.call('public/get_ticker', { instrument_name: matched.instrument_name });
+          const mark = parseFloat(t.M);
+          if (mark === 0) return { id: inst.id, source: 'Derive', error: 'No active market on Derive (mark = 0)' };
+          const expiry = new Date(matched.option_details.expiry * 1000)
+            .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
+          return {
+            id: inst.id, asset: 'opt', type: inst.type, position: inst.position, size: inst.size,
+            source: 'Derive', name: matched.instrument_name,
+            strike: parseFloat(matched.option_details.strike), expiry,
+            bid:  parseFloat(t.b),
+            ask:  parseFloat(t.a),
+            mark,
+            iv: t.option_pricing ? parseFloat(t.option_pricing.v) : null,
+          };
+        }
+        if (inst.asset === 'perp') {
+          const name = `${currency}-PERP`;
+          const t = await ws.call('public/get_ticker', { instrument_name: name });
+          const mark = parseFloat(t.M);
+          if (mark === 0) return { id: inst.id, source: 'Derive', error: 'No active market on Derive (mark = 0)' };
+          return {
+            id: inst.id, asset: 'perp', position: inst.position, size: inst.size,
+            source: 'Derive', name,
+            bid:     parseFloat(t.b),
+            ask:     parseFloat(t.a),
+            mark,
+            funding: t.f != null ? parseFloat(t.f) : null,
+          };
+        }
+      } catch (e) {
+        return { id: inst.id, source: 'Derive', error: e.message };
+      }
+    }));
+  } finally {
+    ws.close();
+  }
 }
 
 // ─── Deribit ─────────────────────────────────────────────────────────────────
