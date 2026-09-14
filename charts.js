@@ -171,49 +171,53 @@ export function renderPNLChart(datasets, strikePrices = []) {
   });
 }
 
-// Render chart for current builder state
+// Render chart for current builder state.
+// When builder.showQuotes is true, uses real Deribit mark prices (premiumOverride) for
+// quoted legs and skips any leg that has no valid quote.
 export async function updateBuilderChart() {
   const datasets = [];
   const strikePrices = [];
-
 
   for (const inst of builder.customInstruments) {
     let data;
     let label;
     let strikeOrEntry;
-    if ( inst.asset === 'opt'){
-      // Payoff uses the leg's real (rounded) strike; the premium tier comes from the design
-      // ratio it was prefilled at, so rounding can't push it across a tier boundary (see
-      // generatePremium). Legs added by hand — and prefilled legs whose strike the user has
-      // since moved — carry no designRatio and pass null, tiering off their real strike.
-      data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position, undefined, undefined, inst.designRatio ?? null);
-      strikePrices.push(inst.strike)
-      strikeOrEntry = inst.strike;
+
+    if (builder.showQuotes) {
+      const q = builder.quotesByLeg[inst.id];
+      if (!q || q.error) continue; // exclude legs without a valid quote
+      if (inst.asset === 'opt') {
+        data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position, undefined, undefined, null, q.mark);
+        strikePrices.push(inst.strike);
+        strikeOrEntry = inst.strike;
+      }
+      if (inst.asset === 'perp') {
+        data = Strategies.calculatePerpPNL(q.mark, inst.size, inst.leverage, inst.position);
+        strikePrices.push(q.mark);
+        strikeOrEntry = q.mark;
+      }
+    } else {
+      if (inst.asset === 'opt') {
+        data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position, undefined, undefined, inst.designRatio ?? null);
+        strikePrices.push(inst.strike);
+        strikeOrEntry = inst.strike;
+      }
+      if (inst.asset === 'perp') {
+        data = Strategies.calculatePerpPNL(inst.entry, inst.size, inst.leverage, inst.position);
+        strikePrices.push(inst.entry);
+        strikeOrEntry = inst.entry;
+      }
     }
-    if (inst.asset === 'perp'){
-      data = Strategies.calculatePerpPNL(inst.entry, inst.size, inst.leverage, inst.position);
-      strikePrices.push(inst.entry)
-      strikeOrEntry = inst.entry;
-    }
+
+    if (data === undefined) continue;
 
     const style = Strategies.legLineStyle(inst.asset, inst.type, inst.position);
     label = Strategies.legLabel(inst.asset, inst.type, inst.position, strikeOrEntry);
-
-    datasets.push({
-      label,
-      data,
-      color: style.color,
-      borderDash: style.borderDash
-    });
+    datasets.push({ label, data, color: style.color, borderDash: style.borderDash });
   }
 
   const compound = Strategies.combinePNLCurves(datasets.map(d => d.data));
-  datasets.push({
-    label: 'PnL',
-    data: compound,
-    color: '#00E083',
-    bgColor: 'rgba(0, 224, 131, 0.14)'
-  });
+  datasets.push({ label: 'PnL', data: compound, color: '#00E083', bgColor: 'rgba(0, 224, 131, 0.14)' });
 
   renderPNLChart(datasets, strikePrices);
 }

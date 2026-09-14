@@ -19,7 +19,8 @@ export function calculatePerpPNL(entryPrice, quantity, leverage = 1, position = 
 // Option PNL (Call or Put)
 // tierRatioOverride: see generatePremium — lets a caller price the leg's tier off its designed
 // ratio while the (rounded) strikePrice still drives the payoff. Null/omitted = unchanged.
-export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long', spotPrice = currentPrice, priceRange = importedPriceRange, tierRatioOverride = null) {
+// premiumOverride: when provided (real market price in USD), replaces generatePremium().
+export function calculateOptionPNL(optionType, strikePrice, quantity = 1, position = 'long', spotPrice = currentPrice, priceRange = importedPriceRange, tierRatioOverride = null, premiumOverride = null) {
   return priceRange.map(currentPrice => {
     let intrinsicValue;
     if (optionType === 'call') {
@@ -30,9 +31,11 @@ export function calculateOptionPNL(optionType, strikePrice, quantity = 1, positi
       throw new Error("Invalid option type");
     }
 
-    const totalPNL = (intrinsicValue - generatePremium(strikePrice, optionType, spotPrice, tierRatioOverride)) * quantity;
+    const premium = premiumOverride !== null
+      ? premiumOverride
+      : generatePremium(strikePrice, optionType, spotPrice, tierRatioOverride);
+    const totalPNL = (intrinsicValue - premium) * quantity;
     if (position === 'short') {
-      // If the position is short, we invert the PNL
       return { price: currentPrice, pnl: -totalPNL };
     }
     return { price: currentPrice, pnl: totalPNL };

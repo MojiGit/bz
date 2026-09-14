@@ -22,6 +22,9 @@ let cachedExpiries = []; // [{ ts: number, label: string }]
 // the leg list currently holds.
 let activeStrategyId = null;
 
+export let showQuotes = false;
+export let quotesByLeg = {}; // { [instId]: quoteResult } — populated while in quote mode
+
 // Display-only mapping. `instrument.position` stays 'long'/'short' everywhere in state and
 // in the payoff maths; only the button face reads BUY/SELL.
 function positionLabel(position) {
@@ -94,6 +97,18 @@ export async function enterBuildMode() {
   charts.updateBuilderChart();
 }
 
+function setEditingEnabled(enabled) {
+  const toggleEl = el => {
+    el.disabled = !enabled;
+    el.classList.toggle('opacity-40', !enabled);
+    el.classList.toggle('pointer-events-none', !enabled);
+  };
+  [addOptionBtn, addPerpBtn].forEach(toggleEl);
+  instrumentList.querySelectorAll(
+    '.type-btn, .position-btn, .strike-trigger, .size-input, .entry-input, .expiry-leg-select, [data-remove]'
+  ).forEach(toggleEl);
+}
+
 // Exit build mode
 export function exitBuilder(){
     strategyMenu.classList.remove('hidden');
@@ -104,6 +119,8 @@ export function exitBuilder(){
     strategyTitle.innerHTML = '';
     builderMode = false;
     cachedExpiries = [];
+    showQuotes = false;
+    quotesByLeg = {};
     quotePanel.classList.add('hidden');
 }
 
@@ -473,9 +490,30 @@ function renderQuotes(results) {
 
   let netPremium = 0;
 
+  const missingCount = results.filter(q => !q || q.error).length;
+  const partialNotice = missingCount > 0
+    ? `<div class="text-[10px] text-amber-500 mb-1.5 px-1">Chart shows ${results.length - missingCount}/${results.length} legs — missing legs excluded.</div>`
+    : '';
+
   const rows = results.map(q => {
-    if (q.error) {
-      return `<div class="py-1.5 text-[11px] text-red-400">${q.error}</div>`;
+    if (!q || q.error) {
+      const inst = customInstruments.find(x => x.id === q?.id);
+      const instLabel = inst
+        ? (inst.asset === 'opt'
+            ? `${inst.type.toUpperCase()} · $${Number(inst.strike).toLocaleString('en-US')}`
+            : 'PERP')
+        : 'Unknown leg';
+      return `
+        <div class="py-1.5 border-b border-amber-200 last:border-0 bg-amber-50 rounded px-1 mb-0.5">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="text-[10px] font-bold shrink-0 text-amber-500">NO QUOTE</span>
+              <span class="text-[11px] font-semibold text-amber-700 truncate">${instLabel}</span>
+            </div>
+            <span class="text-[10px] text-amber-400 shrink-0 italic">adjust strike or expiry</span>
+          </div>
+          <div class="text-[10px] text-amber-400 mt-0.5">${q?.error ?? 'No response'}</div>
+        </div>`;
     }
 
     const isBuy = q.position === 'long';
@@ -536,25 +574,49 @@ function renderQuotes(results) {
       </div>
       ${netLabel ? `<span class="text-[10px] font-semibold ${netColor}">${netLabel}</span>` : ''}
     </div>
+    ${partialNotice}
     ${rows}
   `;
   quotePanel.classList.remove('hidden');
 }
 
 quoteBtn.addEventListener('click', async () => {
+  // In quote mode: "Edit" → exit quote mode, restore editing
+  if (showQuotes) {
+    showQuotes = false;
+    quotesByLeg = {};
+    setEditingEnabled(true);
+    quoteBtn.textContent = 'Quote';
+    quotePanel.classList.add('hidden');
+    charts.updateBuilderChart();
+    const disc = document.getElementById('premium-disclaimer');
+    if (disc) disc.textContent = 'Payoff curves use estimated reference premiums for illustration only — not live market prices. Actual costs and breakevens will differ. Request a quote for real pricing.';
+    return;
+  }
+
   if (!customInstruments.length) return;
   quotePanel.classList.add('hidden');
   quoteBtn.textContent = 'Loading…';
   quoteBtn.disabled = true;
   try {
     const results = await fetchDeribitQuotes(customInstruments, mvp.selectedTokenSymbol, mvp.currentPrice);
+    quotesByLeg = {};
+    for (const r of results) {
+      if (r) quotesByLeg[r.id] = r;
+    }
+    showQuotes = true;
+    setEditingEnabled(false);
+    quoteBtn.textContent = 'Edit';
     renderQuotes(results);
+    charts.updateBuilderChart();
+    const disc = document.getElementById('premium-disclaimer');
+    if (disc) disc.textContent = 'Payoff curves use live Deribit mark prices. Legs without quotes are excluded from the chart.';
   } catch (e) {
     console.error('Quote fetch failed:', e);
     quotePanel.innerHTML = `<div class="text-red-400">Failed to fetch quotes. Try again.</div>`;
     quotePanel.classList.remove('hidden');
-  } finally {
     quoteBtn.textContent = 'Quote';
+  } finally {
     quoteBtn.disabled = false;
   }
 });
