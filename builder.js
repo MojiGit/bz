@@ -9,11 +9,12 @@ export const strategyTitle = document.getElementById('builder-strategy-title');
 import * as charts from './charts.js';
 import * as mvp from './mvp.js';
 import * as Strategies from './strategies.js';
-import { fetchDeribitQuotes } from './quotes.js';
+import { fetchDeribitQuotes, fetchDeribitExpiries } from './quotes.js';
 
 
 export let customInstruments = [];
 export let builderMode = false;
+export let selectedExpiry = null; // expiration timestamp (ms) selected by the user
 // Strategy this builder session started from. Captured once on entry and deliberately not
 // refreshed as legs are edited — the title row reports where the session began, not what
 // the leg list currently holds.
@@ -41,16 +42,41 @@ function renderStrategyTitle() {
        <span class="text-[14px] text-gray-400 capitalize">${info.sentiment}</span>`;
 }
 
+const expirySelect = document.getElementById('expiry-select');
+
+async function loadExpiries() {
+  expirySelect.innerHTML = '<option value="">Loading…</option>';
+  expirySelect.disabled = true;
+  try {
+    const expiries = await fetchDeribitExpiries(mvp.selectedTokenSymbol);
+    expirySelect.innerHTML = expiries
+      .map(e => `<option value="${e.ts}">${e.label}</option>`)
+      .join('');
+    selectedExpiry = expiries.length ? expiries[0].ts : null;
+    expirySelect.value = selectedExpiry ?? '';
+  } catch {
+    expirySelect.innerHTML = '<option value="">Unavailable</option>';
+    selectedExpiry = null;
+  } finally {
+    expirySelect.disabled = false;
+  }
+}
+
+expirySelect.addEventListener('change', () => {
+  selectedExpiry = expirySelect.value ? Number(expirySelect.value) : null;
+  // Invalidate any existing quotes when expiry changes
+  quotePanel.classList.add('hidden');
+});
+
 // Launch build mode
 export function enterBuildMode() {
-  // Hide filters and strategies
   strategyMenu.classList.add('hidden');
-  // Show strategy builder UI
   strategyBuilderBoard.classList.remove('hidden');
   builderMode = true;
 
   activeStrategyId = mvp.selectedStrategyId;
   renderStrategyTitle();
+  loadExpiries();
 
   if(mvp.strategyComponents){
     for (const inst of mvp.strategyComponents){
@@ -78,6 +104,9 @@ export function exitBuilder(){
     activeStrategyId = null;
     strategyTitle.innerHTML = '';
     builderMode = false;
+    selectedExpiry = null;
+    expirySelect.innerHTML = '<option value="">—</option>';
+    quotePanel.classList.add('hidden');
 }
 
 exitBuilderBtn.addEventListener('click', () => {
@@ -508,7 +537,7 @@ quoteBtn.addEventListener('click', async () => {
   quoteBtn.textContent = 'Loading…';
   quoteBtn.disabled = true;
   try {
-    const results = await fetchDeribitQuotes(customInstruments, mvp.selectedTokenSymbol, mvp.currentPrice);
+    const results = await fetchDeribitQuotes(customInstruments, mvp.selectedTokenSymbol, mvp.currentPrice, selectedExpiry);
     renderQuotes(results);
   } catch (e) {
     console.error('Quote fetch failed:', e);
