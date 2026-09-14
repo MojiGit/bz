@@ -164,7 +164,7 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
   div.className = 'flex flex-col gap-1.5 p-1.5 md:gap-1 border border-[#D8DDEF] shadow-sm rounded-lg';
   div.id = instrumentId;
   div.innerHTML = `
-    <div class="grid grid-rows-3 gap-1.5 md:gap-1">
+    <div class="flex flex-col gap-1.5 md:gap-1">
       <div class="flex flex-row justify-between items-center gap-1.5 md:gap-1 min-w-0">
         <div class="flex flex-row items-center gap-1.5 md:gap-1 min-w-0">
           <button type="button" class="position-btn text-[12px] leading-tight font-semibold uppercase px-2 py-0.5 md:px-1.5 md:py-[1px] rounded border border-[#D8DDEF] bg-white hover:bg-gray-200">${positionLabel(instrument.position)}</button>
@@ -172,39 +172,32 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
         </div>
         <button data-remove="${instrumentId}" aria-label="Remove leg" class="text-gray-500 shrink-0 flex items-center justify-center text-[12px] leading-none min-w-[20px] min-h-[20px] rounded hover:bg-gray-200 md:text-[10px] md:min-w-0 md:min-h-0 md:hover:bg-transparent">X</button>
       </div>
-      <div class="flex flex-col gap-0.5">
-        <span class="text-[10px] text-gray-400">Expiry</span>
-        <select class="expiry-leg-select w-full text-[12px] border border-[#D8DDEF] rounded px-2 py-0.5 bg-white focus:outline-none focus:ring-1 focus:ring-[#00E083] text-[#191308]">
-          <option value="">—</option>
-        </select>
-      </div>
       <div class="flex flex-row items-start gap-1.5 min-w-0">
-        <!-- Deliberately a <div>, not a <label>: a label forwards clicks to its labelable
-             descendant, which here is the hidden <select>, popping the native picker on top
-             of the custom one. The caption is a plain span instead. -->
-        <div class="flex flex-col gap-0.5 w-full min-w-0">
+        <!-- Strike (custom dropdown). Deliberately a <div> not a <label>: a label forwards
+             clicks to the hidden <select>, popping the native picker over the custom one. -->
+        <div class="flex flex-col gap-0.5 flex-1 min-w-0">
           <span class="text-[10px] text-gray-400">Strike</span>
           <div class="strike-field relative w-full min-w-0">
-            <!-- Source of truth. Still a real <select>, still filled by populateStrikeOptions,
-                 still carrying the change listener that owns instrument.strike/designRatio.
-                 Visually hidden rather than display:none so it stays a live form control; the
-                 custom UI below only presents it. tabindex/aria-hidden move the keyboard stop
-                 to the trigger so one control is not two tab stops. -->
             <select class="strike-select absolute inset-0 w-full h-full opacity-0 pointer-events-none" tabindex="-1" aria-hidden="true"></select>
-            <button type="button" class="strike-trigger relative w-full text-[16px] leading-tight border px-2 py-1 md:text-[12px] md:py-0.5 bg-white text-left flex flex-row items-center justify-between gap-1" aria-haspopup="listbox" aria-expanded="false">
+            <button type="button" class="strike-trigger relative w-full text-[12px] leading-tight border px-2 py-0.5 bg-white text-left flex flex-row items-center justify-between gap-1" aria-haspopup="listbox" aria-expanded="false">
               <span class="strike-trigger-label truncate"></span>
               <span class="text-[10px] text-gray-400 shrink-0" aria-hidden="true">&#9662;</span>
             </button>
-            <!-- Both caps are ~5.5 rows at their own row height (mobile rows are taller for
-                 touch), so the half row that says "this scrolls" survives at either size —
-                 the list can run 20-40 strikes. -->
             <div class="strike-popup hidden absolute left-0 right-0 top-full mt-1 z-20 max-h-[168px] md:max-h-[132px] overflow-y-auto overscroll-contain rounded border border-[#D8DDEF] bg-white shadow-lg" role="listbox"></div>
           </div>
         </div>
-        <label class="flex flex-col gap-0.5 w-full min-w-0">
-          <span class="text-[10px] text-gray-400">Size</span>
-          <input type="number" class="size-input w-full text-[16px] leading-tight border px-2 py-1 md:text-[12px] md:py-0.5" value="${instrument.size}">
+        <!-- Qty (narrow fixed width) -->
+        <label class="flex flex-col gap-0.5 shrink-0 w-10">
+          <span class="text-[10px] text-gray-400">Qty</span>
+          <input type="number" class="size-input w-full text-[12px] leading-tight border px-1 py-0.5" value="${instrument.size}">
         </label>
+        <!-- Expiry -->
+        <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+          <span class="text-[10px] text-gray-400">Expiry</span>
+          <select class="expiry-leg-select w-full text-[12px] border border-[#D8DDEF] rounded px-1 py-0.5 bg-white focus:outline-none focus:ring-1 focus:ring-[#00E083] text-[#191308]">
+            <option value="">—</option>
+          </select>
+        </div>
       </div>
     </div>`;
   instrumentList.appendChild(div);
