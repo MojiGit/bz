@@ -88,13 +88,19 @@ export async function fetchDeriveQuotes(instruments, token) {
   const hasOpts = instruments.some(i => i.asset === 'opt');
   let deriveInsts = null;
   if (hasOpts) {
-    const r = await deriveFetch('public/get_all_instruments', {
-      instrument_type: 'option',
-      currency,
-      expired: false,
-      page_size: 1000,
-    });
-    deriveInsts = r.instruments;
+    try {
+      const r = await deriveFetch('public/get_all_instruments', {
+        instrument_type: 'option',
+        currency,
+        expired: false,
+        page_size: 1000,
+      });
+      deriveInsts = r.instruments;
+    } catch (e) {
+      // CORS or network failure — return error objects for all legs so the
+      // Deribit path in the caller is unaffected.
+      return instruments.map(inst => ({ id: inst.id, source: 'Derive', error: `Derive unavailable: ${e.message}` }));
+    }
   }
 
   return Promise.all(instruments.map(async inst => {
