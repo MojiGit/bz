@@ -39,7 +39,7 @@ export async function fetchDeribitQuotes(instruments, token, spotPrice) {
         const expiry = new Date(matched.expiration_timestamp)
           .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
         return {
-          id: inst.id, asset: 'opt', position: inst.position, size: inst.size,
+          id: inst.id, asset: 'opt', type: inst.type, position: inst.position, size: inst.size,
           source: 'Deribit', name: matched.instrument_name,
           strike: matched.strike, expiry,
           bid:  t.best_bid_price  * spotPrice,
