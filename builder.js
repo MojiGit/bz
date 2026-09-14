@@ -422,53 +422,80 @@ function renderQuotes(results) {
       : `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })}`;
   const fmtPct = n => n == null ? '—' : `${Number(n).toFixed(2)}%`;
 
+  // BTC-16SEP26-77500-C → CALL · $77,500 · 16 Sep 26
+  function fmtOptName(q) {
+    const parts = q.name.split('-');
+    const expRaw = parts[1] ?? '';
+    const day = expRaw.slice(0, 2);
+    const mon = expRaw.slice(2, 5);
+    const yr = expRaw.length >= 7 ? '20' + expRaw.slice(5) : '';
+    return `${q.type.toUpperCase()} · $${Number(q.strike).toLocaleString('en-US')} · ${day} ${mon} ${yr}`.trim();
+  }
+
   let netPremium = 0;
 
   const rows = results.map(q => {
     if (q.error) {
-      return `<div class="py-1 text-red-400">${q.error}</div>`;
+      return `<div class="py-1.5 text-[11px] text-red-400">${q.error}</div>`;
     }
+
+    const isBuy = q.position === 'long';
+    const posClass = isBuy ? 'text-[#00C96B]' : 'text-[#FF6B6B]';
+    const posLabel = isBuy ? 'BUY' : 'SELL';
+
     if (q.asset === 'opt') {
-      const sign = q.position === 'long' ? 1 : -1;
-      netPremium += q.mark * q.size * sign;
-      return `<div class="py-1 border-b border-[#D8DDEF] last:border-0">
-        <div class="flex justify-between gap-2">
-          <span class="font-semibold uppercase">${q.position === 'long' ? 'BUY' : 'SELL'} ${q.size} ${q.name}</span>
-          <span class="text-gray-400 shrink-0">IV ${fmtPct(q.iv)}</span>
-        </div>
-        <div class="flex gap-3 text-gray-500 mt-0.5">
-          <span>Bid <span class="text-black">${fmt(q.bid)}</span></span>
-          <span>Mark <span class="text-black font-semibold">${fmt(q.mark)}</span></span>
-          <span>Ask <span class="text-black">${fmt(q.ask)}</span></span>
-        </div>
-      </div>`;
+      netPremium += q.mark * q.size * (isBuy ? 1 : -1);
+      return `
+        <div class="py-1.5 border-b border-[#D8DDEF] last:border-0">
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="text-[10px] font-bold shrink-0 ${posClass}">${posLabel}</span>
+              <span class="text-[11px] font-semibold text-[#191308] truncate">${fmtOptName(q)}</span>
+            </div>
+            <span class="text-[10px] text-gray-400 shrink-0">IV ${fmtPct(q.iv)}</span>
+          </div>
+          <div class="grid grid-cols-3 gap-1 text-center text-[10px]">
+            <div class="flex flex-col"><span class="text-gray-400">Bid</span><span class="text-[#191308]">${fmt(q.bid)}</span></div>
+            <div class="flex flex-col bg-[#F4FFF9] rounded"><span class="text-gray-400">Mark</span><span class="text-[#191308] font-bold">${fmt(q.mark)}</span></div>
+            <div class="flex flex-col"><span class="text-gray-400">Ask</span><span class="text-[#191308]">${fmt(q.ask)}</span></div>
+          </div>
+        </div>`;
     }
+
     if (q.asset === 'perp') {
-      return `<div class="py-1 border-b border-[#D8DDEF] last:border-0">
-        <div class="flex justify-between gap-2">
-          <span class="font-semibold uppercase">${q.position === 'long' ? 'BUY' : 'SELL'} ${q.size} ${q.name}</span>
-          <span class="text-gray-400 shrink-0">Funding ${fmtPct(q.funding)}/8h</span>
-        </div>
-        <div class="flex gap-3 text-gray-500 mt-0.5">
-          <span>Bid <span class="text-black">${fmt(q.bid)}</span></span>
-          <span>Mark <span class="text-black font-semibold">${fmt(q.mark)}</span></span>
-          <span>Ask <span class="text-black">${fmt(q.ask)}</span></span>
-        </div>
-      </div>`;
+      return `
+        <div class="py-1.5 border-b border-[#D8DDEF] last:border-0">
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-bold shrink-0 ${posClass}">${posLabel}</span>
+              <span class="text-[11px] font-semibold text-[#191308]">${q.name}</span>
+            </div>
+            <span class="text-[10px] text-gray-400 shrink-0">Fund. ${fmtPct(q.funding)}/8h</span>
+          </div>
+          <div class="grid grid-cols-3 gap-1 text-center text-[10px]">
+            <div class="flex flex-col"><span class="text-gray-400">Bid</span><span class="text-[#191308]">${fmt(q.bid)}</span></div>
+            <div class="flex flex-col bg-[#F4FFF9] rounded"><span class="text-gray-400">Mark</span><span class="text-[#191308] font-bold">${fmt(q.mark)}</span></div>
+            <div class="flex flex-col"><span class="text-gray-400">Ask</span><span class="text-[#191308]">${fmt(q.ask)}</span></div>
+          </div>
+        </div>`;
     }
     return '';
   }).join('');
 
-  const netLabel = netPremium > 0
-    ? `Net cost: ${fmt(Math.abs(netPremium))}`
-    : netPremium < 0
-    ? `Net credit: ${fmt(Math.abs(netPremium))}`
+  const absNet = Math.abs(netPremium);
+  const netColor = netPremium < 0 ? 'text-[#00C96B]' : 'text-[#191308]';
+  const netLabel = netPremium > 0 ? `Cost ${fmt(absNet)}`
+    : netPremium < 0 ? `Credit ${fmt(absNet)}`
     : '';
 
   quotePanel.innerHTML = `
-    <div class="flex justify-between items-center mb-1">
-      <span class="font-semibold uppercase tracking-wide text-gray-400">Quotes · Deribit</span>
-      ${netLabel ? `<span class="text-gray-500">${netLabel}</span>` : ''}
+    <div class="flex items-center justify-between mb-1.5">
+      <div class="flex items-center gap-1.5">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#00E083] shrink-0"></span>
+        <span class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Live Quotes</span>
+        <span class="text-[10px] text-gray-400 border border-[#D8DDEF] rounded px-1">Deribit</span>
+      </div>
+      ${netLabel ? `<span class="text-[10px] font-semibold ${netColor}">${netLabel}</span>` : ''}
     </div>
     ${rows}
   `;
