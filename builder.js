@@ -14,7 +14,7 @@ const quoteStripCount = document.getElementById('quote-strip-count');
 import * as charts from './charts.js';
 import * as mvp from './mvp.js';
 import * as Strategies from './strategies.js';
-import { fetchDeribitQuotes, fetchDeribitExpiries } from './quotes.js';
+import { fetchDeribitQuotes, fetchDeribitExpiries, fetchDeriveQuotes } from './quotes.js';
 
 
 export let customInstruments = [];
@@ -27,8 +27,9 @@ let cachedExpiries = []; // [{ ts: number, label: string }]
 // the leg list currently holds.
 let activeStrategyId = null;
 
-export let showQuotes = false;
-export let quotesByLeg = {}; // { [instId]: quoteResult } — populated while in quote mode
+export let showQuotes  = false;
+export let quotesByLeg = {}; // { [instId]: selectedQuoteResult } — used by charts.js
+let venueQuotes = {};        // { [instId]: { deribit, derive, selected } }
 
 // Display-only mapping. `instrument.position` stays 'long'/'short' everywhere in state and
 // in the payoff maths; only the button face reads BUY/SELL.
@@ -82,8 +83,9 @@ export async function enterBuildMode() {
   builderMode = true;
 
   // Always start in editing state, discarding any leftover quote mode from a prior session
-  showQuotes = false;
+  showQuotes  = false;
   quotesByLeg = {};
+  venueQuotes = {};
   editingBlock.classList.remove('hidden');
   quotingBlock.classList.add('hidden');
 
@@ -118,8 +120,9 @@ export function exitBuilder(){
     strategyTitle.innerHTML = '';
     builderMode = false;
     cachedExpiries = [];
-    showQuotes = false;
+    showQuotes  = false;
     quotesByLeg = {};
+    venueQuotes = {};
     editingBlock.classList.remove('hidden');
     quotingBlock.classList.add('hidden');
 }
@@ -464,8 +467,11 @@ addPerpBtn.addEventListener('click', () => {
 const quoteBtn   = document.getElementById('get-quote');
 const quotePanel = document.getElementById('quote-results');
 
-// Render expandable quote cards into #quote-results inside the quoting block.
-function renderQuoteCards(results) {
+const VENUE_COLORS = { deribit: '#00E083', derive: '#6366F1' };
+const VENUE_NAMES  = { deribit: 'Deribit', derive: 'Derive' };
+
+// Render expandable quote cards into #quote-results, reading from venueQuotes module state.
+function renderQuoteCards() {
   const fmt = (n, dec = 0) =>
     n == null || isNaN(n) || n === 0
       ? '—'
@@ -483,15 +489,19 @@ function renderQuoteCards(results) {
 
   quotePanel.innerHTML = '';
 
-  results.forEach(q => {
-    // — NO QUOTE card (error or null result) —
-    if (!q || q.error) {
-      const inst = customInstruments.find(x => x.id === q?.id);
-      const instLabel = inst
-        ? (inst.asset === 'opt'
-            ? `${inst.type.toUpperCase()} · $${Number(inst.strike).toLocaleString('en-US')}`
-            : 'PERP')
-        : 'Unknown leg';
+  customInstruments.forEach(inst => {
+    const vq = venueQuotes[inst.id];
+    if (!vq) return;
+
+    const hasD   = vq.deribit && !vq.deribit.error && vq.deribit.mark > 0;
+    const hasDrv = vq.derive  && !vq.derive.error  && vq.derive.mark  > 0;
+
+    // — NO QUOTE card (neither venue has a usable price) —
+    if (!hasD && !hasDrv) {
+      const instLabel = inst.asset === 'opt'
+        ? `${inst.type.toUpperCase()} · $${Number(inst.strike).toLocaleString('en-US')}`
+        : 'PERP';
+      const errorMsg = vq.deribit?.error ?? vq.derive?.error ?? 'No response';
       const div = document.createElement('div');
       div.className = 'border border-amber-200 bg-amber-50 rounded-lg px-2 py-1.5';
       div.innerHTML = `
@@ -500,20 +510,21 @@ function renderQuoteCards(results) {
           <span class="text-[11px] font-semibold text-amber-700 flex-1 min-w-0 truncate">${instLabel}</span>
           <span class="text-[10px] text-amber-400 italic shrink-0">adjust strike or expiry</span>
         </div>
-        <div class="text-[10px] text-amber-300 mt-0.5">${q?.error ?? 'No response'}</div>`;
+        <div class="text-[10px] text-amber-300 mt-0.5">${errorMsg}</div>`;
       quotePanel.appendChild(div);
       return;
     }
 
-    // — Quote card (valid result) —
-    const isBuy     = q.position === 'long';
-    const posClass  = isBuy ? 'text-[#00C96B]' : 'text-[#FF6B6B]';
-    const posLabel  = isBuy ? 'BUY' : 'SELL';
-    const name      = q.asset === 'opt' ? fmtOptName(q) : (q.name ?? 'PERP');
-    const total     = q.mark != null ? q.mark * q.size : null;
-    const extraInfo = q.asset === 'opt'
-      ? `<span class="text-[10px] text-gray-400 shrink-0">IV ${fmtPct(q.iv)}</span>`
-      : `<span class="text-[10px] text-gray-400 shrink-0">Fund. ${fmtPct(q.funding)}/8h</span>`;
+    // — Quote card (at least one venue has a valid price) —
+    const selKey  = vq.selected;
+    const selQ    = vq[selKey];
+    const isBuy   = inst.position === 'long';
+    const posClass = isBuy ? 'text-[#00C96B]' : 'text-[#FF6B6B]';
+    const posLabel = isBuy ? 'BUY' : 'SELL';
+    const name     = inst.asset === 'opt' ? fmtOptName(selQ) : (selQ.name ?? 'PERP');
+    const total    = selQ.mark != null ? selQ.mark * selQ.size : null;
+    const selColor = VENUE_COLORS[selKey];
+    const selName  = VENUE_NAMES[selKey];
 
     const card = document.createElement('div');
     card.className = 'border border-[#D8DDEF] rounded-lg overflow-hidden';
@@ -521,30 +532,61 @@ function renderQuoteCards(results) {
       <button type="button" class="quote-card-header w-full flex items-center gap-1.5 px-2 py-1.5 text-left hover:bg-gray-50">
         <span class="text-[10px] font-bold shrink-0 ${posClass}">${posLabel}</span>
         <span class="text-[11px] font-semibold text-[#191308] flex-1 min-w-0 truncate">${name}</span>
-        <span class="text-[10px] text-gray-400 shrink-0">×${q.size}</span>
+        <span class="text-[10px] text-gray-400 shrink-0">×${selQ.size}</span>
         <span class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0">
-          <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#00E083]"></span>Deribit
+          <span class="inline-block w-1.5 h-1.5 rounded-full" style="background:${selColor}"></span>${selName}
         </span>
         <span class="text-[10px] font-semibold text-[#191308] shrink-0">${fmt(total)}</span>
         <span class="quote-card-chevron text-[9px] text-gray-400 shrink-0" style="display:inline-block;transition:transform 150ms">▼</span>
       </button>
-      <div class="quote-card-detail hidden border-t border-[#D8DDEF]">
-        <div class="flex items-center gap-2 px-2 py-1.5">
-          <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#00E083] shrink-0"></span>
-          <span class="text-[11px] font-semibold text-[#191308] flex-1">Deribit</span>
+      <div class="quote-card-detail hidden border-t border-[#D8DDEF]"></div>`;
+
+    const detail  = card.querySelector('.quote-card-detail');
+    const header  = card.querySelector('.quote-card-header');
+    const chevron = card.querySelector('.quote-card-chevron');
+
+    // Venue rows — one per venue, Deribit first
+    const venueList = [
+      { key: 'deribit', q: vq.deribit, valid: hasD },
+      { key: 'derive',  q: vq.derive,  valid: hasDrv },
+    ];
+
+    venueList.forEach((venue, idx) => {
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 px-2 py-1.5' + (idx > 0 ? ' border-t border-[#D8DDEF]' : '');
+
+      if (venue.valid) {
+        const isSelected = selKey === venue.key;
+        const extraInfo = inst.asset === 'opt'
+          ? `<span class="text-[10px] text-gray-400 shrink-0">IV ${fmtPct(venue.q.iv)}</span>`
+          : `<span class="text-[10px] text-gray-400 shrink-0">Fund. ${fmtPct(venue.q.funding)}/8h</span>`;
+        row.innerHTML = `
+          <span class="inline-block w-1.5 h-1.5 rounded-full shrink-0" style="background:${VENUE_COLORS[venue.key]}"></span>
+          <span class="text-[11px] font-semibold text-[#191308] flex-1">${VENUE_NAMES[venue.key]}</span>
           <div class="grid grid-cols-3 gap-2 text-center text-[10px] mr-1">
-            <div class="flex flex-col"><span class="text-gray-400">Bid</span><span>${fmt(q.bid)}</span></div>
-            <div class="flex flex-col bg-[#F4FFF9] rounded px-1"><span class="text-gray-400">Mark</span><span class="font-bold">${fmt(q.mark)}</span></div>
-            <div class="flex flex-col"><span class="text-gray-400">Ask</span><span>${fmt(q.ask)}</span></div>
+            <div class="flex flex-col"><span class="text-gray-400">Bid</span><span>${fmt(venue.q.bid)}</span></div>
+            <div class="flex flex-col ${isSelected ? 'bg-[#F4FFF9]' : ''} rounded px-1"><span class="text-gray-400">Mark</span><span class="${isSelected ? 'font-bold' : ''}">${fmt(venue.q.mark)}</span></div>
+            <div class="flex flex-col"><span class="text-gray-400">Ask</span><span>${fmt(venue.q.ask)}</span></div>
           </div>
           ${extraInfo}
-          <span class="text-[10px] text-[#00C96B] shrink-0 font-bold">✓</span>
-        </div>
-      </div>`;
+          <button type="button" class="venue-select-btn text-[10px] shrink-0 font-bold w-4 text-center ${isSelected ? 'text-[#00C96B]' : 'text-gray-300 hover:text-[#00C96B]'}">${isSelected ? '✓' : '○'}</button>`;
 
-    const header  = card.querySelector('.quote-card-header');
-    const detail  = card.querySelector('.quote-card-detail');
-    const chevron = card.querySelector('.quote-card-chevron');
+        row.querySelector('.venue-select-btn').addEventListener('click', () => {
+          vq.selected = venue.key;
+          quotesByLeg[inst.id] = vq[venue.key];
+          renderQuoteCards();
+          charts.updateBuilderChart();
+        });
+      } else {
+        row.innerHTML = `
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-300 shrink-0"></span>
+          <span class="text-[11px] font-semibold text-gray-400 flex-1">${VENUE_NAMES[venue.key]}</span>
+          <span class="text-[10px] text-amber-400 italic">${venue.q?.error ?? 'No quote'}</span>`;
+      }
+
+      detail.appendChild(row);
+    });
+
     header.addEventListener('click', () => {
       const isOpen = !detail.classList.contains('hidden');
       detail.classList.toggle('hidden', isOpen);
@@ -556,7 +598,7 @@ function renderQuoteCards(results) {
 }
 
 // Swap to quoting state: collapse editing block into summary strip + show quote cards.
-function enterQuoteMode(results) {
+function enterQuoteMode() {
   const info = Strategies.strategiesIdMap[activeStrategyId];
   if (quoteStripTitle) {
     quoteStripTitle.innerHTML = info
@@ -571,7 +613,7 @@ function enterQuoteMode(results) {
     quoteStripCount.textContent = `${n} instrument${n !== 1 ? 's' : ''}`;
   }
 
-  renderQuoteCards(results);
+  renderQuoteCards();
 
   editingBlock.classList.add('hidden');
   quotingBlock.classList.remove('hidden');
@@ -579,13 +621,14 @@ function enterQuoteMode(results) {
   setTimeout(() => quotingBlock.classList.remove('anim-fade-rise'), 200);
 
   const disc = document.getElementById('premium-disclaimer');
-  if (disc) disc.textContent = 'Payoff curves use live Deribit mark prices. Legs without quotes are excluded from the chart.';
+  if (disc) disc.textContent = 'Payoff curves use live mark prices (Deribit + Derive). Legs without quotes are excluded from the chart.';
 }
 
 // Restore editing state. Callable from the Edit button and from external resets.
 function exitQuoteMode() {
-  showQuotes = false;
+  showQuotes  = false;
   quotesByLeg = {};
+  venueQuotes = {};
 
   quotingBlock.classList.add('hidden');
   editingBlock.classList.remove('hidden');
@@ -609,13 +652,23 @@ quoteBtn.addEventListener('click', async () => {
   quoteBtn.textContent = 'Loading…';
   quoteBtn.disabled = true;
   try {
-    const results = await fetchDeribitQuotes(customInstruments, mvp.selectedTokenSymbol, mvp.currentPrice);
+    const [deribitResults, deriveResults] = await Promise.all([
+      fetchDeribitQuotes(customInstruments, mvp.selectedTokenSymbol, mvp.currentPrice),
+      fetchDeriveQuotes(customInstruments, mvp.selectedTokenSymbol),
+    ]);
+    venueQuotes = {};
     quotesByLeg = {};
-    for (const r of results) {
-      if (r) quotesByLeg[r.id] = r;
-    }
+    customInstruments.forEach((inst, idx) => {
+      const deribit = deribitResults[idx];
+      const derive  = deriveResults[idx];
+      const hasD    = deribit && !deribit.error && deribit.mark > 0;
+      const hasDrv  = derive  && !derive.error  && derive.mark  > 0;
+      const selected = hasD ? 'deribit' : (hasDrv ? 'derive' : null);
+      venueQuotes[inst.id] = { deribit, derive, selected };
+      if (selected) quotesByLeg[inst.id] = venueQuotes[inst.id][selected];
+    });
     showQuotes = true;
-    enterQuoteMode(results);
+    enterQuoteMode();
     charts.updateBuilderChart();
   } catch (e) {
     console.error('Quote fetch failed:', e);
