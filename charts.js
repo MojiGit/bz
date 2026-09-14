@@ -121,13 +121,24 @@ export function renderPNLChart(datasets, strikePrices = []) {
     z: 1
   };
 
-  // Derive Y range from actual data so small-premium strategies are visible.
-  const allPnl = datasets.flatMap(ds => (ds.data ?? []).map(p => p.pnl)).filter(Number.isFinite);
-  const rawMin = allPnl.length ? Math.min(...allPnl) : -1;
-  const rawMax = allPnl.length ? Math.max(...allPnl) :  1;
-  const pad = Math.max(Math.abs(rawMax - rawMin) * 0.15, 0.5);
-  const yMin = rawMin - pad;
-  const yMax = rawMax + pad;
+  // Y range: scale to the compound strategy curve only — individual leg curves can have
+  // much larger swings that would compress the strategy PnL into an invisible flat line.
+  const compoundDs = datasets.find(ds => ds.label === 'PnL');
+  const compoundPnl = (compoundDs?.data ?? []).map(p => p.pnl).filter(Number.isFinite);
+  const rawYMin = compoundPnl.length ? Math.min(...compoundPnl) : -1;
+  const rawYMax = compoundPnl.length ? Math.max(...compoundPnl) :  1;
+  const yPad = Math.max(Math.abs(rawYMax - rawYMin) * 0.15, 0.5);
+  const yMin = rawYMin - yPad;
+  const yMax = rawYMax + yPad;
+
+  // X range: cover the outermost strike and the current price, then add 15% buffer on
+  // each side so the curves extend visibly past the reference levels.
+  const hasPrice = typeof mvp.currentPrice === 'number' && !isNaN(mvp.currentPrice);
+  const xRefPoints = hasPrice
+    ? [mvp.currentPrice, ...strikePrices].filter(Number.isFinite)
+    : strikePrices.filter(Number.isFinite);
+  const xMin = xRefPoints.length ? Math.min(...xRefPoints) * 0.85 : undefined;
+  const xMax = xRefPoints.length ? Math.max(...xRefPoints) * 1.15 : undefined;
 
   if (chartInstance) chartInstance.destroy();
 
@@ -148,10 +159,7 @@ export function renderPNLChart(datasets, strikePrices = []) {
             display: true,
             text: `${mvp.selectedTokenSymbol} Price`,
           },
-          ...(typeof mvp.currentPrice === 'number' && !isNaN(mvp.currentPrice) ? {
-            min: mvp.currentPrice * 0.8,
-            max: mvp.currentPrice * 1.2,
-          } : {}),
+          ...(xMin != null ? { min: xMin, max: xMax } : {}),
         },
         y: {
           min: yMin,
