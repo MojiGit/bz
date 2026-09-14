@@ -29,7 +29,8 @@ let activeStrategyId = null;
 
 export let showQuotes  = false;
 export let quotesByLeg = {}; // { [instId]: selectedQuoteResult } — used by charts.js
-let venueQuotes = {};        // { [instId]: { deribit, derive, selected } }
+let venueQuotes = {};        // { [instId]: { deribit, derive, userSelected: null|key } }
+let openCards   = new Set(); // instrument IDs of currently expanded quote cards
 
 // Display-only mapping. `instrument.position` stays 'long'/'short' everywhere in state and
 // in the payoff maths; only the button face reads BUY/SELL.
@@ -123,6 +124,7 @@ export function exitBuilder(){
     showQuotes  = false;
     quotesByLeg = {};
     venueQuotes = {};
+    openCards   = new Set();
     editingBlock.classList.remove('hidden');
     quotingBlock.classList.add('hidden');
 }
@@ -469,22 +471,39 @@ const quotePanel = document.getElementById('quote-results');
 
 const VENUE_COLORS = { deribit: '#00E083', derive: '#6366F1' };
 const VENUE_NAMES  = { deribit: 'Deribit', derive: 'Derive' };
+const VENUE_KIND   = { deribit: 'Orderbook', derive: 'Orderbook' };
+
+// Returns the best-execution venue key for a given instrument + venueQuotes entry.
+// BUY legs: cheapest ask. SELL legs: highest bid.
+function bestVenueKey(inst, vq) {
+  const valid = [
+    { key: 'deribit', q: vq.deribit },
+    { key: 'derive',  q: vq.derive  },
+  ].filter(v => v.q && !v.q.error && v.q.mark > 0);
+  if (!valid.length) return null;
+  if (valid.length === 1) return valid[0].key;
+  return inst.position === 'long'
+    ? valid.reduce((b, v) => v.q.ask < b.q.ask ? v : b).key
+    : valid.reduce((b, v) => v.q.bid > b.q.bid ? v : b).key;
+}
+
+// User's explicit pick wins; absent that, best-execution.
+function resolvedVenueKey(inst, vq) {
+  return vq.userSelected ?? bestVenueKey(inst, vq);
+}
 
 // Render expandable quote cards into #quote-results, reading from venueQuotes module state.
+// openCards (Set<instId>) tracks which cards are expanded so venue selection doesn't collapse them.
 function renderQuoteCards() {
-  const fmt = (n, dec = 0) =>
+  const fmt = n =>
     n == null || isNaN(n) || n === 0
       ? '—'
-      : `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })}`;
-  const fmtPct = n => n == null ? '—' : `${Number(n).toFixed(2)}%`;
+      : `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
   function fmtOptName(q) {
     const parts = (q.name ?? '').split('-');
     const expRaw = parts[1] ?? '';
-    const day = expRaw.slice(0, 2);
-    const mon = expRaw.slice(2, 5);
-    const yr  = expRaw.length >= 7 ? '20' + expRaw.slice(5) : '';
-    return `${(q.type ?? '').toUpperCase()} · $${Number(q.strike).toLocaleString('en-US')} · ${day} ${mon} ${yr}`.trim();
+    return `${(q.type ?? '').toUpperCase()} · $${Number(q.strike).toLocaleString('en-US')} · ${expRaw.slice(0,2)} ${expRaw.slice(2,5)}`.trim();
   }
 
   quotePanel.innerHTML = '';
@@ -496,12 +515,11 @@ function renderQuoteCards() {
     const hasD   = vq.deribit && !vq.deribit.error && vq.deribit.mark > 0;
     const hasDrv = vq.derive  && !vq.derive.error  && vq.derive.mark  > 0;
 
-    // — NO QUOTE card (neither venue has a usable price) —
+    // — NO QUOTE card —
     if (!hasD && !hasDrv) {
       const instLabel = inst.asset === 'opt'
         ? `${inst.type.toUpperCase()} · $${Number(inst.strike).toLocaleString('en-US')}`
         : 'PERP';
-      const errorMsg = vq.deribit?.error ?? vq.derive?.error ?? 'No response';
       const div = document.createElement('div');
       div.className = 'border border-amber-200 bg-amber-50 rounded-lg px-2 py-1.5';
       div.innerHTML = `
@@ -509,22 +527,34 @@ function renderQuoteCards() {
           <span class="text-[10px] font-bold text-amber-500 shrink-0">NO QUOTE</span>
           <span class="text-[11px] font-semibold text-amber-700 flex-1 min-w-0 truncate">${instLabel}</span>
           <span class="text-[10px] text-amber-400 italic shrink-0">adjust strike or expiry</span>
-        </div>
-        <div class="text-[10px] text-amber-300 mt-0.5">${errorMsg}</div>`;
+        </div>`;
       quotePanel.appendChild(div);
       return;
     }
 
-    // — Quote card (at least one venue has a valid price) —
-    const selKey  = vq.selected;
-    const selQ    = vq[selKey];
-    const isBuy   = inst.position === 'long';
+    // Sort valid venues best-first (BUY → cheapest ask; SELL → highest bid); invalid appended last.
+    const isBuy = inst.position === 'long';
+    const validV = [
+      { key: 'deribit', q: vq.deribit, valid: true  },
+      { key: 'derive',  q: vq.derive,  valid: true  },
+    ].filter(v => (v.key === 'deribit' ? hasD : hasDrv));
+    validV.sort((a, b) => isBuy ? a.q.ask - b.q.ask : b.q.bid - a.q.bid);
+    const invalidV = [
+      { key: 'deribit', q: vq.deribit, valid: false },
+      { key: 'derive',  q: vq.derive,  valid: false },
+    ].filter(v => !(v.key === 'deribit' ? hasD : hasDrv));
+    const sortedVenues = [...validV, ...invalidV];
+
+    // Resolve selection: user's explicit pick, else best-execution (row 0 after sort).
+    const selKey = resolvedVenueKey(inst, vq) ?? sortedVenues[0]?.key;
+    const selQ   = vq[selKey] ?? sortedVenues[0]?.q;
     const posClass = isBuy ? 'text-[#00C96B]' : 'text-[#FF6B6B]';
     const posLabel = isBuy ? 'BUY' : 'SELL';
-    const name     = inst.asset === 'opt' ? fmtOptName(selQ) : (selQ.name ?? 'PERP');
-    const total    = selQ.mark != null ? selQ.mark * selQ.size : null;
-    const selColor = VENUE_COLORS[selKey];
-    const selName  = VENUE_NAMES[selKey];
+    const name     = inst.asset === 'opt' ? fmtOptName(selQ) : (selQ?.name ?? 'PERP');
+    const total    = selQ?.mark != null ? selQ.mark * inst.size : null;
+    const selColor = VENUE_COLORS[selKey] ?? '#888';
+    const selName  = VENUE_NAMES[selKey]  ?? '—';
+    const isOpen   = openCards.has(inst.id);
 
     const card = document.createElement('div');
     card.className = 'border border-[#D8DDEF] rounded-lg overflow-hidden';
@@ -532,65 +562,69 @@ function renderQuoteCards() {
       <button type="button" class="quote-card-header w-full flex items-center gap-1.5 px-2 py-1.5 text-left hover:bg-gray-50">
         <span class="text-[10px] font-bold shrink-0 ${posClass}">${posLabel}</span>
         <span class="text-[11px] font-semibold text-[#191308] flex-1 min-w-0 truncate">${name}</span>
-        <span class="text-[10px] text-gray-400 shrink-0">×${selQ.size}</span>
+        <span class="text-[10px] text-gray-400 shrink-0">×${inst.size}</span>
         <span class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0">
           <span class="inline-block w-1.5 h-1.5 rounded-full" style="background:${selColor}"></span>${selName}
         </span>
-        <span class="text-[10px] font-semibold text-[#191308] shrink-0">${fmt(total)}</span>
-        <span class="quote-card-chevron text-[9px] text-gray-400 shrink-0" style="display:inline-block;transition:transform 150ms">▼</span>
+        <span class="text-[10px] font-semibold tabular-nums text-[#191308] shrink-0">${fmt(total)}</span>
+        <span class="quote-card-chevron text-[9px] text-gray-400 shrink-0"
+              style="display:inline-block;transition:transform 150ms;transform:${isOpen ? 'rotate(180deg)' : ''}">&#9662;</span>
       </button>
-      <div class="quote-card-detail hidden border-t border-[#D8DDEF]"></div>`;
+      <div class="quote-card-detail ${isOpen ? '' : 'hidden'} border-t border-[#D8DDEF] py-1"></div>`;
 
     const detail  = card.querySelector('.quote-card-detail');
     const header  = card.querySelector('.quote-card-header');
     const chevron = card.querySelector('.quote-card-chevron');
 
-    // Venue rows — one per venue, Deribit first
-    const venueList = [
-      { key: 'deribit', q: vq.deribit, valid: hasD },
-      { key: 'derive',  q: vq.derive,  valid: hasDrv },
-    ];
-
-    venueList.forEach((venue, idx) => {
-      const row = document.createElement('div');
-      row.className = 'flex items-center gap-2 px-2 py-1.5' + (idx > 0 ? ' border-t border-[#D8DDEF]' : '');
+    // Build venue rows
+    sortedVenues.forEach(venue => {
+      const row      = document.createElement('div');
+      const isSelected = venue.key === selKey;
+      const accent   = VENUE_COLORS[venue.key];
 
       if (venue.valid) {
-        const isSelected = selKey === venue.key;
-        const extraInfo = inst.asset === 'opt'
-          ? `<span class="text-[10px] text-gray-400 shrink-0">IV ${fmtPct(venue.q.iv)}</span>`
-          : `<span class="text-[10px] text-gray-400 shrink-0">Fund. ${fmtPct(venue.q.funding)}/8h</span>`;
+        const rowTotal = venue.q.mark * inst.size;
+        row.className = 'flex items-center gap-2 px-2 py-1.5 cursor-pointer rounded-md mx-1 my-0.5 transition-colors';
+        row.style.cssText = isSelected
+          ? `border: 1.5px solid ${accent}; background: ${accent}18;`
+          : 'border: 1.5px solid transparent;';
         row.innerHTML = `
-          <span class="inline-block w-1.5 h-1.5 rounded-full shrink-0" style="background:${VENUE_COLORS[venue.key]}"></span>
-          <span class="text-[11px] font-semibold text-[#191308] flex-1">${VENUE_NAMES[venue.key]}</span>
-          <div class="grid grid-cols-3 gap-2 text-center text-[10px] mr-1">
-            <div class="flex flex-col"><span class="text-gray-400">Bid</span><span>${fmt(venue.q.bid)}</span></div>
-            <div class="flex flex-col ${isSelected ? 'bg-[#F4FFF9]' : ''} rounded px-1"><span class="text-gray-400">Mark</span><span class="${isSelected ? 'font-bold' : ''}">${fmt(venue.q.mark)}</span></div>
-            <div class="flex flex-col"><span class="text-gray-400">Ask</span><span>${fmt(venue.q.ask)}</span></div>
-          </div>
-          ${extraInfo}
-          <button type="button" class="venue-select-btn text-[10px] shrink-0 font-bold w-4 text-center ${isSelected ? 'text-[#00C96B]' : 'text-gray-300 hover:text-[#00C96B]'}">${isSelected ? '✓' : '○'}</button>`;
+          <span class="inline-block w-1.5 h-1.5 rounded-full shrink-0" style="background:${accent}"></span>
+          <span class="text-[11px] font-semibold shrink-0" style="color:${isSelected ? accent : '#191308'}">${VENUE_NAMES[venue.key]}</span>
+          <span class="text-[10px] font-mono text-gray-400 shrink-0">${VENUE_KIND[venue.key]}</span>
+          <span class="flex-1"></span>
+          <span class="text-[10px] font-semibold tabular-nums shrink-0" style="color:${isSelected ? accent : '#191308'}">${fmt(rowTotal)}</span>
+          ${isSelected ? `<span class="text-[9px] font-bold tracking-wide ml-1 shrink-0" style="color:${accent}">SELECTED</span>` : ''}`;
 
-        row.querySelector('.venue-select-btn').addEventListener('click', () => {
-          vq.selected = venue.key;
+        row.addEventListener('click', () => {
+          vq.userSelected = venue.key;
           quotesByLeg[inst.id] = vq[venue.key];
           renderQuoteCards();
           charts.updateBuilderChart();
         });
       } else {
+        row.className = 'flex items-center gap-2 px-2 py-1.5 mx-1';
         row.innerHTML = `
           <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-300 shrink-0"></span>
-          <span class="text-[11px] font-semibold text-gray-400 flex-1">${VENUE_NAMES[venue.key]}</span>
-          <span class="text-[10px] text-amber-400 italic">${venue.q?.error ?? 'No quote'}</span>`;
+          <span class="text-[11px] font-semibold text-gray-400 shrink-0">${VENUE_NAMES[venue.key]}</span>
+          <span class="text-[10px] font-mono text-gray-300 shrink-0">${VENUE_KIND[venue.key]}</span>
+          <span class="flex-1"></span>
+          <span class="text-[10px] text-amber-400 italic shrink-0">${venue.q?.error ?? 'No quote'}</span>`;
       }
 
       detail.appendChild(row);
     });
 
     header.addEventListener('click', () => {
-      const isOpen = !detail.classList.contains('hidden');
-      detail.classList.toggle('hidden', isOpen);
-      chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+      if (openCards.has(inst.id)) {
+        openCards.delete(inst.id);
+        detail.classList.add('hidden');
+        chevron.style.transform = '';
+      } else {
+        openCards.add(inst.id);
+        detail.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+      }
     });
 
     quotePanel.appendChild(card);
@@ -599,6 +633,7 @@ function renderQuoteCards() {
 
 // Swap to quoting state: collapse editing block into summary strip + show quote cards.
 function enterQuoteMode() {
+  openCards = new Set();
   const info = Strategies.strategiesIdMap[activeStrategyId];
   if (quoteStripTitle) {
     quoteStripTitle.innerHTML = info
@@ -629,6 +664,7 @@ function exitQuoteMode() {
   showQuotes  = false;
   quotesByLeg = {};
   venueQuotes = {};
+  openCards   = new Set();
 
   quotingBlock.classList.add('hidden');
   editingBlock.classList.remove('hidden');
@@ -663,9 +699,9 @@ quoteBtn.addEventListener('click', async () => {
       const derive  = deriveResults[idx];
       const hasD    = deribit && !deribit.error && deribit.mark > 0;
       const hasDrv  = derive  && !derive.error  && derive.mark  > 0;
-      const selected = hasD ? 'deribit' : (hasDrv ? 'derive' : null);
-      venueQuotes[inst.id] = { deribit, derive, selected };
-      if (selected) quotesByLeg[inst.id] = venueQuotes[inst.id][selected];
+      venueQuotes[inst.id] = { deribit, derive, userSelected: null };
+      const key = resolvedVenueKey(inst, venueQuotes[inst.id]);
+      if (key) quotesByLeg[inst.id] = venueQuotes[inst.id][key];
     });
     showQuotes = true;
     enterQuoteMode();
