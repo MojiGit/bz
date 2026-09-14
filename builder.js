@@ -14,7 +14,9 @@ import { fetchDeribitQuotes, fetchDeribitExpiries } from './quotes.js';
 
 export let customInstruments = [];
 export let builderMode = false;
-export let selectedExpiry = null; // expiration timestamp (ms) selected by the user
+
+// Cache of available expiry dates for the active token, fetched once per build session.
+let cachedExpiries = []; // [{ ts: number, label: string }]
 // Strategy this builder session started from. Captured once on entry and deliberately not
 // refreshed as legs are edited — the title row reports where the session began, not what
 // the leg list currently holds.
@@ -42,41 +44,38 @@ function renderStrategyTitle() {
        <span class="text-[14px] text-gray-400 capitalize">${info.sentiment}</span>`;
 }
 
-const expirySelect = document.getElementById('expiry-select');
-
+// Fetch and cache expiry list for the active token. Called once per build session.
 async function loadExpiries() {
-  expirySelect.innerHTML = '<option value="">Loading…</option>';
-  expirySelect.disabled = true;
   try {
-    const expiries = await fetchDeribitExpiries(mvp.selectedTokenSymbol);
-    expirySelect.innerHTML = expiries
-      .map(e => `<option value="${e.ts}">${e.label}</option>`)
-      .join('');
-    selectedExpiry = expiries.length ? expiries[0].ts : null;
-    expirySelect.value = selectedExpiry ?? '';
+    cachedExpiries = await fetchDeribitExpiries(mvp.selectedTokenSymbol);
   } catch {
-    expirySelect.innerHTML = '<option value="">Unavailable</option>';
-    selectedExpiry = null;
-  } finally {
-    expirySelect.disabled = false;
+    cachedExpiries = [];
   }
 }
 
-expirySelect.addEventListener('change', () => {
-  selectedExpiry = expirySelect.value ? Number(expirySelect.value) : null;
-  // Invalidate any existing quotes when expiry changes
-  quotePanel.classList.add('hidden');
-});
+// Populate an expiry <select> element from the cache and set a default value.
+function populateExpirySelect(selectEl, defaultTs) {
+  if (!cachedExpiries.length) {
+    selectEl.innerHTML = '<option value="">Unavailable</option>';
+    return null;
+  }
+  selectEl.innerHTML = cachedExpiries
+    .map(e => `<option value="${e.ts}">${e.label}</option>`)
+    .join('');
+  const ts = defaultTs ?? cachedExpiries[0].ts;
+  selectEl.value = ts;
+  return ts;
+}
 
 // Launch build mode
-export function enterBuildMode() {
+export async function enterBuildMode() {
   strategyMenu.classList.add('hidden');
   strategyBuilderBoard.classList.remove('hidden');
   builderMode = true;
 
   activeStrategyId = mvp.selectedStrategyId;
   renderStrategyTitle();
-  loadExpiries();
+  await loadExpiries();
 
   if(mvp.strategyComponents){
     for (const inst of mvp.strategyComponents){
@@ -104,8 +103,7 @@ export function exitBuilder(){
     activeStrategyId = null;
     strategyTitle.innerHTML = '';
     builderMode = false;
-    selectedExpiry = null;
-    expirySelect.innerHTML = '<option value="">—</option>';
+    cachedExpiries = [];
     quotePanel.classList.add('hidden');
 }
 
@@ -141,6 +139,7 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
     leverage: 1,
     color: '#D8DDEF',
     designRatio,
+    expiryTs: cachedExpiries.length ? cachedExpiries[0].ts : null,
   };
   customInstruments.push(instrument);
 
@@ -148,17 +147,19 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
   div.className = 'flex flex-col gap-1.5 p-1.5 md:gap-1 border border-[#D8DDEF] shadow-sm rounded-lg';
   div.id = instrumentId;
   div.innerHTML = `
-    <div class="grid grid-rows-2 gap-1.5 md:gap-1">
+    <div class="grid grid-rows-3 gap-1.5 md:gap-1">
       <div class="flex flex-row justify-between items-center gap-1.5 md:gap-1 min-w-0">
         <div class="flex flex-row items-center gap-1.5 md:gap-1 min-w-0">
           <button type="button" class="position-btn text-[12px] leading-tight font-semibold uppercase px-2 py-0.5 md:px-1.5 md:py-[1px] rounded border border-[#D8DDEF] bg-white hover:bg-gray-200">${positionLabel(instrument.position)}</button>
           <button type="button" class="type-btn text-[12px] leading-tight font-semibold uppercase px-2 py-0.5 md:px-1.5 md:py-[1px] rounded border border-[#D8DDEF] bg-white hover:bg-gray-200">${instrument.type}</button>
         </div>
-        <!-- 20px is a deliberate trade: row density over the 24px minimum touch target this
-             control used to meet. It still gets a real hit box rather than a bare 10px glyph,
-             and it is destructive-but-recoverable (re-add the leg), so the cost of the
-             occasional missed tap is low. Revisit if removals start going wrong in practice. -->
         <button data-remove="${instrumentId}" aria-label="Remove leg" class="text-gray-500 shrink-0 flex items-center justify-center text-[12px] leading-none min-w-[20px] min-h-[20px] rounded hover:bg-gray-200 md:text-[10px] md:min-w-0 md:min-h-0 md:hover:bg-transparent">X</button>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[10px] text-gray-400">Expiry</span>
+        <select class="expiry-leg-select w-full text-[12px] border border-[#D8DDEF] rounded px-2 py-0.5 bg-white focus:outline-none focus:ring-1 focus:ring-[#00E083] text-[#191308]">
+          <option value="">—</option>
+        </select>
       </div>
       <div class="flex flex-row items-start gap-1.5 min-w-0">
         <!-- Deliberately a <div>, not a <label>: a label forwards clicks to its labelable
@@ -242,6 +243,15 @@ function addOption(optType = 'call', optPost = 'long', optStrike = 1, optSize = 
     customInstruments = customInstruments.filter(inst => inst.id !== instrumentId);
     document.getElementById(instrumentId).remove();
     charts.updateBuilderChart();
+  });
+
+  // Expiry select — populate from cache and track per-instrument
+  const expiryLegSelect = div.querySelector('.expiry-leg-select');
+  populateExpirySelect(expiryLegSelect, instrument.expiryTs);
+  instrument.expiryTs = expiryLegSelect.value ? Number(expiryLegSelect.value) : null;
+  expiryLegSelect.addEventListener('change', () => {
+    instrument.expiryTs = expiryLegSelect.value ? Number(expiryLegSelect.value) : null;
+    quotePanel.classList.add('hidden'); // invalidate quotes on expiry change
   });
 
   // Listen to input changes
@@ -537,7 +547,7 @@ quoteBtn.addEventListener('click', async () => {
   quoteBtn.textContent = 'Loading…';
   quoteBtn.disabled = true;
   try {
-    const results = await fetchDeribitQuotes(customInstruments, mvp.selectedTokenSymbol, mvp.currentPrice, selectedExpiry);
+    const results = await fetchDeribitQuotes(customInstruments, mvp.selectedTokenSymbol, mvp.currentPrice);
     renderQuotes(results);
   } catch (e) {
     console.error('Quote fetch failed:', e);

@@ -40,7 +40,7 @@ export async function fetchDeribitExpiries(token) {
   return expiries;
 }
 
-export async function fetchDeribitQuotes(instruments, token, spotPrice, expiryTs) {
+export async function fetchDeribitQuotes(instruments, token, spotPrice) {
   const currency = TOKEN_CURRENCY[token] ?? 'BTC';
 
   const hasOpts = instruments.some(i => i.asset === 'opt');
@@ -51,7 +51,7 @@ export async function fetchDeribitQuotes(instruments, token, spotPrice, expiryTs
   return Promise.all(instruments.map(async inst => {
     try {
       if (inst.asset === 'opt') {
-        const matched = optionForExpiry(optInsts, inst.strike, inst.type, expiryTs);
+        const matched = optionForExpiry(optInsts, inst.strike, inst.type, inst.expiryTs);
         if (!matched) return { id: inst.id, error: 'No instrument found on Deribit' };
         const t = await deribitFetch(`ticker?instrument_name=${encodeURIComponent(matched.instrument_name)}`);
         const expiry = new Date(matched.expiration_timestamp)
