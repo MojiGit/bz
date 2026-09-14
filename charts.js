@@ -185,7 +185,7 @@ export async function updateBuilderChart() {
 
     if (builder.showQuotes) {
       const q = builder.quotesByLeg[inst.id];
-      if (!q || q.error) continue; // exclude legs without a valid quote
+      if (!q || q.error || !(q.mark > 0)) continue; // exclude legs without a usable price
       if (inst.asset === 'opt') {
         data = Strategies.calculateOptionPNL(inst.type, inst.strike, inst.size, inst.position, undefined, undefined, null, q.mark);
         strikePrices.push(inst.strike);
