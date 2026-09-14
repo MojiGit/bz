@@ -121,6 +121,14 @@ export function renderPNLChart(datasets, strikePrices = []) {
     z: 1
   };
 
+  // Derive Y range from actual data so small-premium strategies are visible.
+  const allPnl = datasets.flatMap(ds => (ds.data ?? []).map(p => p.pnl)).filter(Number.isFinite);
+  const rawMin = allPnl.length ? Math.min(...allPnl) : -1;
+  const rawMax = allPnl.length ? Math.max(...allPnl) :  1;
+  const pad = Math.max(Math.abs(rawMax - rawMin) * 0.15, 0.5);
+  const yMin = rawMin - pad;
+  const yMax = rawMax + pad;
+
   if (chartInstance) chartInstance.destroy();
 
   chartInstance = new Chart(ctx, {
@@ -146,12 +154,13 @@ export function renderPNLChart(datasets, strikePrices = []) {
           } : {}),
         },
         y: {
+          min: yMin,
+          max: yMax,
           grid: { color: 'rgba(216, 221, 239, 0.5)' },
           title: {
             display: false,
             text: 'PnL',
           },
-          beginAtZero: false,
         }
       },
       plugins: {
