@@ -54,10 +54,10 @@ export async function fetchDeribitQuotes(instruments, token, spotPrice) {
         const matched = optionForExpiry(optInsts, inst.strike, inst.type, inst.expiryTs);
         if (!matched) return { id: inst.id, error: 'No instrument found on Deribit' };
         const t = await deribitFetch(`ticker?instrument_name=${encodeURIComponent(matched.instrument_name)}`);
-        // No active market: both bid and ask are zero — only a model price exists, not a
-        // tradeable one. Treat as no quote so the chart is not polluted with a $0 premium.
-        if (t.best_bid_price === 0 && t.best_ask_price === 0) {
-          return { id: inst.id, error: 'No active market on Deribit (no bid / no ask)' };
+        // Mark = 0 means Deribit's own model values the option at zero — no usable price
+        // regardless of whether a lone bid or ask exists on one side.
+        if (t.mark_price === 0) {
+          return { id: inst.id, error: 'No active market on Deribit (mark = 0)' };
         }
         const expiry = new Date(matched.expiration_timestamp)
           .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
