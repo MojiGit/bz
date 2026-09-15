@@ -708,6 +708,9 @@ quoteBtn.addEventListener('click', async () => {
     charts.updateBuilderChart();
   } catch (e) {
     console.error('Quote fetch failed:', e);
+    const friendly = { system_maintenance: 'Deribit maintenance — retry later' };
+    quoteBtn.textContent = friendly[e.message] ?? 'Failed — retry';
+    await new Promise(r => setTimeout(r, 2500));
   } finally {
     quoteBtn.textContent = 'Quote';
     quoteBtn.disabled = false;
