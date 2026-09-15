@@ -179,6 +179,51 @@ export async function fetchDeriveQuotes(instruments, token) {
   }
 }
 
+// ─── Hyperliquid ─────────────────────────────────────────────────────────────
+// CORS enabled (access-control-allow-origin: *) — plain fetch works from the browser.
+// Only perpetual futures are available; option legs get an informative error.
+// impactPxs[0]/[1] are $5M-notional impact bid/ask — best available proxy for top-of-book.
+
+const HYPERLIQUID_URL = 'https://api.hyperliquid.xyz/info';
+
+export async function fetchHyperliquidQuotes(instruments, token) {
+  const currency = TOKEN_CURRENCY[token] ?? 'BTC';
+
+  let meta, ctxs;
+  try {
+    const res = await fetch(HYPERLIQUID_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'metaAndAssetCtxs' }),
+    });
+    [meta, ctxs] = await res.json();
+  } catch (e) {
+    return instruments.map(inst => ({ id: inst.id, source: 'Hyperliquid', error: `Hyperliquid unavailable: ${e.message}` }));
+  }
+
+  const coinIdx = meta.universe.findIndex(u => u.name === currency);
+
+  return instruments.map(inst => {
+    if (inst.asset === 'opt') {
+      return { id: inst.id, source: 'Hyperliquid', error: 'Options not available on Hyperliquid' };
+    }
+    if (inst.asset === 'perp') {
+      if (coinIdx === -1) return { id: inst.id, source: 'Hyperliquid', error: `${currency} not found on Hyperliquid` };
+      const ctx  = ctxs[coinIdx];
+      const mark = parseFloat(ctx.markPx);
+      if (!mark) return { id: inst.id, source: 'Hyperliquid', error: 'No active market on Hyperliquid' };
+      return {
+        id: inst.id, asset: 'perp', position: inst.position, size: inst.size,
+        source: 'Hyperliquid', name: `${currency}-PERP`,
+        bid:     parseFloat(ctx.impactPxs[0]),
+        ask:     parseFloat(ctx.impactPxs[1]),
+        mark,
+        funding: parseFloat(ctx.funding),
+      };
+    }
+  });
+}
+
 // ─── Deribit ─────────────────────────────────────────────────────────────────
 
 export async function fetchDeribitQuotes(instruments, token, spotPrice) {

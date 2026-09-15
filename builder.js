@@ -14,7 +14,7 @@ const quoteStripCount = document.getElementById('quote-strip-count');
 import * as charts from './charts.js';
 import * as mvp from './mvp.js';
 import * as Strategies from './strategies.js';
-import { fetchDeribitQuotes, fetchDeribitExpiries, fetchDeriveQuotes } from './quotes.js';
+import { fetchDeribitQuotes, fetchDeribitExpiries, fetchDeriveQuotes, fetchHyperliquidQuotes } from './quotes.js';
 
 
 export let customInstruments = [];
@@ -469,9 +469,9 @@ addPerpBtn.addEventListener('click', () => {
 const quoteBtn   = document.getElementById('get-quote');
 const quotePanel = document.getElementById('quote-results');
 
-const VENUE_COLORS = { deribit: '#00E083', derive: '#6366F1' };
-const VENUE_NAMES  = { deribit: 'Deribit', derive: 'Derive' };
-const VENUE_KIND   = { deribit: 'Orderbook', derive: 'Orderbook' };
+const VENUE_COLORS = { deribit: '#00E083', derive: '#6366F1', hyperliquid: '#06B6D4' };
+const VENUE_NAMES  = { deribit: 'Deribit', derive: 'Derive', hyperliquid: 'Hyperliquid' };
+const VENUE_KIND   = { deribit: 'Orderbook', derive: 'Orderbook', hyperliquid: 'Perp DEX' };
 
 const ERROR_LABELS = {
   system_maintenance: 'In maintenance',
@@ -482,8 +482,9 @@ const friendlyError = e => ERROR_LABELS[e] ?? (e ?? 'No quote');
 // BUY legs: cheapest ask. SELL legs: highest bid.
 function bestVenueKey(inst, vq) {
   const valid = [
-    { key: 'deribit', q: vq.deribit },
-    { key: 'derive',  q: vq.derive  },
+    { key: 'deribit',     q: vq.deribit     },
+    { key: 'derive',      q: vq.derive      },
+    { key: 'hyperliquid', q: vq.hyperliquid },
   ].filter(v => v.q && !v.q.error && v.q.mark > 0);
   if (!valid.length) return null;
   if (valid.length === 1) return valid[0].key;
@@ -517,11 +518,12 @@ function renderQuoteCards() {
     const vq = venueQuotes[inst.id];
     if (!vq) return;
 
-    const hasD   = vq.deribit && !vq.deribit.error && vq.deribit.mark > 0;
-    const hasDrv = vq.derive  && !vq.derive.error  && vq.derive.mark  > 0;
+    const hasD   = vq.deribit     && !vq.deribit.error     && vq.deribit.mark     > 0;
+    const hasDrv = vq.derive      && !vq.derive.error      && vq.derive.mark      > 0;
+    const hasHL  = vq.hyperliquid && !vq.hyperliquid.error && vq.hyperliquid.mark > 0;
 
     // — NO QUOTE card — shows per-venue error rows so the user knows what failed and why
-    if (!hasD && !hasDrv) {
+    if (!hasD && !hasDrv && !hasHL) {
       const instLabel = inst.asset === 'opt'
         ? `${inst.type.toUpperCase()} · $${Number(inst.strike).toLocaleString('en-US')}`
         : 'PERP';
@@ -535,8 +537,9 @@ function renderQuoteCards() {
         <div class="nq-rows py-1"></div>`;
       const nqRows = card.querySelector('.nq-rows');
       [
-        { key: 'deribit', q: vq.deribit },
-        { key: 'derive',  q: vq.derive  },
+        { key: 'deribit',     q: vq.deribit     },
+        { key: 'derive',      q: vq.derive      },
+        { key: 'hyperliquid', q: vq.hyperliquid },
       ].forEach(v => {
         const row = document.createElement('div');
         row.className = 'flex items-center gap-2 px-2 py-1.5 mx-1';
@@ -554,15 +557,18 @@ function renderQuoteCards() {
 
     // Sort valid venues best-first (BUY → cheapest ask; SELL → highest bid); invalid appended last.
     const isBuy = inst.position === 'long';
+    const venueValid = { deribit: hasD, derive: hasDrv, hyperliquid: hasHL };
     const validV = [
-      { key: 'deribit', q: vq.deribit, valid: true  },
-      { key: 'derive',  q: vq.derive,  valid: true  },
-    ].filter(v => (v.key === 'deribit' ? hasD : hasDrv));
+      { key: 'deribit',     q: vq.deribit,     valid: true },
+      { key: 'derive',      q: vq.derive,       valid: true },
+      { key: 'hyperliquid', q: vq.hyperliquid,  valid: true },
+    ].filter(v => venueValid[v.key]);
     validV.sort((a, b) => isBuy ? a.q.ask - b.q.ask : b.q.bid - a.q.bid);
     const invalidV = [
-      { key: 'deribit', q: vq.deribit, valid: false },
-      { key: 'derive',  q: vq.derive,  valid: false },
-    ].filter(v => !(v.key === 'deribit' ? hasD : hasDrv));
+      { key: 'deribit',     q: vq.deribit,     valid: false },
+      { key: 'derive',      q: vq.derive,       valid: false },
+      { key: 'hyperliquid', q: vq.hyperliquid,  valid: false },
+    ].filter(v => !venueValid[v.key]);
     const sortedVenues = [...validV, ...invalidV];
 
     // Resolve selection: user's explicit pick, else best-execution (row 0 after sort).
@@ -676,7 +682,7 @@ function enterQuoteMode() {
   setTimeout(() => quotingBlock.classList.remove('anim-fade-rise'), 200);
 
   const disc = document.getElementById('premium-disclaimer');
-  if (disc) disc.textContent = 'Payoff curves use live mark prices (Deribit + Derive). Legs without quotes are excluded from the chart.';
+  if (disc) disc.textContent = 'Payoff curves use live mark prices (Deribit · Derive · Hyperliquid). Legs without quotes are excluded from the chart.';
 }
 
 // Restore editing state. Callable from the Edit button and from external resets.
@@ -708,18 +714,18 @@ quoteBtn.addEventListener('click', async () => {
   quoteBtn.textContent = 'Loading…';
   quoteBtn.disabled = true;
   try {
-    const [deribitResults, deriveResults] = await Promise.all([
+    const [deribitResults, deriveResults, hyperliquidResults] = await Promise.all([
       fetchDeribitQuotes(customInstruments, mvp.selectedTokenSymbol, mvp.currentPrice),
       fetchDeriveQuotes(customInstruments, mvp.selectedTokenSymbol),
+      fetchHyperliquidQuotes(customInstruments, mvp.selectedTokenSymbol),
     ]);
     venueQuotes = {};
     quotesByLeg = {};
     customInstruments.forEach((inst, idx) => {
-      const deribit = deribitResults[idx];
-      const derive  = deriveResults[idx];
-      const hasD    = deribit && !deribit.error && deribit.mark > 0;
-      const hasDrv  = derive  && !derive.error  && derive.mark  > 0;
-      venueQuotes[inst.id] = { deribit, derive, userSelected: null };
+      const deribit     = deribitResults[idx];
+      const derive      = deriveResults[idx];
+      const hyperliquid = hyperliquidResults[idx];
+      venueQuotes[inst.id] = { deribit, derive, hyperliquid, userSelected: null };
       const key = resolvedVenueKey(inst, venueQuotes[inst.id]);
       if (key) quotesByLeg[inst.id] = venueQuotes[inst.id][key];
     });
