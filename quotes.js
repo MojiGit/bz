@@ -186,20 +186,25 @@ export async function fetchDeribitQuotes(instruments, token, spotPrice) {
   const currency = TOKEN_CURRENCY[token] ?? 'BTC';
 
   const hasOpts = instruments.some(i => i.asset === 'opt');
-  const optInsts = hasOpts
-    ? await deribitFetch(`get_instruments?currency=${currency}&kind=option&expired=false`)
-    : null;
+  let optInsts = null;
+  if (hasOpts) {
+    try {
+      optInsts = await deribitFetch(`get_instruments?currency=${currency}&kind=option&expired=false`);
+    } catch (e) {
+      return instruments.map(inst => ({ id: inst.id, source: 'Deribit', error: e.message }));
+    }
+  }
 
   return Promise.all(instruments.map(async inst => {
     try {
       if (inst.asset === 'opt') {
         const matched = optionForExpiry(optInsts, inst.strike, inst.type, inst.expiryTs);
-        if (!matched) return { id: inst.id, error: 'No instrument found on Deribit' };
+        if (!matched) return { id: inst.id, source: 'Deribit', error: 'No instrument found on Deribit' };
         const t = await deribitFetch(`ticker?instrument_name=${encodeURIComponent(matched.instrument_name)}`);
         // Mark = 0 means Deribit's own model values the option at zero — no usable price
         // regardless of whether a lone bid or ask exists on one side.
         if (t.mark_price === 0) {
-          return { id: inst.id, error: 'No active market on Deribit (mark = 0)' };
+          return { id: inst.id, source: 'Deribit', error: 'No active market on Deribit (mark = 0)' };
         }
         const expiry = new Date(matched.expiration_timestamp)
           .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
@@ -226,7 +231,7 @@ export async function fetchDeribitQuotes(instruments, token, spotPrice) {
         };
       }
     } catch (e) {
-      return { id: inst.id, error: e.message };
+      return { id: inst.id, source: 'Deribit', error: e.message };
     }
   }));
 }

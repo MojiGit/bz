@@ -473,6 +473,11 @@ const VENUE_COLORS = { deribit: '#00E083', derive: '#6366F1' };
 const VENUE_NAMES  = { deribit: 'Deribit', derive: 'Derive' };
 const VENUE_KIND   = { deribit: 'Orderbook', derive: 'Orderbook' };
 
+const ERROR_LABELS = {
+  system_maintenance: 'In maintenance',
+};
+const friendlyError = e => ERROR_LABELS[e] ?? (e ?? 'No quote');
+
 // Returns the best-execution venue key for a given instrument + venueQuotes entry.
 // BUY legs: cheapest ask. SELL legs: highest bid.
 function bestVenueKey(inst, vq) {
@@ -609,7 +614,7 @@ function renderQuoteCards() {
           <span class="text-[11px] font-semibold text-gray-400 shrink-0">${VENUE_NAMES[venue.key]}</span>
           <span class="text-[10px] font-mono text-gray-300 shrink-0">${VENUE_KIND[venue.key]}</span>
           <span class="flex-1"></span>
-          <span class="text-[10px] text-amber-400 italic shrink-0">${venue.q?.error ?? 'No quote'}</span>`;
+          <span class="text-[10px] text-amber-400 italic shrink-0">${friendlyError(venue.q?.error)}</span>`;
       }
 
       detail.appendChild(row);
@@ -708,8 +713,7 @@ quoteBtn.addEventListener('click', async () => {
     charts.updateBuilderChart();
   } catch (e) {
     console.error('Quote fetch failed:', e);
-    const friendly = { system_maintenance: 'Deribit maintenance — retry later' };
-    quoteBtn.textContent = friendly[e.message] ?? 'Failed — retry';
+    quoteBtn.textContent = 'Failed — retry';
     await new Promise(r => setTimeout(r, 2500));
   } finally {
     quoteBtn.textContent = 'Quote';
