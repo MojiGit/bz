@@ -520,20 +520,35 @@ function renderQuoteCards() {
     const hasD   = vq.deribit && !vq.deribit.error && vq.deribit.mark > 0;
     const hasDrv = vq.derive  && !vq.derive.error  && vq.derive.mark  > 0;
 
-    // — NO QUOTE card —
+    // — NO QUOTE card — shows per-venue error rows so the user knows what failed and why
     if (!hasD && !hasDrv) {
       const instLabel = inst.asset === 'opt'
         ? `${inst.type.toUpperCase()} · $${Number(inst.strike).toLocaleString('en-US')}`
         : 'PERP';
-      const div = document.createElement('div');
-      div.className = 'border border-amber-200 bg-amber-50 rounded-lg px-2 py-1.5';
-      div.innerHTML = `
-        <div class="flex items-center gap-1.5">
+      const card = document.createElement('div');
+      card.className = 'border border-amber-200 rounded-lg overflow-hidden';
+      card.innerHTML = `
+        <div class="flex items-center gap-1.5 px-2 py-1.5 bg-amber-50 border-b border-amber-200">
           <span class="text-[10px] font-bold text-amber-500 shrink-0">NO QUOTE</span>
           <span class="text-[11px] font-semibold text-amber-700 flex-1 min-w-0 truncate">${instLabel}</span>
-          <span class="text-[10px] text-amber-400 italic shrink-0">adjust strike or expiry</span>
-        </div>`;
-      quotePanel.appendChild(div);
+        </div>
+        <div class="nq-rows py-1"></div>`;
+      const nqRows = card.querySelector('.nq-rows');
+      [
+        { key: 'deribit', q: vq.deribit },
+        { key: 'derive',  q: vq.derive  },
+      ].forEach(v => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 px-2 py-1.5 mx-1';
+        row.innerHTML = `
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-300 shrink-0"></span>
+          <span class="text-[11px] font-semibold text-gray-400 shrink-0">${VENUE_NAMES[v.key]}</span>
+          <span class="text-[10px] font-mono text-gray-300 shrink-0">${VENUE_KIND[v.key]}</span>
+          <span class="flex-1"></span>
+          <span class="text-[10px] text-amber-400 italic shrink-0">${friendlyError(v.q?.error)}</span>`;
+        nqRows.appendChild(row);
+      });
+      quotePanel.appendChild(card);
       return;
     }
 

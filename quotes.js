@@ -100,14 +100,26 @@ function tsToYYYYMMDD(tsMs) {
 }
 
 // Find the active Derive instrument with the nearest strike for a given date + type.
+// Falls back to the nearest available expiry date when no exact match exists
+// (Deribit has daily expiries; Derive only has weekly/monthly).
 function nearestDeriveOpt(instruments, strike, type, dateStr) {
   const typeChar = type === 'call' ? 'C' : 'P';
-  const candidates = instruments.filter(i => {
-    if (!i.is_active) return false;
-    const p = i.instrument_name.split('-');
-    return p[1] === dateStr && p[3] === typeChar;
-  });
-  if (!candidates.length) return null;
+  const active = instruments.filter(i => i.is_active);
+  const byType = active.filter(i => i.instrument_name.split('-')[3] === typeChar);
+  if (!byType.length) return null;
+
+  // Prefer exact date; fall back to the date whose YYYYMMDD integer is closest.
+  const exact = byType.filter(i => i.instrument_name.split('-')[1] === dateStr);
+  let candidates = exact;
+  if (!candidates.length) {
+    const target = parseInt(dateStr, 10);
+    const allDates = [...new Set(byType.map(i => i.instrument_name.split('-')[1]))];
+    const nearest = allDates.reduce((b, d) =>
+      Math.abs(parseInt(d, 10) - target) < Math.abs(parseInt(b, 10) - target) ? d : b
+    );
+    candidates = byType.filter(i => i.instrument_name.split('-')[1] === nearest);
+  }
+
   return candidates.reduce((best, i) => {
     const s = parseFloat(i.option_details.strike);
     const b = parseFloat(best.option_details.strike);
