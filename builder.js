@@ -501,9 +501,9 @@ function renderQuoteCards() {
       : `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
   function fmtOptName(q) {
-    const parts = (q.name ?? '').split('-');
-    const expRaw = parts[1] ?? '';
-    return `${(q.type ?? '').toUpperCase()} · $${Number(q.strike).toLocaleString('en-US')} · ${expRaw.slice(0,2)} ${expRaw.slice(2,5)}`.trim();
+    // q.expiry is pre-formatted ("15 Sep 26") by both Deribit and Derive fetchers
+    const expLabel = (q.expiry ?? '').slice(0, 6); // "15 Sep"
+    return `${(q.type ?? '').toUpperCase()} · $${Number(q.strike).toLocaleString('en-US')} · ${expLabel}`.trim();
   }
 
   quotePanel.innerHTML = '';
