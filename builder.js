@@ -638,7 +638,8 @@ function renderQuoteCards() {
     const posClass = isBuy ? 'text-[#00C96B]' : 'text-[#FF6B6B]';
     const posLabel = isBuy ? 'BUY' : 'SELL';
     const name     = inst.asset === 'opt' ? fmtOptName(selQ) : (selQ?.name ?? 'PERP');
-    const total    = selQ?.mark != null ? selQ.mark * inst.size : null;
+    const execPrice = selQ ? (isBuy ? (selQ.ask > 0 ? selQ.ask : selQ.mark) : (selQ.bid > 0 ? selQ.bid : selQ.mark)) : null;
+    const total     = execPrice != null ? execPrice * inst.size : null;
     const selColor = VENUE_COLORS[selKey] ?? '#888';
     const selName  = VENUE_NAMES[selKey]  ?? '—';
     const isOpen   = openCards.has(inst.id);
@@ -670,7 +671,8 @@ function renderQuoteCards() {
       const accent   = VENUE_COLORS[venue.key];
 
       if (venue.valid) {
-        const rowTotal = venue.q.mark * inst.size;
+        const vExecPrice = isBuy ? (venue.q.ask > 0 ? venue.q.ask : venue.q.mark) : (venue.q.bid > 0 ? venue.q.bid : venue.q.mark);
+        const rowTotal = vExecPrice * inst.size;
         row.className = 'flex items-center gap-2 px-2 py-1.5 cursor-pointer rounded-md mx-1 my-0.5 transition-colors';
         row.style.cssText = isSelected
           ? `border: 1.5px solid ${accent}; background: ${accent}18;`
