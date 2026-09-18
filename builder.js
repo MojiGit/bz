@@ -125,6 +125,8 @@ export function exitBuilder(){
     quotesByLeg = {};
     venueQuotes = {};
     openCards   = new Set();
+    netTotalBar.classList.add('hidden');
+    netTotalBar.innerHTML = '';
     editingBlock.classList.remove('hidden');
     quotingBlock.classList.add('hidden');
 }
@@ -466,8 +468,9 @@ addPerpBtn.addEventListener('click', () => {
 });
 
 // Quote button and results panel (DOM refs; both live inside their respective blocks)
-const quoteBtn   = document.getElementById('get-quote');
-const quotePanel = document.getElementById('quote-results');
+const quoteBtn      = document.getElementById('get-quote');
+const quotePanel    = document.getElementById('quote-results');
+const netTotalBar   = document.getElementById('quote-net-total');
 
 const VENUE_COLORS = { deribit: '#00E083', derive: '#6366F1', hyperliquid: '#06B6D4' };
 const VENUE_NAMES  = { deribit: 'Deribit', derive: 'Derive', hyperliquid: 'Hyperliquid' };
@@ -498,6 +501,50 @@ function resolvedVenueKey(inst, vq) {
   return vq.userSelected ?? bestVenueKey(inst, vq);
 }
 
+// Render the net debit/credit bar from the currently resolved quotes.
+// BUY legs cost the ask; SELL legs receive the bid — execution-cost model.
+function renderNetTotal() {
+  const fmtTotal = n =>
+    `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+
+  let debit  = 0; // cash out (long legs, paying ask)
+  let credit = 0; // cash in  (short legs, receiving bid)
+  let quoted = 0;
+  let missing = 0;
+
+  customInstruments.forEach(inst => {
+    const q = quotesByLeg[inst.id];
+    if (!q || q.error || !q.mark) { missing++; return; }
+    quoted++;
+    if (inst.position === 'long') {
+      debit  += (q.ask ?? q.mark) * inst.size;
+    } else {
+      credit += (q.bid ?? q.mark) * inst.size;
+    }
+  });
+
+  if (quoted === 0) {
+    netTotalBar.classList.add('hidden');
+    return;
+  }
+
+  const net    = credit - debit;
+  const isCredit = net >= 0;
+  const color  = isCredit ? '#00C96B' : '#FF6B6B';
+  const label  = isCredit ? 'NET CREDIT' : 'NET DEBIT';
+  const note   = missing > 0
+    ? `<span class="text-[10px] text-gray-400 italic">${missing} leg${missing > 1 ? 's' : ''} missing</span>`
+    : `<span class="text-[10px] text-gray-400">all legs quoted</span>`;
+
+  netTotalBar.innerHTML = `
+    <div class="flex items-center gap-2">
+      <span class="text-[10px] font-bold uppercase tracking-wide" style="color:${color}">${label}</span>
+      ${note}
+    </div>
+    <span class="text-[15px] font-bold tabular-nums" style="color:${color}">${fmtTotal(Math.abs(net))}</span>`;
+  netTotalBar.classList.remove('hidden');
+}
+
 // Render expandable quote cards into #quote-results, reading from venueQuotes module state.
 // openCards (Set<instId>) tracks which cards are expanded so venue selection doesn't collapse them.
 function renderQuoteCards() {
@@ -512,6 +559,7 @@ function renderQuoteCards() {
     return `${(q.type ?? '').toUpperCase()} · $${Number(q.strike).toLocaleString('en-US')} · ${expLabel}`.trim();
   }
 
+  renderNetTotal();
   quotePanel.innerHTML = '';
 
   customInstruments.forEach(inst => {
@@ -691,6 +739,8 @@ function exitQuoteMode() {
   quotesByLeg = {};
   venueQuotes = {};
   openCards   = new Set();
+  netTotalBar.classList.add('hidden');
+  netTotalBar.innerHTML = '';
 
   quotingBlock.classList.add('hidden');
   editingBlock.classList.remove('hidden');
