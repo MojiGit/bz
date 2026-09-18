@@ -516,12 +516,15 @@ function renderNetTotal() {
     const q = quotesByLeg[inst.id];
     if (!q || q.error || !q.mark) { missing++; return; }
     quoted++;
-    // Mark price for both sides — consistent with what each card shows and
-    // ensures buy+sell of the same instrument nets to zero.
+    // Execution cost model: pay ask to buy, receive bid to sell.
+    // Same instrument round-trip nets to -(bid-ask spread), not zero — the spread
+    // is the real cost of entering and exiting. Mark price is not used here
+    // because DEX venues (Derive) can have mark well below their actual bid,
+    // which would produce a nonsensical net when venues differ per leg.
     if (inst.position === 'long') {
-      debit  += q.mark * inst.size;
+      debit  += (q.ask > 0 ? q.ask : q.mark) * inst.size;
     } else {
-      credit += q.mark * inst.size;
+      credit += (q.bid > 0 ? q.bid : q.mark) * inst.size;
     }
   });
 
