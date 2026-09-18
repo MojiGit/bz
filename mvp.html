@@ -169,13 +169,17 @@
                 <!-- STATE 2 — Quoting block (hidden until quote mode is entered) -->
                 <div id="builder-quoting-block" class="hidden flex-1 flex flex-col min-h-0 overflow-y-auto no-scrollbar">
 
-                    <!-- Summary strip: strategy info + count + EDIT link (not editable) -->
+                    <!-- Summary strip: strategy info + count + timestamp + REFRESH + EDIT -->
                     <div class="flex-none flex items-center justify-between gap-2 px-2 py-1.5 bg-gray-50 border-b border-[#D8DDEF]">
                         <div class="flex items-center gap-2 min-w-0 flex-wrap">
                             <div id="quote-strip-title" class="flex items-center gap-2 min-w-0"></div>
                             <span id="quote-strip-count" class="text-[10px] font-mono text-gray-400 shrink-0"></span>
                         </div>
-                        <button id="edit-from-quote" class="text-[11px] font-bold uppercase tracking-wide text-[#191308] hover:text-[#00E083] shrink-0 px-1">Edit</button>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span id="quote-timestamp" class="text-[10px] font-mono text-gray-400"></span>
+                            <button id="refresh-quote" class="text-[11px] font-bold uppercase tracking-wide text-[#191308] hover:text-[#00E083] px-1" title="Refresh quotes">↻</button>
+                            <button id="edit-from-quote" class="text-[11px] font-bold uppercase tracking-wide text-[#191308] hover:text-[#00E083] px-1">Edit</button>
+                        </div>
                     </div>
 
                     <!-- Net total bar (rendered by builder.js when in quote mode) -->

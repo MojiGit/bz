@@ -468,9 +468,11 @@ addPerpBtn.addEventListener('click', () => {
 });
 
 // Quote button and results panel (DOM refs; both live inside their respective blocks)
-const quoteBtn      = document.getElementById('get-quote');
-const quotePanel    = document.getElementById('quote-results');
-const netTotalBar   = document.getElementById('quote-net-total');
+const quoteBtn        = document.getElementById('get-quote');
+const quotePanel      = document.getElementById('quote-results');
+const netTotalBar     = document.getElementById('quote-net-total');
+const quoteTimestamp  = document.getElementById('quote-timestamp');
+const refreshQuoteBtn = document.getElementById('refresh-quote');
 
 const VENUE_COLORS = { deribit: '#00E083', derive: '#6366F1', hyperliquid: '#06B6D4' };
 const VENUE_NAMES  = { deribit: 'Deribit', derive: 'Derive', hyperliquid: 'Hyperliquid' };
@@ -756,6 +758,7 @@ function exitQuoteMode() {
   openCards   = new Set();
   netTotalBar.classList.add('hidden');
   netTotalBar.innerHTML = '';
+  if (quoteTimestamp) quoteTimestamp.textContent = '';
 
   quotingBlock.classList.add('hidden');
   editingBlock.classList.remove('hidden');
@@ -774,10 +777,17 @@ export function resetQuoteMode() {
 
 document.getElementById('edit-from-quote').addEventListener('click', () => exitQuoteMode());
 
-quoteBtn.addEventListener('click', async () => {
+function updateTimestamp() {
+  if (!quoteTimestamp) return;
+  const now = new Date();
+  quoteTimestamp.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+// Core fetch logic — shared by the initial Quote button and the Refresh button.
+async function runQuoteFetch(triggerBtn, loadingLabel, resetLabel) {
   if (!customInstruments.length) return;
-  quoteBtn.textContent = 'Loading…';
-  quoteBtn.disabled = true;
+  triggerBtn.textContent = loadingLabel;
+  triggerBtn.disabled = true;
   try {
     const [deribitResults, deriveResults, hyperliquidResults] = await Promise.all([
       fetchDeribitQuotes(customInstruments, mvp.selectedTokenSymbol, mvp.currentPrice),
@@ -795,15 +805,19 @@ quoteBtn.addEventListener('click', async () => {
       if (key) quotesByLeg[inst.id] = venueQuotes[inst.id][key];
     });
     showQuotes = true;
+    updateTimestamp();
     enterQuoteMode();
     charts.updateBuilderChart();
   } catch (e) {
     console.error('Quote fetch failed:', e);
-    quoteBtn.textContent = 'Failed — retry';
+    triggerBtn.textContent = 'Failed — retry';
     await new Promise(r => setTimeout(r, 2500));
   } finally {
-    quoteBtn.textContent = 'Quote';
-    quoteBtn.disabled = false;
+    triggerBtn.textContent = resetLabel;
+    triggerBtn.disabled = false;
   }
-});
+}
+
+quoteBtn.addEventListener('click', () => runQuoteFetch(quoteBtn, 'Loading…', 'Quote'));
+refreshQuoteBtn.addEventListener('click', () => runQuoteFetch(refreshQuoteBtn, '↻', '↻'));
 
