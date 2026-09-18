@@ -516,10 +516,12 @@ function renderNetTotal() {
     const q = quotesByLeg[inst.id];
     if (!q || q.error || !q.mark) { missing++; return; }
     quoted++;
+    // Mark price for both sides — consistent with what each card shows and
+    // ensures buy+sell of the same instrument nets to zero.
     if (inst.position === 'long') {
-      debit  += (q.ask ?? q.mark) * inst.size;
+      debit  += q.mark * inst.size;
     } else {
-      credit += (q.bid ?? q.mark) * inst.size;
+      credit += q.mark * inst.size;
     }
   });
 
