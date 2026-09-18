@@ -42,6 +42,7 @@ globalThis.document = {
 globalThis.window = { 'chartjs-plugin-annotation': {} };
 const ChartStub = function () {};
 ChartStub.register = function () {};
+ChartStub.defaults = { font: {}, plugins: { legend: { labels: {} } } };
 globalThis.Chart = ChartStub;
 
 const { calculateOptionPNL, calculatePerpPNL, combinePNLCurves, findBreakevenPoints, generateDynamicPriceRange, generatePremium, roundToStrikeStep } = await import('../strategies.js');

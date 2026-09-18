@@ -501,26 +501,25 @@ function resolvedVenueKey(inst, vq) {
   return vq.userSelected ?? bestVenueKey(inst, vq);
 }
 
-// Render the net debit/credit bar from the currently resolved quotes.
-// BUY legs cost the ask; SELL legs receive the bid — execution-cost model.
-function renderNetTotal() {
-  const fmtTotal = n =>
-    `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-
+// Pure calculation of the strategy's net debit/credit from resolved per-leg quotes.
+// Execution-cost model: a BUY leg pays the ask, a SELL leg receives the bid.
+//   - Same instrument round-trip nets to -(bid-ask spread), not zero — the spread
+//     is the real cost of entering and exiting.
+//   - Mark price is NOT used for the net (only as a fallback when a side has no
+//     market, bid/ask == 0): DEX venues (Derive) can quote a mark far below their
+//     actual bid, which would produce a nonsensical net when venues differ per leg.
+//   - `net = credit - debit`. Positive → NET CREDIT (cash in), negative → NET DEBIT.
+// Kept pure and exported so the formula is unit-testable without the DOM.
+export function computeNetTotal(instruments, quotesByLegMap) {
   let debit  = 0; // cash out (long legs, paying ask)
   let credit = 0; // cash in  (short legs, receiving bid)
   let quoted = 0;
   let missing = 0;
 
-  customInstruments.forEach(inst => {
-    const q = quotesByLeg[inst.id];
+  instruments.forEach(inst => {
+    const q = quotesByLegMap[inst.id];
     if (!q || q.error || !q.mark) { missing++; return; }
     quoted++;
-    // Execution cost model: pay ask to buy, receive bid to sell.
-    // Same instrument round-trip nets to -(bid-ask spread), not zero — the spread
-    // is the real cost of entering and exiting. Mark price is not used here
-    // because DEX venues (Derive) can have mark well below their actual bid,
-    // which would produce a nonsensical net when venues differ per leg.
     if (inst.position === 'long') {
       debit  += (q.ask > 0 ? q.ask : q.mark) * inst.size;
     } else {
@@ -528,13 +527,22 @@ function renderNetTotal() {
     }
   });
 
+  const net = credit - debit;
+  return { net, debit, credit, quoted, missing, isCredit: net >= 0 };
+}
+
+// Render the net debit/credit bar from the currently resolved quotes.
+function renderNetTotal() {
+  const fmtTotal = n =>
+    `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+
+  const { net, quoted, missing, isCredit } = computeNetTotal(customInstruments, quotesByLeg);
+
   if (quoted === 0) {
     netTotalBar.classList.add('hidden');
     return;
   }
 
-  const net    = credit - debit;
-  const isCredit = net >= 0;
   const color  = isCredit ? '#00C96B' : '#FF6B6B';
   const label  = isCredit ? 'NET CREDIT' : 'NET DEBIT';
   const note   = missing > 0

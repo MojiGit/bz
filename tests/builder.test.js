@@ -102,6 +102,7 @@ globalThis.window = { 'chartjs-plugin-annotation': {} };
 let lastChartConfig = null;
 const ChartStub = function (ctx, config) { lastChartConfig = config; this.destroy = () => {}; };
 ChartStub.register = function () {};
+ChartStub.defaults = { font: {}, plugins: { legend: { labels: {} } } };
 globalThis.Chart = ChartStub;
 
 // Pinned spot. The assertions below derive their expectations from this rather than hardcoding
