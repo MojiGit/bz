@@ -546,6 +546,19 @@ function renderSummary() {
   }
 
   // Build PnL curves from quoted legs using the same strategy engine as the chart.
+  // The standard module price range uses step = spot × 1%. For a short straddle the
+  // peak PnL is exactly at S = strike; if that price is between two sample points the
+  // discrete max is less than the true max (= sum of premiums). We add all strikes to
+  // the range so the maximum is always captured at the correct price.
+  const spot = mvp.currentPrice;
+  const baseRange  = Strategies.generateDynamicPriceRange(spot);
+  const strikes    = customInstruments
+    .filter(i => i.asset === 'opt' && quotesByLeg[i.id] && !quotesByLeg[i.id].error)
+    .map(i => i.strike);
+  const pnlRange = strikes.length
+    ? [...new Set([...baseRange, ...strikes])].sort((a, b) => a - b)
+    : baseRange;
+
   const curves = [];
   for (const inst of customInstruments) {
     const q = quotesByLeg[inst.id];
@@ -560,10 +573,10 @@ function renderSummary() {
     if (inst.asset === 'opt') {
       curves.push(Strategies.calculateOptionPNL(
         inst.type, inst.strike, inst.size, inst.position,
-        undefined, undefined, null, execPx,
+        undefined, pnlRange, null, execPx,
       ));
     } else if (inst.asset === 'perp') {
-      curves.push(Strategies.calculatePerpPNL(execPx, inst.size, inst.leverage ?? 1, inst.position));
+      curves.push(Strategies.calculatePerpPNL(execPx, inst.size, inst.leverage ?? 1, inst.position, pnlRange));
     }
   }
 
