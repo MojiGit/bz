@@ -656,7 +656,7 @@ function renderQuoteCards() {
         <span class="text-[11px] font-semibold text-[#191308] flex-1 min-w-0 truncate">${name}</span>
         <span class="text-[10px] text-gray-400 shrink-0">×${inst.size}</span>
         <span class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0">
-          <span class="inline-block w-1.5 h-1.5 rounded-full" style="background:${selColor}"></span>${selName}${selUsingMark ? ' <span class="text-gray-400 italic">mark</span>' : ''}
+          <span class="inline-block w-1.5 h-1.5 rounded-full" style="background:${selColor}"></span>${selName}${selUsingMark ? ' <span class="text-gray-400 italic">AMM</span>' : ''}
         </span>
         <span class="text-[10px] font-semibold tabular-nums text-[#191308] shrink-0">${fmt(total)}</span>
         <span class="quote-card-chevron text-[9px] text-gray-400 shrink-0"
@@ -687,7 +687,7 @@ function renderQuoteCards() {
           <span class="inline-block w-1.5 h-1.5 rounded-full shrink-0" style="background:${accent}"></span>
           <span class="text-[11px] font-semibold shrink-0" style="color:${isSelected ? accent : '#191308'}">${VENUE_NAMES[venue.key]}</span>
           <span class="text-[10px] font-mono text-gray-400 shrink-0">${VENUE_KIND[venue.key]}</span>
-          ${usingMark ? `<span class="text-[9px] text-gray-400 italic shrink-0">mark</span>` : ''}
+          ${usingMark ? `<span class="text-[9px] text-gray-400 italic shrink-0">AMM</span>` : ''}
           <span class="flex-1"></span>
           <span class="text-[10px] font-semibold tabular-nums shrink-0" style="color:${isSelected ? accent : '#191308'}">${fmt(rowTotal)}</span>
           ${isSelected ? `<span class="text-[9px] font-bold tracking-wide ml-1 shrink-0" style="color:${accent}">SELECTED</span>` : ''}`;
