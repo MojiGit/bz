@@ -640,8 +640,10 @@ function renderQuoteCards() {
     const posClass = isBuy ? 'text-[#00C96B]' : 'text-[#FF6B6B]';
     const posLabel = isBuy ? 'BUY' : 'SELL';
     const name     = inst.asset === 'opt' ? fmtOptName(selQ) : (selQ?.name ?? 'PERP');
-    const execPrice = selQ ? (isBuy ? (selQ.ask > 0 ? selQ.ask : selQ.mark) : (selQ.bid > 0 ? selQ.bid : selQ.mark)) : null;
-    const total     = execPrice != null ? execPrice * inst.size : null;
+    const selExecSide  = selQ ? (isBuy ? selQ.ask : selQ.bid) : null;
+    const selUsingMark = selQ && !(selExecSide > 0);
+    const execPrice    = selQ ? (selUsingMark ? selQ.mark : selExecSide) : null;
+    const total        = execPrice != null ? execPrice * inst.size : null;
     const selColor = VENUE_COLORS[selKey] ?? '#888';
     const selName  = VENUE_NAMES[selKey]  ?? '—';
     const isOpen   = openCards.has(inst.id);
@@ -654,7 +656,7 @@ function renderQuoteCards() {
         <span class="text-[11px] font-semibold text-[#191308] flex-1 min-w-0 truncate">${name}</span>
         <span class="text-[10px] text-gray-400 shrink-0">×${inst.size}</span>
         <span class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0">
-          <span class="inline-block w-1.5 h-1.5 rounded-full" style="background:${selColor}"></span>${selName}
+          <span class="inline-block w-1.5 h-1.5 rounded-full" style="background:${selColor}"></span>${selName}${selUsingMark ? ' <span class="text-gray-400 italic">mark</span>' : ''}
         </span>
         <span class="text-[10px] font-semibold tabular-nums text-[#191308] shrink-0">${fmt(total)}</span>
         <span class="quote-card-chevron text-[9px] text-gray-400 shrink-0"
@@ -673,8 +675,10 @@ function renderQuoteCards() {
       const accent   = VENUE_COLORS[venue.key];
 
       if (venue.valid) {
-        const vExecPrice = isBuy ? (venue.q.ask > 0 ? venue.q.ask : venue.q.mark) : (venue.q.bid > 0 ? venue.q.bid : venue.q.mark);
-        const rowTotal = vExecPrice * inst.size;
+        const execSide   = isBuy ? venue.q.ask : venue.q.bid;
+        const usingMark  = !(execSide > 0);
+        const vExecPrice = usingMark ? venue.q.mark : execSide;
+        const rowTotal   = vExecPrice * inst.size;
         row.className = 'flex items-center gap-2 px-2 py-1.5 cursor-pointer rounded-md mx-1 my-0.5 transition-colors';
         row.style.cssText = isSelected
           ? `border: 1.5px solid ${accent}; background: ${accent}18;`
@@ -683,6 +687,7 @@ function renderQuoteCards() {
           <span class="inline-block w-1.5 h-1.5 rounded-full shrink-0" style="background:${accent}"></span>
           <span class="text-[11px] font-semibold shrink-0" style="color:${isSelected ? accent : '#191308'}">${VENUE_NAMES[venue.key]}</span>
           <span class="text-[10px] font-mono text-gray-400 shrink-0">${VENUE_KIND[venue.key]}</span>
+          ${usingMark ? `<span class="text-[9px] text-gray-400 italic shrink-0">mark</span>` : ''}
           <span class="flex-1"></span>
           <span class="text-[10px] font-semibold tabular-nums shrink-0" style="color:${isSelected ? accent : '#191308'}">${fmt(rowTotal)}</span>
           ${isSelected ? `<span class="text-[9px] font-bold tracking-wide ml-1 shrink-0" style="color:${accent}">SELECTED</span>` : ''}`;
