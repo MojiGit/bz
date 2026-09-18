@@ -167,9 +167,9 @@
                 </div>
 
                 <!-- STATE 2 — Quoting block (hidden until quote mode is entered) -->
-                <div id="builder-quoting-block" class="hidden flex-1 flex flex-col min-h-0 overflow-y-auto no-scrollbar">
+                <div id="builder-quoting-block" class="hidden flex-1 flex flex-col min-h-0">
 
-                    <!-- Summary strip: strategy info + count + EDIT -->
+                    <!-- Summary strip: strategy info + count + EDIT (fixed top) -->
                     <div class="flex-none flex items-center justify-between gap-2 px-2 py-1.5 bg-gray-50 border-b border-[#D8DDEF]">
                         <div class="flex items-center gap-2 min-w-0 flex-wrap">
                             <div id="quote-strip-title" class="flex items-center gap-2 min-w-0"></div>
@@ -178,18 +178,21 @@
                         <button id="edit-from-quote" class="text-[11px] font-bold uppercase tracking-wide text-[#191308] hover:text-[#00E083] shrink-0 px-1">Edit</button>
                     </div>
 
-                    <!-- Net total bar (rendered by builder.js when in quote mode) -->
-                    <div id="quote-net-total" class="hidden flex-none flex items-center justify-between gap-2 px-3 py-2 border-b border-[#D8DDEF]"></div>
-
-                    <!-- Quotes section label + refresh + timestamp -->
-                    <div class="flex-none flex items-center justify-between px-2 pt-2 pb-1">
-                        <span class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Quotes</span>
-                        <div class="flex items-center gap-1.5">
-                            <span id="quote-timestamp" class="text-[10px] font-mono text-gray-400"></span>
-                            <button id="refresh-quote" class="text-[13px] font-bold text-gray-400 hover:text-[#00E083] leading-none" title="Refresh quotes">↻</button>
+                    <!-- Scrollable cards area -->
+                    <div class="flex-1 min-h-0 overflow-y-auto no-scrollbar">
+                        <!-- Quotes section label + refresh + timestamp -->
+                        <div class="flex items-center justify-between px-2 pt-2 pb-1">
+                            <span class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Quotes</span>
+                            <div class="flex items-center gap-1.5">
+                                <span id="quote-timestamp" class="text-[10px] font-mono text-gray-400"></span>
+                                <button id="refresh-quote" class="text-[13px] font-bold text-gray-400 hover:text-[#00E083] leading-none" title="Refresh quotes">↻</button>
+                            </div>
                         </div>
+                        <div id="quote-results" class="flex flex-col gap-2 px-2 pb-2"></div>
                     </div>
-                    <div id="quote-results" class="flex flex-col gap-2 px-2 pb-2"></div>
+
+                    <!-- Strategy summary (fixed bottom, rendered by builder.js) -->
+                    <div id="quote-summary" class="hidden flex-none border-t border-[#D8DDEF] px-3 py-2 flex flex-col gap-1"></div>
 
                 </div>
 

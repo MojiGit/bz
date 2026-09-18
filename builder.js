@@ -125,8 +125,8 @@ export function exitBuilder(){
     quotesByLeg = {};
     venueQuotes = {};
     openCards   = new Set();
-    netTotalBar.classList.add('hidden');
-    netTotalBar.innerHTML = '';
+    summaryEl.classList.add('hidden');
+    summaryEl.innerHTML = '';
     editingBlock.classList.remove('hidden');
     quotingBlock.classList.add('hidden');
 }
@@ -470,7 +470,7 @@ addPerpBtn.addEventListener('click', () => {
 // Quote button and results panel (DOM refs; both live inside their respective blocks)
 const quoteBtn        = document.getElementById('get-quote');
 const quotePanel      = document.getElementById('quote-results');
-const netTotalBar     = document.getElementById('quote-net-total');
+const summaryEl       = document.getElementById('quote-summary');
 const quoteTimestamp  = document.getElementById('quote-timestamp');
 const refreshQuoteBtn = document.getElementById('refresh-quote');
 
@@ -533,31 +533,91 @@ export function computeNetTotal(instruments, quotesByLegMap) {
   return { net, debit, credit, quoted, missing, isCredit: net >= 0 };
 }
 
-// Render the net debit/credit bar from the currently resolved quotes.
-function renderNetTotal() {
-  const fmtTotal = n =>
+// Render strategy summary (net + max profit/loss + breakevens) at the bottom of the quoting panel.
+function renderSummary() {
+  const fmt = n =>
     `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
   const { net, quoted, missing, isCredit } = computeNetTotal(customInstruments, quotesByLeg);
 
   if (quoted === 0) {
-    netTotalBar.classList.add('hidden');
+    summaryEl.classList.add('hidden');
     return;
   }
 
-  const color  = isCredit ? '#00C96B' : '#FF6B6B';
-  const label  = isCredit ? 'NET CREDIT' : 'NET DEBIT';
-  const note   = missing > 0
-    ? `<span class="text-[10px] text-gray-400 italic">${missing} leg${missing > 1 ? 's' : ''} missing</span>`
-    : `<span class="text-[10px] text-gray-400">all legs quoted</span>`;
+  // Build PnL curves from quoted legs using the same strategy engine as the chart.
+  const curves = [];
+  for (const inst of customInstruments) {
+    const q = quotesByLeg[inst.id];
+    if (!q || q.error || !q.mark) continue;
+    if (inst.asset === 'opt') {
+      curves.push(Strategies.calculateOptionPNL(
+        inst.type, inst.strike, inst.size, inst.position,
+        undefined, undefined, null, q.mark,
+      ));
+    } else if (inst.asset === 'perp') {
+      curves.push(Strategies.calculatePerpPNL(q.mark, inst.size, inst.leverage ?? 1, inst.position));
+    }
+  }
 
-  netTotalBar.innerHTML = `
-    <div class="flex items-center gap-2">
-      <span class="text-[10px] font-bold uppercase tracking-wide" style="color:${color}">${label}</span>
-      ${note}
+  let maxProfitHtml = '';
+  let maxLossHtml   = '';
+  let breakevenHtml = '';
+
+  if (curves.length) {
+    const combined   = Strategies.combinePNLCurves(curves);
+    const pnlValues  = combined.map(p => p.pnl);
+    const maxProfit  = Math.max(...pnlValues);
+    const maxLoss    = Math.min(...pnlValues);
+    const breakevens = Strategies.findBreakevenPoints(combined);
+    const n          = pnlValues.length;
+
+    const isMaxProfitUncapped =
+      (pnlValues[n - 1] === maxProfit && pnlValues[n - 1] > pnlValues[n - 2]) ||
+      (pnlValues[0]     === maxProfit && pnlValues[0]     > pnlValues[1]);
+    const isMaxLossUncapped =
+      (pnlValues[n - 1] === maxLoss && pnlValues[n - 1] < pnlValues[n - 2]) ||
+      (pnlValues[0]     === maxLoss && pnlValues[0]     < pnlValues[1]);
+
+    const mpVal  = isMaxProfitUncapped ? 'Uncapped' : fmt(maxProfit);
+    const mlVal  = isMaxLossUncapped   ? 'Uncapped' : fmt(Math.abs(maxLoss));
+    const bkVals = breakevens.length
+      ? breakevens.map(b => `$${Number(b).toLocaleString('en-US')}`).join(' · ')
+      : '—';
+
+    maxProfitHtml = `
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Max Profit</span>
+        <span class="text-[12px] font-bold tabular-nums text-[#00C96B]">${mpVal}</span>
+      </div>`;
+    maxLossHtml = `
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Max Loss</span>
+        <span class="text-[12px] font-bold tabular-nums text-[#FF6B6B]">${mlVal}</span>
+      </div>`;
+    breakevenHtml = `
+      <div class="flex items-center justify-between gap-2">
+        <span class="text-[10px] font-semibold uppercase tracking-wide text-gray-400 shrink-0">Breakeven${breakevens.length > 1 ? 's' : ''}</span>
+        <span class="text-[10px] font-mono tabular-nums text-[#191308] text-right">${bkVals}</span>
+      </div>`;
+  }
+
+  const netColor = isCredit ? '#00C96B' : '#FF6B6B';
+  const netLabel = isCredit ? 'NET CREDIT' : 'NET DEBIT';
+  const note     = missing > 0
+    ? `<span class="text-[10px] text-gray-400 italic">${missing} leg${missing > 1 ? 's' : ''} missing</span>`
+    : '';
+
+  summaryEl.innerHTML = `
+    <div class="flex items-center justify-between gap-2 pb-1 border-b border-[#D8DDEF]">
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-bold uppercase tracking-wide" style="color:${netColor}">${netLabel}</span>
+        ${note}
+      </div>
+      <span class="text-[15px] font-bold tabular-nums" style="color:${netColor}">${fmt(Math.abs(net))}</span>
     </div>
-    <span class="text-[15px] font-bold tabular-nums" style="color:${color}">${fmtTotal(Math.abs(net))}</span>`;
-  netTotalBar.classList.remove('hidden');
+    ${maxProfitHtml}${maxLossHtml}${breakevenHtml}`;
+  summaryEl.classList.remove('hidden');
 }
 
 // Render expandable quote cards into #quote-results, reading from venueQuotes module state.
@@ -574,7 +634,7 @@ function renderQuoteCards() {
     return `${(q.type ?? '').toUpperCase()} · $${Number(q.strike).toLocaleString('en-US')} · ${expLabel}`.trim();
   }
 
-  renderNetTotal();
+  renderSummary();
   quotePanel.innerHTML = '';
 
   customInstruments.forEach(inst => {
@@ -761,8 +821,8 @@ function exitQuoteMode() {
   quotesByLeg = {};
   venueQuotes = {};
   openCards   = new Set();
-  netTotalBar.classList.add('hidden');
-  netTotalBar.innerHTML = '';
+  summaryEl.classList.add('hidden');
+  summaryEl.innerHTML = '';
   if (quoteTimestamp) quoteTimestamp.textContent = '';
 
   quotingBlock.classList.add('hidden');
