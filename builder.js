@@ -550,13 +550,20 @@ function renderSummary() {
   for (const inst of customInstruments) {
     const q = quotesByLeg[inst.id];
     if (!q || q.error || !q.mark) continue;
+    // Use execution price (same model as net total): BUY pays ask, SELL receives bid.
+    // Mark is only a fallback when that side has no market. This keeps max profit
+    // consistent with the net credit shown: for a short straddle the peak of the
+    // combined PnL curve equals exactly the sum of the two bids received.
+    const execPx = inst.position === 'long'
+      ? (q.ask > 0 ? q.ask : q.mark)
+      : (q.bid > 0 ? q.bid : q.mark);
     if (inst.asset === 'opt') {
       curves.push(Strategies.calculateOptionPNL(
         inst.type, inst.strike, inst.size, inst.position,
-        undefined, undefined, null, q.mark,
+        undefined, undefined, null, execPx,
       ));
     } else if (inst.asset === 'perp') {
-      curves.push(Strategies.calculatePerpPNL(q.mark, inst.size, inst.leverage ?? 1, inst.position));
+      curves.push(Strategies.calculatePerpPNL(execPx, inst.size, inst.leverage ?? 1, inst.position));
     }
   }
 
